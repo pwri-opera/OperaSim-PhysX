@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<robot name="ic120" xmlns:xacro="http://ros.org/wiki/xacro" >
+  <xacro:property name="PI" value="3.1415926535" />
+  <xacro:property name="temp_mass" value="1" />
+  <xacro:property name="base_mass" value="1" />
+  <xacro:property name="model_offset_x" value="3.1" />
+  <xacro:property name="model_offset_y" value="-1.5" />
+  <!-- <xacro:property name="model_offset_x" value="-1.5" />
+  <xacro:property name="model_offset_y" value="-3.1" /> -->
+
+
+  <link name="base_link"/>
+
+  <link name="track_frame_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://ic120_model/mesh/track_frame.stl" />
+      </geometry>
+      <origin rpy="0 0 ${PI/2}" xyz="${model_offset_x} ${model_offset_y} 0"/>
+      <material name="Gray">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${base_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="track_frame_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child  link="track_frame_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="track_belt_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://ic120_model/mesh/track_belt.stl" />
+      </geometry>
+      <origin rpy="0 0 ${PI/2}" xyz="${model_offset_x} ${model_offset_y} 0"/>
+      <material name="Black">
+        <color rgba="0 0 0 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${base_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="track_belt_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="track_frame_link"/>
+    <child  link="track_belt_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="upper_frame_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://ic120_model/mesh/upper_frame.stl" />
+      </geometry>
+      <origin rpy="0 0 ${PI/2}" xyz="${model_offset_x} ${model_offset_y} 0"/>
+      <material name="Teal">
+        <color rgba="0 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${base_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="upper_frame_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="track_frame_link"/>
+    <child  link="upper_frame_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="cabin_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://ic120_model/mesh/cabin.stl" />
+      </geometry>
+      <origin rpy="0 0 ${PI/2}" xyz="${model_offset_x} ${model_offset_y} 0"/>
+      <material name="Black">
+        <color rgba="0 0 0 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${base_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="cabin_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="track_frame_link"/>
+    <child  link="cabin_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="cabin_window_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://ic120_model/mesh/cabin_window.stl" />
+      </geometry>
+      <origin rpy="0 0 ${PI/2}" xyz="${model_offset_x} ${model_offset_y} 0"/>
+      <material name="Gray">
+        <color rgba="0.7 0.7 0.7 0.2"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${base_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="cabin_window_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="track_frame_link"/>
+    <child  link="cabin_window_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="vessel_pin_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://ic120_model/mesh/vessel.stl" />
+      </geometry>
+      <origin rpy="0 0 ${PI/2}" xyz="${model_offset_x+2.3} ${model_offset_y} -1.55"/>
+      <material name="Teal">
+        <color rgba="0 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="1.0e-03" />
+      <inertia ixx="1.0e-03" ixy="0.0" ixz="0.0"
+               iyy="1.0e-03" iyz="0.0"
+               izz="1.0e-03" />
+    </inertial>
+  </link>
+  <joint name="vessel_pin_joint" type="revolute">
+    <origin xyz="-2.30 0 1.55" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child  link="vessel_pin_link"/>
+    <axis xyz="0 1 0" />
+    <limit effort="1" lower="-3.14" upper="0" velocity="0.5"/>
+  </joint>
+
+  <link name="vessel_link"/>
+  <joint name="vessel_joint" type="fixed">
+  <origin xyz="-1.6 0 1.5" rpy="0 0 0"/>
+    <parent link="track_frame_link"/>
+    <child  link="vessel_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+</robot>
