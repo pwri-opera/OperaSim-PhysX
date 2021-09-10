@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 12127169}
   m_Layer: 0
   m_Name: cabin_link
-  m_TagString: Untagged
+  m_TagString: manip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -187,7 +187,7 @@ ArticulationBody:
   m_ParentAnchorPosition: {x: 0, y: 0.19999999, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
-  m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_ComputeParentAnchor: 1
   m_ArticulationJointType: 0
   m_LinearX: 2
@@ -387,7 +387,7 @@ GameObject:
   - component: {fileID: 105939859}
   m_Layer: 0
   m_Name: left_rear_wheel_link
-  m_TagString: Untagged
+  m_TagString: wheel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1511,7 +1511,7 @@ GameObject:
   - component: {fileID: 579445595}
   m_Layer: 0
   m_Name: boom_link
-  m_TagString: Untagged
+  m_TagString: manip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2079,11 +2079,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de755eb9608519242b24f7ffc65aad35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  left_wheels:
-  - {fileID: 1547580939}
-  - {fileID: 1971555859}
-  - {fileID: 105939857}
-  right_wheels: []
+  leftWheels: []
+  rightWheels: []
+  leftUpKey: 117
+  leftDownKey: 106
+  rightUpKey: 105
+  rightDownKey: 107
 --- !u!1 &753970705
 GameObject:
   m_ObjectHideFlags: 0
@@ -2189,7 +2190,7 @@ GameObject:
   - component: {fileID: 875619686}
   m_Layer: 0
   m_Name: rotator_link
-  m_TagString: Untagged
+  m_TagString: manip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2258,7 +2259,7 @@ ArticulationBody:
   m_ParentAnchorPosition: {x: 0, y: 0.643, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
-  m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: -0.70710677}
   m_ComputeParentAnchor: 1
   m_ArticulationJointType: 2
   m_LinearX: 0
@@ -2780,7 +2781,7 @@ GameObject:
   - component: {fileID: 1125051092}
   m_Layer: 0
   m_Name: right_middle_wheel_link
-  m_TagString: Untagged
+  m_TagString: wheel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3719,7 +3720,7 @@ GameObject:
   - component: {fileID: 1240656900}
   m_Layer: 0
   m_Name: upper_link
-  m_TagString: Untagged
+  m_TagString: manip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3789,7 +3790,7 @@ ArticulationBody:
   m_ParentAnchorPosition: {x: 0, y: 0.24900001, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
-  m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_AnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_ComputeParentAnchor: 1
   m_ArticulationJointType: 0
   m_LinearX: 2
@@ -4819,7 +4820,7 @@ GameObject:
   - component: {fileID: 1490509952}
   m_Layer: 0
   m_Name: right_rear_wheel_link
-  m_TagString: Untagged
+  m_TagString: wheel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5154,7 +5155,7 @@ GameObject:
   - component: {fileID: 1547580941}
   m_Layer: 0
   m_Name: left_front_wheel_link
-  m_TagString: Untagged
+  m_TagString: wheel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5795,7 +5796,7 @@ GameObject:
   - component: {fileID: 1849876169}
   m_Layer: 0
   m_Name: right_front_wheel_link
-  m_TagString: Untagged
+  m_TagString: wheel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6222,7 +6223,7 @@ GameObject:
   - component: {fileID: 1971555861}
   m_Layer: 0
   m_Name: left_middle_wheel_link
-  m_TagString: Untagged
+  m_TagString: wheel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

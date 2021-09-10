@@ -23,7 +23,8 @@ public class DiffDriveController : MonoBehaviour
         {
             var body = left.GetComponent<ArticulationBody>();
             var drive = body.xDrive;
-            drive.stiffness = 100000;
+            body.mass = 100.0f;
+            drive.stiffness = 0;
             drive.damping = 100000;
             drive.forceLimit = 100000;
             body.xDrive = drive;
@@ -33,7 +34,8 @@ public class DiffDriveController : MonoBehaviour
         {
             var body = right.GetComponent<ArticulationBody>();
             var drive = body.xDrive;
-            drive.stiffness = 100000;
+            body.mass = 100.0f;
+            drive.stiffness = 0;
             drive.damping = 100000;
             drive.forceLimit = 100000;
             body.xDrive = drive;
