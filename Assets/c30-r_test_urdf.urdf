@@ -22,12 +22,17 @@
       <material name="grey"/>
     </visual>
     <!--<collision>
-      <origin xyz="0 0 0.0" rpy="${pi/2} 0 ${pi}"/>
       <origin xyz="0 0 0.0" rpy="1.57 0 3.141592"/>
       <geometry>
         <mesh filename="package://c30-r_description/meshes/carrier.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>-->
+    <collision>
+      <origin xyz="-0.5 0 0.22" rpy="0.0 0.0 0.0"/>
+      <geometry>
+        <box size ="3.25 1.5 0.8"/>
+      </geometry>
+    </collision>
     <inertial>
       <mass value="2429"/>
       
@@ -52,16 +57,16 @@
       <!--<origin xyz="0 0 0.0" rpy="${pi/2} 0 ${pi}"/>-->
       <origin xyz="0 0 0.0" rpy="1.57075 0 3.1415"/>
       <geometry>
-        <mesh filename="package://c30-r_description/meshes/bed.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://c30-r_description/meshes/bed_removed.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="yellow"/>
     </visual>
-    <!-- <collision>
-      <origin xyz="0 0 0.0" rpy="${pi/2} 0 ${pi}"/>
+    <collision>
+      <origin xyz="0 0 0.0" rpy="1.57075 0 3.1415"/>
       <geometry>
-        <mesh filename="package://c30-r_description/meshes/bed.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://c30-r_description/meshes/bed_removed.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-    </collision> -->
+    </collision>
     <inertial>
       <mass value="346"/> 
       <origin xyz="-1.5 0.0 0.892" rpy="0 0 0"/>
