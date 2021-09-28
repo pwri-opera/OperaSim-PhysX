@@ -28,6 +28,8 @@ public class DiffDriveController : MonoBehaviour
         ros = ROSConnection.instance;
         leftBodies = new List<ArticulationBody>();
         rightBodies = new List<ArticulationBody>();
+        twist = new TwistMsg();
+
         foreach (GameObject left in leftWheels)
         {
             var body = left.GetComponent<ArticulationBody>();
@@ -62,7 +64,8 @@ public class DiffDriveController : MonoBehaviour
         const float speed = 100.0f;
         float leftVel = 0;
         float rightVel = 0;
-        
+
+        /*
         if (Input.GetKey(leftUpKey))
         {
             leftVel = speed;
@@ -79,12 +82,11 @@ public class DiffDriveController : MonoBehaviour
         {
             rightVel = -speed;
         }
+        */
         
-        
-        /*
         rightVel = (float)(twist.linear.x + tread_half * twist.angular.z) * Mathf.Rad2Deg;
         leftVel = (float)(twist.linear.x - tread_half * twist.angular.z) * Mathf.Rad2Deg;
-        */
+
         foreach (ArticulationBody left in leftBodies)
         {
             var drive = left.xDrive;
