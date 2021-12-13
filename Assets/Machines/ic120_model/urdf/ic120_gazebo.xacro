@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<robot name="ic120" xmlns:xacro="http://ros.org/wiki/xacro" >
+  <xacro:property name="PI" value="3.1415926535" />
+  <xacro:property name="temp_mass" value="1" />
+  <xacro:property name="base_mass" value="1" />
+  <xacro:property name="model_offset_x" value="3.1" />
+  <xacro:property name="model_offset_y" value="-1.5" />
+  <!-- <xacro:property name="model_offset_x" value="-1.5" />
+  <xacro:property name="model_offset_y" value="-3.1" /> -->
+
+  <xacro:include filename="$(find ic120_model)/urdf/ic120.xacro"/>
+
+  <xacro:macro name="wheel_macro" params="parent prefix xyz">
+    <joint name="${prefix}_joint" type="continuous">
+      <origin xyz="${xyz}" rpy="${radians(-90)} 0 0"/>
+      <parent link="${parent}"/>
+      <child  link="${prefix}_link"/>
+      <axis xyz="0 0 1" />
+    </joint>
+    <transmission name="${prefix}_trans" type="SimpleTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="${prefix}_motor">
+          <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+      <joint name="${prefix}_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+    <link name="${prefix}_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="10"/>
+        <inertia ixx="5" ixy="0.0" ixz="0.0" iyy="5" iyz="0.0" izz="5"/>
+      </inertial>
+      <!-- <visual>
+        <geometry>
+          <cylinder radius="0.5" length="0.5" />
+        </geometry>
+      </visual> -->
+      <collision>
+        <geometry>
+          <cylinder radius="0.5" length="0.1" />
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}_link">
+      <!--material>Gazebo/Red</material-->
+      <mu1 value="0.7" />
+      <mu2 value="0.6" />
+      <kp value="7.5e+5" />
+      <kd value="0.001" />
+    </gazebo>
+  </xacro:macro> 
+
+
+  <!--Track(Multi Wheel) Definition-->
+  <xacro:wheel_macro prefix="left_middle_wheel"  parent="base_link" xyz="0 1 0.5"/>
+  <xacro:wheel_macro prefix="left_front1_wheel"  parent="base_link" xyz="0.5 1 0.5"/>
+  <xacro:wheel_macro prefix="left_front2_wheel"  parent="base_link" xyz="1 1 0.5"/>
+  <xacro:wheel_macro prefix="left_front3_wheel"  parent="base_link" xyz="1.5 1 0.5"/>
+  <xacro:wheel_macro prefix="left_rear1_wheel"  parent="base_link" xyz="-0.5 1 0.5"/>
+  <xacro:wheel_macro prefix="left_rear2_wheel"  parent="base_link" xyz="-1 1 0.5"/>
+  <xacro:wheel_macro prefix="left_rear3_wheel"  parent="base_link" xyz="-1.5 1 0.5"/>
+
+  <xacro:wheel_macro prefix="right_middle_wheel"  parent="base_link" xyz="0 -1 0.5"/>
+  <xacro:wheel_macro prefix="right_front1_wheel"  parent="base_link" xyz="0.5 -1 0.5"/>
+  <xacro:wheel_macro prefix="right_front2_wheel"  parent="base_link" xyz="1 -1 0.5"/>
+  <xacro:wheel_macro prefix="right_front3_wheel"  parent="base_link" xyz="1.5 -1 0.5"/>
+  <xacro:wheel_macro prefix="right_rear1_wheel"  parent="base_link" xyz="-0.5 -1 0.5"/>
+  <xacro:wheel_macro prefix="right_rear2_wheel"  parent="base_link" xyz="-1 -1 0.5"/>
+  <xacro:wheel_macro prefix="right_rear3_wheel"  parent="base_link" xyz="-1.5 -1 0.5"/>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+      <!-- <robotNamespace>/ic120</robotNamespace>
+    </plugin> -->
+  </gazebo>
+
+
+</robot>

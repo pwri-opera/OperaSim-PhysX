@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+<robot name="zx135u" xmlns:xacro="http://ros.org/wiki/xacro" >
+  <xacro:property name="PI" value="3.1415926535" />
+  <xacro:property name="base_mass" value="2." />
+  <xacro:property name="rotator_mass" value="1" />
+  <xacro:property name="upper_mass" value="1" />
+  <xacro:property name="boom_mass" value="1" />
+  <xacro:property name="arm_mass" value="1" />
+  <xacro:property name="backet_mass" value="1" />
+  <xacro:property name="is_gravity_off" value="true" />
+
+
+
+  <xacro:macro name="wheel_macro" params="parent prefix xyz">
+    <joint name="${prefix}_joint" type="continuous">
+      <origin xyz="${xyz}" rpy="${radians(-90)} 0 0"/>
+      <parent link="${parent}"/>
+      <child  link="${prefix}_link"/>
+      <axis xyz="0 0 1" />
+    </joint>
+    <transmission name="${prefix}_trans" type="SimpleTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="${prefix}_motor">
+          <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+      <joint name="${prefix}_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+    <link name="${prefix}_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.1"/>
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <cylinder radius="0.001" length="0.001" />
+        </geometry>
+        <!--material name="red"/-->
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="0.6" length="0.6" />
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}_link">
+      <!--material>Gazebo/Red</material-->
+      <mu1 value="2.5" />
+      <mu2 value="2.5" />
+      <kp value="50000" />
+      <kd value="10" />
+    </gazebo>
+  </xacro:macro> 
+
+  <!-- Inertia is calculated as slender rod in https://en.wikipedia.org/wiki/List_of_moments_of_inertia#List_of_3D_inertia_tensors -->
+  <link name="base_link"/>
+
+  <link name="track_body_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody39_rviz.stl" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="Gray">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${base_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="track_body_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child  link="track_body_link"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+
+
+
+
+  <!--Track(Temporary, Wheel) Definition-->
+  <xacro:wheel_macro prefix="left_front_wheel"  parent="track_body_link" xyz="0 1 0.6"/>
+  <xacro:wheel_macro prefix="left_middle_wheel"  parent="track_body_link" xyz="-1.5 1 0.6"/>
+  <xacro:wheel_macro prefix="left_rear_wheel"  parent="track_body_link" xyz="1.5 1 0.6"/>
+
+  <xacro:wheel_macro prefix="right_front_wheel"  parent="track_body_link" xyz="0 -1 0.6"/>
+  <xacro:wheel_macro prefix="right_middle_wheel"  parent="track_body_link" xyz="-1.5 -1 0.6"/>
+  <xacro:wheel_macro prefix="right_rear_wheel"  parent="track_body_link" xyz="1.5 -1 0.6"/>
+
+
+  <!-- Track Model and Joint Definition-->
+  <link name="track_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody38_rviz.stl" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="Black">
+        <color rgba="0.0 0.0 0.0 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${rotator_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+
+  <joint name="track_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="track_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <!-- Rotator Model and Joint Definition-->
+  <link name="rotator_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody1_rviz.stl" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="Gray">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${rotator_mass}"/>
+      <!-- inertia ixx="${(boom_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(boom_mass*4.6*4.6)/3}"/ -->
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+
+  <joint name="rotator_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="rotator_link"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0 0 0.643"/>
+    <!-- limit effort="100" lower="${-70/180*PI}" upper="${44/180*PI}" velocity="5"/-->
+  </joint>
+
+  <gazebo reference="rotator_link">
+    <turnGravityOff>${is_gravity_off}</turnGravityOff>
+  </gazebo>
+
+  <!-- upper Model and Joint Definition-->
+  <link name="upper_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody12-18_rviz.stl" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="Orange">
+        <color rgba="0.97 0.41 0.05 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${upper_mass}"/>
+      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+    </inertial>
+  </link>
+
+  <joint name="upper_joint" type="fixed">
+    <parent link="rotator_link"/>
+    <child link="upper_link"/>
+    <origin xyz="0 0 0.249"/>
+  </joint>
+
+  <!-- cabin Model and Joint Definition-->
+  <link name="cabin_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody10_rviz.stl" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="Black">
+        <color rgba="0 0 0 1.0"/>
+      </material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody2-8_rviz.stl" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="White">
+        <color rgba="1.0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="cabin_joint" type="fixed">
+    <parent link="upper_link"/>
+    <child link="cabin_link"/>
+    <origin xyz="0 0 0.2"/>
+  </joint>
+
+  <!-- boom Model and Joint Definition-->
+  <link name="boom_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody19_rviz.stl" scale="1.115 1.115 1.115"/>
+      </geometry>
+      <origin rpy="0 ${-PI/2+0.025} 0" xyz="0 0 0"/>
+      <material name="Orange">
+        <color rgba="0.97 0.41 0.05 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${boom_mass}"/>
+      <inertia ixx="${(boom_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(boom_mass*4.6*4.6)/3}"/>
+    </inertial>
+  </link>
+
+  <joint name="boom_joint" type="revolute">
+    <parent link="upper_link"/>
+    <child link="boom_link"/>
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 ${90/180*PI} 0" xyz="0.14 -0.16 0.532"/>
+    <limit effort="1" lower="${-70/180*PI}" upper="${44/180*PI}" velocity="0.5"/>
+  </joint>
+
+  <gazebo reference="boom_link">
+    <turnGravityOff>${is_gravity_off}</turnGravityOff>
+  </gazebo>
+
+  <!-- arm Model and Joint Definition-->
+  <link name="arm_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody26_rviz.stl" scale="1.17 1.17 1.17"/>
+      </geometry>
+      <origin rpy="0 ${PI/1.5-0.01} 0" xyz="-0.3 0 -0.55"/>
+      <material name="Orange">
+        <color rgba="0.97 0.41 0.05 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${arm_mass}"/>
+      <inertia ixx="${(arm_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(arm_mass*4.6*4.6)/3}"/>
+    </inertial>
+  </link>
+
+  <joint name="arm_joint" type="revolute">
+    <parent link="boom_link"/>
+    <child link="arm_link"/>
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 0 0" xyz="0 0 4.6"/>
+    <limit effort="1" lower="${30/180*PI}" upper="${152/180*PI}" velocity="0.5"/>
+  </joint>
+
+  <gazebo reference="arm_link">
+    <turnGravityOff>${is_gravity_off}</turnGravityOff>
+  </gazebo>
+
+  <!-- backet Model and Joint Definition-->
+  <link name="backet_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://excavator_model/mesh/meshbody24_rviz.stl" scale="0.99 0.99 0.99"/>
+      </geometry>
+      <origin rpy="0 ${-PI/6+0.082} 0" xyz="-0.1 0 -0.05"/>
+      <material name="Orange">
+        <color rgba="0.97 0.41 0.05 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="${backet_mass}"/>
+      <inertia ixx="${(backet_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(backet_mass*4.6*4.6)/3}"/>
+    </inertial>
+  </link>
+
+  <joint name="backet_joint" type="revolute">
+    <parent link="arm_link"/>
+    <child link="backet_link"/>
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 0 0" xyz="0 0 2.519"/>
+    <limit effort="1" lower="${-33/180*PI}" upper="${143/180*PI}" velocity="0.5"/>
+  </joint>
+
+  <!-- backet end Model and Joint Definition-->
+  <link name="backet_end_link"/>
+
+  <joint name="backet_end_joint" type="fixed">
+    <parent link="backet_link"/>
+    <child link="backet_end_link"/>
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 0 0" xyz="0 0 1.23"/>
+  </joint>
+
+
+
+  <gazebo reference="backet_link">
+    <turnGravityOff>${is_gravity_off}</turnGravityOff>
+  </gazebo>
+
+  <transmission name="rotator_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+      <joint name="rotator_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="rotator_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="boom_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+      <joint name="boom_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="boom_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="arm_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+      <joint name="arm_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="arm_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="backet_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+      <joint name="backet_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="backet_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/zx135u</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+
+</robot>

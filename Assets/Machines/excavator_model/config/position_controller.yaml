@@ -1,0 +1,22 @@
+zx135u:      
+  rotator_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: rotator_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  boom_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: boom_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  arm_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: arm_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  backet_joint_position_controller:
+    type: position_controllers/JointPositionController
+    joint: backet_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50

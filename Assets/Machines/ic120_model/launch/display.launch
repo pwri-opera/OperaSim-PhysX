@@ -1,0 +1,19 @@
+<launch>
+  <group ns="ic120">
+    <param name="tf_prefix" value="ic120_tf" />
+
+    <arg name="model" default="$(find ic120_model)/urdf/ic120.xacro"/>
+    <arg name="gui" default="true" />
+    <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+
+    <param name="/ic120/robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
+    <param name="use_gui" value="$(arg gui)"/>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node pkg="tf" type="static_transform_publisher" name="gps_static_tf" args="0 0 0 0 0 0 /ic120_tf/base_link /ic120_tf/gps_compass 30"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ic120_model)/rviz/urdf.rviz" required="true" />
+  </group>
+</launch>
