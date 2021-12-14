@@ -81,15 +81,15 @@
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0.1313 -0.8963 1.35"/>
-      <mass value="0.03"/>
+      <origin rpy="0 0 0" xyz="0.8963 0.1313 1.35"/>
+      <mass value="1"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
   <!-- bucket axis -->
   <joint name="joint1" type="revolute">
-    <origin xyz="0 3.0153 0.94605"/>
-    <axis xyz="1 0 0"/>
+    <origin xyz="-3.015332 0 0.946052"/>
+    <axis xyz="0 1 0"/>
     <parent link="link1"/>
     <child link="link2"/>
     <limit effort="30" lower="-1.1344640138" upper="0" velocity="6.159937255"/>
@@ -110,15 +110,15 @@
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0.0181 -1.978 0.773"/>
-      <mass value="0.03"/>
+      <origin rpy="0 0 0" xyz="1.978 0.0181 0.773"/>
+      <mass value="1"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
   <!-- cylinder outer axis -->
   <joint name="joint2" type="continuous">
-    <origin xyz="0 0.75792 0.73083"/>
-    <axis xyz="1 0 0"/>
+    <origin xyz="-0.75792 0 0.73083"/>
+    <axis xyz="0 1 0"/>
     <parent link="link1"/>
     <child link="link3"/>
     <mimic joint="joint1" multiplier="-0.088"/>
@@ -148,8 +148,8 @@
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0.4842 0.1667"/>
-      <mass value="0.03"/>
+      <origin rpy="0 0 0" xyz="-0.4842 0 0.1667"/>
+      <mass value="1"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
@@ -158,7 +158,7 @@
     <origin xyz="0 0 0"/>
     <parent link="link3"/>
     <child link="link4"/>
-    <axis xyz="0 1.4989 0.51788"/>
+    <axis xyz="-1.4989 0 0.51788"/>
     <limit effort="30" lower="-1" upper="1" velocity="6.159937255"/>
     <mimic joint="joint1" multiplier="-0.705178824776"/>
   </joint>
@@ -187,8 +187,8 @@
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0.8807 0.3033"/>
-      <mass value="0.03"/>
+      <origin rpy="0 0 0" xyz="-0.8807 0 0.3033"/>
+      <mass value="1"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
