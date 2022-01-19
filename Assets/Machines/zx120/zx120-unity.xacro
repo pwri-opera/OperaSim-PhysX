@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<robot name="zx120" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<xacro:property name="PI" value="3.1415926535" />
+	<xacro:property name="base_mass" value="2." />
+	<xacro:property name="rotator_mass" value="2" />
+	<xacro:property name="boom_mass" value="1" />
+	<xacro:property name="arm_mass" value="1" />
+	<xacro:property name="bucket_mass" value="1" />
+	<xacro:property name="is_gravity_off" value="true" />
+	<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+	<xacro:include filename="$(find zx120_description)/urdf/zx120.gazebo" />
+	<!-- Import Rviz colors -->
+	<!-- <xacro:include filename="$(find zx120_description)/urdf/materials.xacro" /> -->
+
+	<xacro:macro name="wheel_macro" params="parent prefix xyz">
+		<joint name="${prefix}_joint" type="continuous">
+			<origin xyz="${xyz}" rpy="${radians(-90)} 0 0" />
+			<parent link="${parent}" />
+			<child link="${prefix}_link" />
+			<axis xyz="0 0 1" />
+		</joint>
+		<transmission name="${prefix}_trans" type="SimpleTransmission">
+			<type>transmission_interface/SimpleTransmission</type>
+			<actuator name="${prefix}_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+			<joint name="${prefix}_joint">
+				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+			</joint>
+		</transmission>
+		<link name="${prefix}_link">
+			<inertial>
+				<origin xyz="0 0 0" rpy="0 0 0" />
+				<mass value="0.1" />
+				<inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+			</inertial>
+			<visual>
+				<geometry>
+					<cylinder radius="0.001" length="0.001" />
+				</geometry>
+				<!--material name="red"/-->
+			</visual>
+			<collision>
+				<geometry>
+					<cylinder radius="0.3" length="0.6" />
+				</geometry>
+			</collision>
+		</link>
+		<gazebo reference="${prefix}_link">
+			<!--material>Gazebo/Red</material-->
+			<mu1 value="2.5" />
+			<mu2 value="2.5" />
+			<kp value="50000" />
+			<kd value="10" />
+		</gazebo>
+	</xacro:macro>
+
+	<!-- Base Link -->
+	<link name="base_link">
+		<visual>
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-crawler.dae" />
+			</geometry>
+		</visual>
+
+		<!-- <collision>
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-crawler.dae"/>
+			</geometry>
+		</collision> -->
+
+		<inertial>
+			<origin xyz="-0.155869 0 0.358402" rpy="0 0 0" />
+			<mass value="${base_mass}" />
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+		</inertial>
+	</link>
+
+	<!--Track(Temporary, Wheel) Definition-->
+	<xacro:wheel_macro prefix="left_front_wheel" parent="base_link" xyz="1.5 1 0.3" />
+	<xacro:wheel_macro prefix="left_middle_wheel" parent="base_link" xyz="0 1 0.3" />
+	<xacro:wheel_macro prefix="left_rear_wheel" parent="base_link" xyz="-1.5 1 0.3" />
+
+	<xacro:wheel_macro prefix="right_front_wheel" parent="base_link" xyz="1.5 -1 0.3" />
+	<xacro:wheel_macro prefix="right_middle_wheel" parent="base_link" xyz="0 -1 0.3" />
+	<xacro:wheel_macro prefix="right_rear_wheel" parent="base_link" xyz="-1.5 -1 0.3" />
+
+	<!-- body axis -->
+	<joint name="swing_joint" type="continuous">
+		<origin xyz="0 0 0.643" />
+		<axis xyz="0 0 2" />
+		<parent link="base_link" />
+		<child link="body_link" />
+	</joint>
+
+	<link name="body_link">
+		<visual>
+			<origin xyz="0 0 0.35" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-body.dae" />
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0.35" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-body.dae" />
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="-0.501522 0 1.191169" rpy="0 0 0" />
+			<mass value="${rotator_mass}" />
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+		</inertial>
+	</link>
+
+	<!-- boom axis -->
+	<joint name="boom_joint" type="revolute">
+		<origin rpy="0 ${90/180*PI} 0" xyz="0.14 -0.16 0.781" />
+		<axis xyz="0 1 0" />
+		<parent link="body_link" />
+		<child link="boom_link" />
+		<limit lower="${radians(-70)}" upper="${radians(44)}" effort="500" velocity="6.159937255" />
+	</joint>
+
+	<link name="boom_link">
+		<visual>
+			<origin rpy="0 ${-PI/2+0.39} 0" xyz="0 0 0" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-boom.dae" />
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin rpy="0 ${-PI/2+0.39} 0" xyz="0 0 0" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-boom.dae" />
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="2.091062 0.055029 0.975556" rpy="0 0 0" />
+			<mass value="${boom_mass}" />
+			<inertia ixx="${(boom_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(boom_mass*4.6*4.6)/3}" />
+		</inertial>
+	</link>
+
+	<joint name="arm_joint" type="revolute">
+		<origin rpy="0 0 0" xyz="0 0 4.6" />
+		<axis xyz="0 1 0" />
+		<parent link="boom_link" />
+		<child link="arm_link" />
+		<limit lower="${radians(30)}" upper="${radians(152)}" effort="500" velocity="6.159937255" />
+	</joint>
+
+	<link name="arm_link">
+		<visual>
+			<origin rpy="0 ${PI+0.15} 0" xyz="0 0 0" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-arm.dae" />
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin rpy="0 ${PI+0.15} 0" xyz="0 0 0" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-arm.dae" />
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="0.305996 0.000026 -0.912806" rpy="0 0 0" />
+			<mass value="${arm_mass}" />
+			<inertia ixx="${(arm_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(arm_mass*4.6*4.6)/3}" />
+		</inertial>
+	</link>
+
+	<!-- bucket axis -->
+	<joint name="bucket_joint" type="revolute">
+		<origin rpy="0 0 0" xyz="0 0 2.519" />
+		<axis xyz="0 1 0" />
+		<parent link="arm_link" />
+		<child link="bucket_link" />
+		<limit lower="${radians(-33)}" upper="${radians(143)}" effort="500" velocity="6.159937255" />
+	</joint>
+
+	<link name="bucket_link">
+		<visual>
+			<origin rpy="0 ${PI/4} 0" xyz="0 0 0" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-bucket.dae" />
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin rpy="0 ${PI/4} 0" xyz="0 0 0" />
+			<geometry>
+				<mesh filename="package://zx120_description/meshes/zx120-bucket.dae" />
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="-0.442405 0.001740 0.247894" rpy="0 0 0" />
+			<mass value="${bucket_mass}" />
+			<inertia ixx="${(bucket_mass*4.6*4.6)/3}" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="${(bucket_mass*4.6*4.6)/3}" />
+		</inertial>
+	</link>
+
+	<link name="bucket_end_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.001 0.001 0.001" />
+			</geometry>
+			<material name="red" />
+		</visual>
+		<inertial>
+			<origin xyz="0 0 0" />
+			<mass value="1.0e-03" />
+			<inertia ixx="1.0e-03" ixy="0.0" ixz="0.0" iyy="1.0e-03" iyz="0.0" izz="1.0e-03" />
+		</inertial>
+	</link>
+
+	<joint name="bucket_end_joint" type="revolute">
+		<parent link="bucket_link" />
+		<child link="bucket_end_link" />
+		<axis xyz="1 0 0" />
+		<origin rpy="0 ${radians(50)} 0" xyz="0 0 1.23" />
+		<limit effort="1" lower="-3.14" upper="3.14" velocity="0.5" />
+	</joint>
+
+	<transmission name="tran1">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="swing_joint">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor1">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="tran2">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="boom_joint">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor2">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="tran3">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="arm_joint">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor3">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="tran4">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="bucket_joint">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="motor4">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="dummy_trans1">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="bucket_end_joint">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="dummy_motor1">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+</robot>

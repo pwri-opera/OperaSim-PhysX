@@ -7,129 +7,96 @@
   <!-- ros_control plugin -->
   <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-      <robotNamespace>/zx120</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <!-- <robotNamespace>/zx120</robotNamespace>
+			<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType> -->
     </plugin>
   </gazebo>
-  <gazebo reference="link1">
+  <gazebo reference="track_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link2">
+  <gazebo reference="body_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link3">
+  <gazebo reference="boom_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link4">
+  <gazebo reference="arm_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link5">
+  <gazebo reference="bucket_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link5">
+  <gazebo reference="bucket_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link6">
+  <gazebo reference="boom_cylinder_head_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link7">
+  <gazebo reference="boom_cylinder_rod_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link8">
+  <gazebo reference="arm_cylinder_head_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link9">
+  <gazebo reference="arm_cylinder_rod_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link10">
+  <gazebo reference="bucket_cylinder_head_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link11">
+  <gazebo reference="bucket_cylinder_rod_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link12">
+  <gazebo reference="bucket_b_link">
     <material>zx120texture</material>
   </gazebo>
-  <gazebo reference="link13">
+  <gazebo reference="bucket_a_link">
     <material>zx120texture</material>
   </gazebo>
-  <!--material name="black">
-		<color rgba="0.0 0.0 0.0 1.0"/>
-	</material>
-
-	<material name="blue">
-		<color rgba="0.0 0.0 0.8 1.0"/>
-	</material>
-
-	<material name="green">
-		<color rgba="0.0 0.8 0.0 1.0"/>
-	</material>
-
-	<material name="grey">
-		<color rgba="0.2 0.2 0.2 1.0"/>
-	</material>
-
-	<material name="orange">
-		<color rgba="${255/255} ${108/255} ${10/255} 1.0"/>
-	</material>
-
-	<material name="brown">
-		<color rgba="${222/255} ${207/255} ${195/255} 1.0"/>
-	</material>
-
-	<material name="red">
-		<color rgba="0.8 0.0 0.0 1.0"/>
-	</material>
-
-	<material name="white">
-		<color rgba="1.0 1.0 1.0 1.0"/>
-	</material>
-
-	<material name="model01color">
-		<color rgba="0.0 1.0 1.0 0.7"/>
-	</material-->
-  <!-- Used for fixing robot to Gazebo 'base_link' -->
-  <link name="world"/>
-  <joint name="fixed" type="fixed">
-    <parent link="world"/>
-    <child link="link1"/>
+  <!-- Import Rviz colors -->
+  <!-- <xacro:include filename="$(find zx120_description)/urdf/materials.xacro" /> -->
+  <!-- Base Link -->
+  <link name="base_link"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="track_link"/>
   </joint>
   <!-- Base Link -->
-  <link name="link1">
+  <link name="track_link">
     <visual>
       <geometry>
-        <mesh filename="package://meshes/zx120-crawler.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-crawler.dae"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://meshes/zx120-crawler.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-crawler.dae"/>
       </geometry>
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.155869 0 0.358402"/>
-      <mass value="0.03"/>
+      <mass value="10"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
   <!-- body axis -->
-  <joint name="joint1" type="continuous">
+  <joint name="swing_joint" type="continuous">
     <origin xyz="0 0 1"/>
     <axis xyz="0 0 2"/>
-    <parent link="link1"/>
-    <child link="link2"/>
+    <parent link="track_link"/>
+    <child link="body_link"/>
   </joint>
-  <link name="link2">
+  <link name="body_link">
     <visual>
       <origin xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-body.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-body.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-body.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-body.dae"/>
       </geometry>
     </collision>
     <inertial>
@@ -139,135 +106,24 @@
     </inertial>
   </link>
   <!-- boom axis -->
-  <joint name="joint2" type="revolute">
-    <origin xyz="0.15433 -0.16443 0.31327"/>
+  <joint name="boom_joint" type="revolute">
+    <origin rpy="0 1.57079632679 0" xyz="0.14 -0.16443 0.424"/>
     <axis xyz="0 1 0"/>
-    <parent link="link2"/>
-    <child link="link3"/>
-    <limit effort="500" lower="-1.2217304764" upper="0.523598775598" velocity="6.159937255"/>
+    <parent link="body_link"/>
+    <child link="boom_link"/>
+    <limit effort="500" lower="-1.2217304764" upper="0.767944870878" velocity="6.159937255"/>
   </joint>
-  <joint name="joint5" type="continuous">
-    <origin xyz="0.556105 -0.164428 0.032962"/>
-    <axis xyz="0 1 0"/>
-    <parent link="link2"/>
-    <child link="link6"/>
-    <mimic joint="joint2" multiplier="0.857142857143"/>
-  </joint>
-  <gazebo>
-    <plugin filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so" name="joint5_mimic_joint_plugin">
-      <joint>joint2</joint>
-      <mimicJoint>joint5</mimicJoint>
-      <multiplier>0.857142857143</multiplier>
-      <offset>0</offset>
-      <robotNamespace>/zx120</robotNamespace>
-    </plugin>
-  </gazebo>
-  <joint name="joint6" type="prismatic">
-    <origin xyz="0 0 0"/>
-    <axis xyz="0.802033 0 1.847495"/>
-    <parent link="link6"/>
-    <child link="link7"/>
-    <limit effort="500" lower="-2" upper="2" velocity="6.159937255"/>
-    <mimic joint="joint2" multiplier="-0.319672131148"/>
-  </joint>
-  <gazebo>
-    <plugin filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so" name="joint6_mimic_joint_plugin">
-      <joint>joint2</joint>
-      <mimicJoint>joint6</mimicJoint>
-      <multiplier>-0.319672131148</multiplier>
-      <offset>0</offset>
-      <robotNamespace>/zx120</robotNamespace>
-    </plugin>
-  </gazebo>
-  <joint name="joint7" type="fixed">
-    <origin xyz="2.053030 0 1.991444"/>
-    <axis xyz="0 1 0"/>
-    <parent link="link3"/>
-    <child link="link8"/>
-  </joint>
-  <joint name="joint8" type="prismatic">
-    <origin xyz="0 0 0"/>
-    <axis xyz="2.36471 0 0"/>
-    <parent link="link8"/>
-    <child link="link9"/>
-    <limit effort="500" lower="-2" upper="2" velocity="6.159937255"/>
-    <mimic joint="joint3" multiplier="0.458366236105"/>
-  </joint>
-  <gazebo>
-    <plugin filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so" name="joint8_mimic_joint_plugin">
-      <joint>joint3</joint>
-      <mimicJoint>joint8</mimicJoint>
-      <multiplier>0.458366236105</multiplier>
-      <offset>0</offset>
-      <robotNamespace>/zx120</robotNamespace>
-    </plugin>
-  </gazebo>
-  <joint name="joint9" type="fixed">
-    <origin xyz="0.605825 0 -0.364793"/>
-    <axis xyz="0 1 0"/>
-    <parent link="link4"/>
-    <child link="link10"/>
-  </joint>
-  <joint name="joint10" type="prismatic">
-    <origin xyz="0 0 0"/>
-    <axis xyz="-0.021529 0 -2.207579"/>
-    <parent link="link10"/>
-    <child link="link11"/>
-    <limit effort="500" lower="-2" upper="2" velocity="6.159937255"/>
-    <mimic joint="joint4" multiplier="0.322580645161"/>
-  </joint>
-  <gazebo>
-    <plugin filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so" name="joint10_mimic_joint_plugin">
-      <joint>joint4</joint>
-      <mimicJoint>joint10</mimicJoint>
-      <multiplier>0.322580645161</multiplier>
-      <offset>0</offset>
-      <robotNamespace>/zx120</robotNamespace>
-    </plugin>
-  </gazebo>
-  <joint name="joint11" type="continuous">
-    <origin xyz="0.330489 0 -2.150643"/>
-    <axis xyz="0 1 0"/>
-    <parent link="link4"/>
-    <child link="link12"/>
-    <mimic joint="joint4" multiplier="0.75"/>
-  </joint>
-  <gazebo>
-    <plugin filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so" name="joint11_mimic_joint_plugin">
-      <joint>joint4</joint>
-      <mimicJoint>joint11</mimicJoint>
-      <multiplier>0.75</multiplier>
-      <offset>0</offset>
-      <robotNamespace>/zx120</robotNamespace>
-    </plugin>
-  </gazebo>
-  <joint name="joint12" type="continuous">
-    <origin xyz="-0.182145 0 -0.315076"/>
-    <axis xyz="0 1 0"/>
-    <parent link="link5"/>
-    <child link="link13"/>
-    <mimic joint="joint4" multiplier="-0.575"/>
-  </joint>
-  <gazebo>
-    <plugin filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so" name="joint12_mimic_joint_plugin">
-      <joint>joint4</joint>
-      <mimicJoint>joint12</mimicJoint>
-      <multiplier>-0.575</multiplier>
-      <offset>0</offset>
-      <robotNamespace>/zx120</robotNamespace>
-    </plugin>
-  </gazebo>
-  <link name="link3">
+  <link name="boom_link">
     <visual>
-      <origin xyz="0 0 0"/>
+      <origin rpy="0 -1.185 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-boom.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-boom.dae"/>
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0"/>
+      <origin rpy="0 -1.185 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-boom.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-boom.dae"/>
       </geometry>
     </collision>
     <inertial>
@@ -276,24 +132,26 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
-  <joint name="joint3" type="revolute">
-    <origin xyz="4.2241 0 1.7311"/>
+  <joint name="arm_joint" type="revolute">
+    <!-- <origin xyz="3.91812248 0 2.410044861"/> -->
+    <origin xyz="0 0 4.6"/>
     <axis xyz="0 1 0"/>
-    <parent link="link3"/>
-    <child link="link4"/>
-    <limit effort="500" lower="-1.2217304764" upper="0.872664625997" velocity="6.159937255"/>
+    <parent link="boom_link"/>
+    <child link="arm_link"/>
+    <!-- <limit lower="-1.279421828" upper="0.849879859" effort="500" velocity="6.159937255"/> -->
+    <limit effort="1" lower="0.523598775598" upper="2.65290046303" velocity="0.5"/>
   </joint>
-  <link name="link4">
+  <link name="arm_link">
     <visual>
-      <origin xyz="0 0 0"/>
+      <origin rpy="0 3.28 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-arm.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-arm.dae"/>
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0"/>
+      <origin rpy="0 3.28 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-arm.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-arm.dae"/>
       </geometry>
     </collision>
     <inertial>
@@ -303,24 +161,26 @@
     </inertial>
   </link>
   <!-- bucket axis -->
-  <joint name="joint4" type="revolute">
-    <origin xyz="0.35383 0 -2.4712"/>
+  <joint name="bucket_joint" type="revolute">
+    <!-- <origin xyz="0.790541414 0 -2.391736874"/> -->
+    <origin xyz="0 0 2.519"/>
     <axis xyz="0 1 0"/>
-    <parent link="link4"/>
-    <child link="link5"/>
-    <limit effort="500" lower="-2.79252680319" upper="0" velocity="6.159937255"/>
+    <parent link="arm_link"/>
+    <child link="bucket_link"/>
+    <!-- <limit lower="-1.593223372" upper="1.478556111" effort="500" velocity="6.159937255"/> -->
+    <limit effort="1" lower="-0.575958653158" upper="2.49582083035" velocity="0.5"/>
   </joint>
-  <link name="link5">
+  <link name="bucket_link">
     <visual>
-      <origin xyz="0 0 0"/>
+      <origin rpy="0 0.75 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-bucket.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-bucket.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-bucket.dae"/>
+        <mesh filename="package://zx120_description/meshes/zx120-bucket.dae"/>
       </geometry>
     </collision>
     <inertial>
@@ -329,197 +189,78 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
-  <link name="link6">
+  <link name="bucket_end_link">
     <visual>
-      <origin xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/zx120-boom-cyl1.dae"/>
+        <box size="0.001 0.001 0.001"/>
       </geometry>
+      <material name="red"/>
     </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-boom-cyl1.dae"/>
-      </geometry>
-    </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0.241225 0.000050 0.577034"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0 0 0"/>
+      <mass value="1.0e-03"/>
+      <inertia ixx="1.0e-03" ixy="0.0" ixz="0.0" iyy="1.0e-03" iyz="0.0" izz="1.0e-03"/>
     </inertial>
   </link>
-  <link name="link7">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-boom-cyl2.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-boom-cyl2.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0.558044 0.000050 1.286359"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-  <link name="link8">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-arm-cyl1.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-arm-cyl1.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0.696672 0.000026 -0.000065"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-  <link name="link9">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-arm-cyl2.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-arm-cyl2.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="1.686736 -0.001027 -0.000662"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-  <link name="link10">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-bucket-cyl1.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-bucket-cyl1.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="-0.010342 0.000321 -0.639293"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-  <link name="link11">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-bucket-cyl2.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-bucket-cyl2.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="-0.015456 0.000321 -1.701647"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-  <link name="link12">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-p1.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-p1.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0.126203 0.000026 -0.212651"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-  <link name="link13">
-    <visual>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-p2.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="package://meshes/zx120-p2.dae"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0.211197 0.000576 0.111406"/>
-      <mass value="0.03"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
+  <joint name="bucket_end_joint" type="revolute">
+    <parent link="bucket_link"/>
+    <child link="bucket_end_link"/>
+    <axis xyz="1 0 0"/>
+    <!-- <origin rpy="0 0 0" xyz="0 0 1.23"/> -->
+    <!-- <origin rpy="0 0 0" xyz="-0.723 0 0.995"/> -->
+    <!-- <origin rpy="0 0 0" xyz="-0.85 0 0.889"/> -->
+    <origin rpy="0 0.872664625997 0" xyz="0 0 1.23"/>
+    <limit effort="1" lower="-3.14" upper="3.14" velocity="0.5"/>
+  </joint>
   <transmission name="tran1">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="joint1">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <joint name="swing_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor1">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
   <transmission name="tran2">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="joint2">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <joint name="boom_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor2">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
   <transmission name="tran3">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="joint3">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <joint name="arm_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor3">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
   <transmission name="tran4">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="joint4">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <joint name="bucket_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor4">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="dummy_trans1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="bucket_end_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="dummy_motor1">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
 </robot>
-
