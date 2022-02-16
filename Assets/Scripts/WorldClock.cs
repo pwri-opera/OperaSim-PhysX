@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+ using System.Collections;
+ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Rosgraph;
@@ -24,7 +24,7 @@ public class WorldClock : MonoBehaviour
     {
         float sim_time = Time.time;
         uint secs = (uint)sim_time;
-        uint nsecs = (uint)((sim_time % 1) * 1e6);
+        uint nsecs = (uint)((sim_time % 1) * 1e9);
         message.clock.sec = secs;
         message.clock.nanosec = nsecs;
         ros.Send(topicName, message);

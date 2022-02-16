@@ -13,6 +13,12 @@ public class JointStatePublisher : MonoBehaviour
     private List<ArticulationBody> joints;
     private List<string> jointNames;
 
+    // Publish the cube's position and rotation every N seconds
+    public float publishMessageInterval = 0.5f;
+
+    // Used to determine how much time has elapsed since the last message was published
+    private float timeElapsed;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,24 +41,30 @@ public class JointStatePublisher : MonoBehaviour
         ros.RegisterPublisher<JointStateMsg>(topicName);
     }
 
-    // Update is called once per frame
+    // Update is called once per constant rate
     void FixedUpdate()
     {
-        float sim_time = Time.time;
-        uint secs = (uint)sim_time;
-        uint nsecs = (uint)((sim_time % 1) * 1e6);
-        message.header.frame_id = "world";
-        message.header.stamp.sec = secs;
-        message.header.stamp.nanosec = nsecs;
-        message.position = new double[joints.Count];
-        message.velocity = new double[joints.Count];
-        message.effort = new double[joints.Count];
-        for (int i = 0; i < joints.Count; i++)
+        timeElapsed += Time.deltaTime;
+
+        if (timeElapsed >= publishMessageInterval)
         {
-            message.position[i] = joints[i].jointPosition[0];
-            message.velocity[i] = joints[i].jointVelocity[0];
-            message.effort[i] = joints[i].jointForce[0];
+            float sim_time = Time.time;
+            uint secs = (uint)sim_time;
+            uint nsecs = (uint)((sim_time % 1) * 1e9);
+            message.header.frame_id = "world";
+            message.header.stamp.sec = secs;
+            message.header.stamp.nanosec = nsecs;
+            message.position = new double[joints.Count];
+            message.velocity = new double[joints.Count];
+            message.effort = new double[joints.Count];
+            for (int i = 0; i < joints.Count; i++)
+            {
+                message.position[i] = joints[i].jointPosition[0];
+                message.velocity[i] = joints[i].jointVelocity[0];
+                message.effort[i] = joints[i].jointForce[0];
+            }
+            ros.Send(topicName, message);
+            timeElapsed = 0.0f;
         }
-        ros.Send(topicName, message);
     }
 }
