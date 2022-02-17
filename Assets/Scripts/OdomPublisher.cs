@@ -33,10 +33,9 @@ public class OdomPublisher : MonoBehaviour
     void FixedUpdate()
     {
         timeElapsed += Time.deltaTime;
-        // Rigidbody取得
+        // Get Rigidbody
         ArticulationBody ab = this.transform.GetComponent<ArticulationBody> ();
-        
-
+    
 
         if (timeElapsed >= publishMessageInterval)
         {
@@ -48,7 +47,7 @@ public class OdomPublisher : MonoBehaviour
             message.header.stamp.nanosec = nsecs;
             message.child_frame_id = childFrameName;
 
-            // Unity -> ROSへの変換方法
+            // Unity -> ROS transformation
             //Position: Unity(x,y,z) -> ROS(z,-x,y)
             //Quaternion: Unity(x,y,z,w) -> ROS(-z,x,-y,w)
             message.pose.pose.position.x = this.transform.localPosition.z;
@@ -63,16 +62,16 @@ public class OdomPublisher : MonoBehaviour
             message.pose.covariance = new double[] {0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000.0};
 
             message.twist.twist.linear.x = ab.velocity.z;
-            // message.twist.twist.linear.y = - ab.velocity.x;
-            // message.twist.twist.linear.z = ab.velocity.y;
-            message.twist.twist.linear.y = 0.0;
-            message.twist.twist.linear.z = 0.0;
+            message.twist.twist.linear.y = - ab.velocity.x;
+            message.twist.twist.linear.z = ab.velocity.y;
+            //message.twist.twist.linear.y = 0.0;
+            //message.twist.twist.linear.z = 0.0;
+            /*If 2D odomtetry's stablity is important linear y&z + angular x&y should be 0.0*/
 
-
-            // message.twist.twist.angular.x = ab.angularVelocity.z;
-            // message.twist.twist.angular.y = - ab.angularVelocity.x;
-            message.twist.twist.angular.x = 0.0;
-            message.twist.twist.angular.y = 0.0;
+            message.twist.twist.angular.x = ab.angularVelocity.z;
+            message.twist.twist.angular.y = - ab.angularVelocity.x;
+            //message.twist.twist.angular.x = 0.0;
+            //message.twist.twist.angular.y = 0.0;
             message.twist.twist.angular.z = - ab.angularVelocity.y;
 
             message.twist.covariance = new double[] {0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000.0};
