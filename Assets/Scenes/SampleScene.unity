@@ -13739,7 +13739,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e480bab4e5de73a47803abf14f576b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DumpTopicName: c30r/dump/cmd
+  DumpTopicName: c30r/vessel/cmd
   dump_joint: {fileID: 326587321}
 --- !u!1 &326820932
 GameObject:
@@ -22839,7 +22839,7 @@ MonoBehaviour:
   leftDownKey: 106
   rightUpKey: 105
   rightDownKey: 107
-  TwistTopicName: c30r/twist
+  TwistTopicName: c30r/tracks/cmd_vel
 --- !u!114 &499170931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37839,7 +37839,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755841124}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc6f5a718578648ba928b41145c438, type: 3}
   m_Name: 
@@ -37854,13 +37854,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755841124}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2ddf92971c4b3145aaa4a37d3d79f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   robotName: ic120
-  topicName: /ic120/diff_drive_controller/odom
+  topicName: /ic120/odom
   childFrameName: ic120_tf/base_link
   publishMessageInterval: 0.05
 --- !u!114 &755841131
@@ -37876,7 +37876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   robotName: ic120
-  topicName: ic120/pose_stmp
+  topicName: ic120/base_link/pose
   publishMessageInterval: 0.05
 --- !u!1 &757590000
 GameObject:
@@ -37892,6 +37892,7 @@ GameObject:
   - component: {fileID: 757590002}
   - component: {fileID: 757590005}
   - component: {fileID: 757590006}
+  - component: {fileID: 757590007}
   m_Layer: 0
   m_Name: base_link
   m_TagString: Untagged
@@ -38012,13 +38013,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 757590000}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc6f5a718578648ba928b41145c438, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: unity/c30r/groundtruth
-  childFrameName: C30R_tf/base_link
+  topicName: /c30r/tracking/groundtruth
+  childFrameName: c30r_tf/base_link
   publishMessageInterval: 0.5
 --- !u!114 &757590006
 MonoBehaviour:
@@ -38033,7 +38034,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   robotName: c30r
-  topicName: c30r/pose_stmp
+  topicName: c30r/base_link/pose
+  publishMessageInterval: 0.05
+--- !u!114 &757590007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757590000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2ddf92971c4b3145aaa4a37d3d79f9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  robotName: c30r
+  topicName: c30r/odom
+  childFrameName: c30r_tf/base_link
   publishMessageInterval: 0.05
 --- !u!1 &762710118
 GameObject:
@@ -42424,7 +42441,7 @@ MonoBehaviour:
   leftDownKey: 106
   rightUpKey: 105
   rightDownKey: 107
-  TwistTopicName: ic120/diff_drive_controller/cmd_vel
+  TwistTopicName: ic120/tracks/cmd_vel
 --- !u!114 &849324484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85167,7 +85184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e480bab4e5de73a47803abf14f576b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DumpTopicName: ic120/dump/cmd
+  DumpTopicName: ic120/vessel/cmd
   dump_joint: {fileID: 1743130958}
 --- !u!1 &1750558493
 GameObject:

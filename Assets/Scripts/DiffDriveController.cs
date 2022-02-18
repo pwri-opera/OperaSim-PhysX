@@ -16,7 +16,7 @@ public class DiffDriveController : MonoBehaviour
     public KeyCode rightUpKey = KeyCode.I;
     public KeyCode rightDownKey = KeyCode.K;
 
-    public string TwistTopicName = "zx120/twist";
+    public string TwistTopicName = "robot_name/tracks/cmd_vel";
     private List<ArticulationBody> leftBodies;
     private List<ArticulationBody> rightBodies;
     private TwistMsg twist;
