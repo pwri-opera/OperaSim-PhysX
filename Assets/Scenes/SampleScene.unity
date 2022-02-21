@@ -22822,7 +22822,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 499170926}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de755eb9608519242b24f7ffc65aad35, type: 3}
   m_Name: 
@@ -22835,11 +22835,11 @@ MonoBehaviour:
   - {fileID: 1966759115}
   - {fileID: 1681101329}
   - {fileID: 604310926}
-  leftUpKey: 117
-  leftDownKey: 106
-  rightUpKey: 105
-  rightDownKey: 107
+  robotName: c30r
   TwistTopicName: c30r/tracks/cmd_vel
+  OdomTopicName: c30r/odom
+  childFrameName: c30r_tf/base_link
+  publishMessageInterval: 0.02
 --- !u!114 &499170931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37854,7 +37854,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755841124}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2ddf92971c4b3145aaa4a37d3d79f9d, type: 3}
   m_Name: 
@@ -38043,7 +38043,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 757590000}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2ddf92971c4b3145aaa4a37d3d79f9d, type: 3}
   m_Name: 
@@ -42437,11 +42437,11 @@ MonoBehaviour:
   - {fileID: 1074700516}
   - {fileID: 584891546}
   - {fileID: 2044115513}
-  leftUpKey: 117
-  leftDownKey: 106
-  rightUpKey: 105
-  rightDownKey: 107
+  robotName: ic120
   TwistTopicName: ic120/tracks/cmd_vel
+  OdomTopicName: ic120/odom
+  childFrameName: ic120_tf/base_link
+  publishMessageInterval: 0.02
 --- !u!114 &849324484
 MonoBehaviour:
   m_ObjectHideFlags: 0

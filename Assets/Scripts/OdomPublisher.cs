@@ -35,7 +35,6 @@ public class OdomPublisher : MonoBehaviour
         timeElapsed += Time.deltaTime;
         // Get Rigidbody
         ArticulationBody ab = this.transform.GetComponent<ArticulationBody> ();
-    
 
         if (timeElapsed >= publishMessageInterval)
         {
@@ -50,14 +49,14 @@ public class OdomPublisher : MonoBehaviour
             // Unity -> ROS transformation
             //Position: Unity(x,y,z) -> ROS(z,-x,y)
             //Quaternion: Unity(x,y,z,w) -> ROS(-z,x,-y,w)
-            message.pose.pose.position.x = this.transform.localPosition.z;
-            message.pose.pose.position.y = - this.transform.localPosition.x;
-            message.pose.pose.position.z = this.transform.localPosition.y;
+            message.pose.pose.position.x = ab.transform.localPosition.z;
+            message.pose.pose.position.y = - ab.transform.localPosition.x;
+            message.pose.pose.position.z = ab.transform.localPosition.y;
 
-            message.pose.pose.orientation.x = - this.transform.localRotation.z;
-            message.pose.pose.orientation.y = this.transform.localRotation.x;
-            message.pose.pose.orientation.z = - this.transform.localRotation.y;
-            message.pose.pose.orientation.w = this.transform.localRotation.w;
+            message.pose.pose.orientation.x = - ab.transform.localRotation.z;
+            message.pose.pose.orientation.y = ab.transform.localRotation.x;
+            message.pose.pose.orientation.z = - ab.transform.localRotation.y;
+            message.pose.pose.orientation.w = ab.transform.localRotation.w;
 
             message.pose.covariance = new double[] {0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000.0};
 

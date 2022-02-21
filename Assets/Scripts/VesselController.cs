@@ -40,7 +40,7 @@ public class VesselController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Dump Target Position:" + target_pos.data);
+        //Debug.Log("Dump Target Position:" + target_pos.data);
         var drive = dump_joint.xDrive;
         drive.target = (float)(target_pos.data * Mathf.Rad2Deg);
         dump_joint.xDrive = drive;
@@ -49,6 +49,6 @@ public class VesselController : MonoBehaviour
     void ExecuteVesselControl(Float64Msg msg)
     {
         target_pos = msg;
-        Debug.Log("Dump Target Position:" + target_pos.data);
+        //Debug.Log("Dump Target Position:" + target_pos.data);
     }
 }
