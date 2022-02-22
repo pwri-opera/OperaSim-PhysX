@@ -11701,6 +11701,7 @@ GameObject:
   - component: {fileID: 300612130}
   - component: {fileID: 300612129}
   - component: {fileID: 300612128}
+  - component: {fileID: 300612132}
   m_Layer: 0
   m_Name: boom_link
   m_TagString: Untagged
@@ -11824,6 +11825,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!114 &300612132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300612126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c99e00684ccb7e04d8d33f2dd431444b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  setpointTopicName: zx120/boom/cmd
+  initTargetPos: -0.8
 --- !u!1 &304525932
 GameObject:
   m_ObjectHideFlags: 0
@@ -16360,6 +16375,7 @@ GameObject:
   - component: {fileID: 371847288}
   - component: {fileID: 371847287}
   - component: {fileID: 371847286}
+  - component: {fileID: 371847290}
   m_Layer: 0
   m_Name: arm_link
   m_TagString: Untagged
@@ -16483,6 +16499,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!114 &371847290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371847284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c99e00684ccb7e04d8d33f2dd431444b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  setpointTopicName: zx120/arm/cmd
+  initTargetPos: 2
 --- !u!1 &372544705
 GameObject:
   m_ObjectHideFlags: 0
@@ -22822,7 +22852,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 499170926}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de755eb9608519242b24f7ffc65aad35, type: 3}
   m_Name: 
@@ -28025,6 +28055,7 @@ GameObject:
   - component: {fileID: 604310930}
   - component: {fileID: 604310929}
   - component: {fileID: 604310928}
+  - component: {fileID: 604310932}
   m_Layer: 0
   m_Name: right_rear_wheel_link
   m_TagString: Untagged
@@ -28147,6 +28178,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!146 &604310932
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604310926}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.29
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_Enabled: 1
 --- !u!1 &606398697
 GameObject:
   m_ObjectHideFlags: 0
@@ -40303,6 +40364,7 @@ GameObject:
   - component: {fileID: 819366425}
   - component: {fileID: 819366424}
   - component: {fileID: 819366423}
+  - component: {fileID: 819366427}
   m_Layer: 0
   m_Name: body_link
   m_TagString: Untagged
@@ -40426,6 +40488,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!114 &819366427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819366421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c99e00684ccb7e04d8d33f2dd431444b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  setpointTopicName: zx120/swing/cmd
+  initTargetPos: 0
 --- !u!1 &821433861
 GameObject:
   m_ObjectHideFlags: 0
@@ -71900,6 +71976,7 @@ GameObject:
   - component: {fileID: 1495784157}
   - component: {fileID: 1495784156}
   - component: {fileID: 1495784155}
+  - component: {fileID: 1495784159}
   m_Layer: 0
   m_Name: left_middle_wheel_link
   m_TagString: Untagged
@@ -72022,6 +72099,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!146 &1495784159
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1495784153}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.29
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_Enabled: 1
 --- !u!1 &1498468793
 GameObject:
   m_ObjectHideFlags: 0
@@ -75969,6 +76076,7 @@ GameObject:
   - component: {fileID: 1575849229}
   - component: {fileID: 1575849228}
   - component: {fileID: 1575849232}
+  - component: {fileID: 1575849233}
   m_Layer: 0
   m_Name: bucket_link
   m_TagString: Untagged
@@ -76146,6 +76254,20 @@ MonoBehaviour:
       isCreate: 1
       viewAdvanced: 0
     modifyNameEnabled: 1
+--- !u!114 &1575849233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575849226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c99e00684ccb7e04d8d33f2dd431444b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  setpointTopicName: zx120/bucket/cmd
+  initTargetPos: 0.8
 --- !u!1 &1586592932
 GameObject:
   m_ObjectHideFlags: 0
@@ -77937,9 +78059,9 @@ MonoBehaviour:
   selectedJoint: 
   selectedIndex: 0
   control: 0
-  stiffness: 10000
-  damping: 10000
-  forceLimit: 10000
+  stiffness: 1000000
+  damping: 100000
+  forceLimit: 100000
   speed: 50
   torque: 10000
   acceleration: 5
@@ -77983,7 +78105,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1618948501}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7e5e0bc5c053403aa2f2296c9df96fa, type: 3}
   m_Name: 
@@ -78592,6 +78714,7 @@ GameObject:
   - component: {fileID: 1631495517}
   - component: {fileID: 1631495516}
   - component: {fileID: 1631495515}
+  - component: {fileID: 1631495519}
   m_Layer: 0
   m_Name: left_rear_wheel_link
   m_TagString: Untagged
@@ -78714,6 +78837,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!146 &1631495519
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1631495513}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.29
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_Enabled: 1
 --- !u!1 &1631917187
 GameObject:
   m_ObjectHideFlags: 0
@@ -81413,6 +81566,7 @@ GameObject:
   - component: {fileID: 1681101333}
   - component: {fileID: 1681101332}
   - component: {fileID: 1681101331}
+  - component: {fileID: 1681101335}
   m_Layer: 0
   m_Name: right_middle_wheel_link
   m_TagString: Untagged
@@ -81535,6 +81689,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!146 &1681101335
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681101329}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.29
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_Enabled: 1
 --- !u!1 &1684636150
 GameObject:
   m_ObjectHideFlags: 0
@@ -86009,6 +86193,7 @@ GameObject:
   - component: {fileID: 1762163906}
   - component: {fileID: 1762163905}
   - component: {fileID: 1762163904}
+  - component: {fileID: 1762163908}
   m_Layer: 0
   m_Name: left_front_wheel_link
   m_TagString: Untagged
@@ -86131,6 +86316,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!146 &1762163908
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762163902}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.29
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_Enabled: 1
 --- !u!43 &1767056671
 Mesh:
   m_ObjectHideFlags: 0
@@ -95694,6 +95909,7 @@ GameObject:
   - component: {fileID: 1966759119}
   - component: {fileID: 1966759118}
   - component: {fileID: 1966759117}
+  - component: {fileID: 1966759121}
   m_Layer: 0
   m_Name: right_front_wheel_link
   m_TagString: Untagged
@@ -95816,6 +96032,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!146 &1966759121
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966759115}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.29
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_Enabled: 1
 --- !u!1 &1966993740
 GameObject:
   m_ObjectHideFlags: 8
