@@ -22839,6 +22839,7 @@ MonoBehaviour:
   TwistTopicName: c30r/tracks/cmd_vel
   OdomTopicName: c30r/odom
   childFrameName: c30r_tf/base_link
+  treadCollectionFactor: 2
   publishMessageInterval: 0.02
 --- !u!114 &499170931
 MonoBehaviour:
@@ -42441,6 +42442,7 @@ MonoBehaviour:
   TwistTopicName: ic120/tracks/cmd_vel
   OdomTopicName: ic120/odom
   childFrameName: ic120_tf/base_link
+  treadCollectionFactor: 3
   publishMessageInterval: 0.02
 --- !u!114 &849324484
 MonoBehaviour:
