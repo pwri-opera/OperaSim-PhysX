@@ -40718,7 +40718,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 821589831}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b6e27abb4aa1a64bbcf79a845601047, type: 3}
   m_Name: 
@@ -78037,6 +78037,7 @@ GameObject:
   - component: {fileID: 1618948502}
   - component: {fileID: 1618948506}
   - component: {fileID: 1618948505}
+  - component: {fileID: 1618948507}
   m_Layer: 0
   m_Name: zx120
   m_TagString: robot
@@ -78135,6 +78136,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   topicName: zx120/joint_states
   publishMessageInterval: 0.5
+--- !u!114 &1618948507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618948501}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de755eb9608519242b24f7ffc65aad35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftWheels:
+  - {fileID: 1728739398}
+  - {fileID: 325890668}
+  - {fileID: 1192763733}
+  rightWheels:
+  - {fileID: 1117837107}
+  - {fileID: 821589831}
+  - {fileID: 968105723}
+  robotName: zx120
+  TwistTopicName: zx120/tracks/cmd_vel
+  OdomTopicName: zx120/odom
+  childFrameName: zx120_tf/base_link
+  treadCollectionFactor: 3
+  publishMessageInterval: 0.02
 --- !u!1 &1619469273
 GameObject:
   m_ObjectHideFlags: 0
@@ -85272,7 +85299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xAxis: 0
-  jointName: container_pin_joint
+  jointName: vessel_pin_joint
   EffortLimit: 1000
   VelocityLimit: 1000
 --- !u!114 &1743130957
