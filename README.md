@@ -30,8 +30,8 @@ Simulator on Unity + PhysX communicating with ROS
   $ catkin build ros_tcp_endpoint
   $ source ../../devel/setup.bash
   ```
-  ```bash
 - ROS側でendpoint.launchを実行する
+  ```bash
   $ roslaunch ros_tcp_endpoint endpoint.launch
   ```
 - Unity Editor上部の実行ボタンをクリックする（実行ボタンのあるツールバーの画像を入れる）
