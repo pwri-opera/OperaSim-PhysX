@@ -21,9 +21,18 @@ Simulator on Unity + PhysX communicating with ROS
 - ROS-TCP-Connectorのアイコン部分の画像を入れる
 
 ### 5. ROSとの連携方法
-- ROS側で[ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint)パッケージをcloneし、endpoint.launchを起動する
+- 【初回のみ】ROS側で[ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint)パッケージをcloneし、buildとセットアップを行う。
   ```bash
-  $ roslaunch ROS-TCP-Endpoint endpoint.launch
+  $ git clone https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
+  $ cd ./ROS-TCP-Endpoint/
+  $ sudo chmod +x setup.py
+  $ ./setup.py
+  $ catkin build ros_tcp_endpoint
+  $ source ../../devel/setup.bash
+  ```
+  ```bash
+- ROS側でendpoint.launchを実行する
+  $ roslaunch ros_tcp_endpoint endpoint.launch
   ```
 - Unity Editor上部の実行ボタンをクリックする（実行ボタンのあるツールバーの画像を入れる）
 - ROS側で、対応する建機のunity用launch ファイルを起動する
