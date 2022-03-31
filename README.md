@@ -41,6 +41,7 @@ Simulator on Unity + PhysX communicating with ROS
 ![ros_ip_setting](https://user-images.githubusercontent.com/24404939/159395478-46617a2f-b05c-4227-9fc9-d93712dc4b9f.jpg)
 
 ### 5. ROSとの連携方法
+![ros-unity](https://user-images.githubusercontent.com/24404939/161001271-0f81d211-4c8e-4341-8f9f-86a02e958c4d.jpg)
 - 【初回のみ】ROS側で[ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint)パッケージをcloneし、buildとセットアップを行う。
   ```bash
   $ git clone https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
@@ -70,3 +71,16 @@ Simulator on Unity + PhysX communicating with ROS
   ```bash
   $ roslaunch zx120_ic120_standby.launch
   ```
+ #### ROSと連携時の送受信データ
+（各詳細については記述準備中）
+- Cmd (ROS -> Unity)
+  - (建機のns)/tracks/cmd_vel [geometry_msgs/Twist]
+  - (建機のns)/vessel/cmd [std_msgs/Float64]
+  - (建機のns)/swing/cmd [std_msgs/Float64]
+  - (建機のns)/boom/cmd [std_msgs/Float64]
+  - (建機のns)/arm/cmd [std_msgs/Float64]
+  - (建機のns)/bucket/cmd [std_msgs/Float64]
+- Res（Unity -> ROS）
+  - (建機のns)/base_link/pose [geometry_msgs/PoseStamped]
+  - (建機のns)/odom [nav_msgs/Odometry]
+  - (建機のns)/joint_states [sensor_msgs/JointState]
