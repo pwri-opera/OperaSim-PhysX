@@ -72,24 +72,21 @@ Simulator on Unity + PhysX communicating with ROS
   $ roslaunch zx120_ic120_standby.launch
   ```
  #### ROSと連携時の送受信データ
-- Cmd (ROS -> Unity)
-  - (建機のns)/tracks/cmd_vel [geometry_msgs/Twist]  
-    建機の移動体部に対する速度指令値（並進速度[m/s], 旋回速度[rad/s]）
-  - (建機のns)/vessel/cmd [std_msgs/Float64]  
-    ダンプトラックの荷台の傾斜角指令値[rad]
-  - (建機のns)/swing/cmd [std_msgs/Float64]  
-    建機のスイング軸の角度指令値 [rad]
-  - (建機のns)/boom/cmd [std_msgs/Float64]  
-    建機のブーム軸の角度指令値 [rad]
-  - (建機のns)/arm/cmd [std_msgs/Float64]  
-    建機のアーム軸の角度指令値 [rad]
-  - (建機のns)/bucket/cmd [std_msgs/Float64]  
-    建機のバケット軸の角度指令値 [rad]
+- Cmd (ROS -> Unity) 
+
+| データの内容 | トピック名 | トピック型 | 物理量 | 単位 | 備考 |
+| ----  |  ---- | ---- | ---- | ---- | ---- |
+| 建機の移動体部に対する対地速度指令値 | /(建機のns)/tracks/cmd_vel | geometry_msgs/Twist | 速度 | [m/s],[rad/s] |  |
+| ダンプトラックの荷台の傾斜角指令値 | /(建機のns)/vessel/cmd | std_msgs/Float64 | 角度 | [rad] |  |
+| 建機のスイング軸の角度指令値 | /(建機のns)/swing/cmd | std_msgs/Float64 | 角度 | [rad] |  |
+| 建機のブーム軸の角度指令値 | /(建機のns)/boom/cmd | std_msgs/Float64 | 角度 | [rad] |  |
+| 建機のアーム軸の角度指令値 | /(建機のns)/arm/cmd | std_msgs/Float64 | 角度 | [rad] |  |
+| 建機のバケット軸の角度指令値 | /(建機のns)/bucket/cmd | std_msgs/Float64 | 角度 | [rad] |  |
+   
 - Res（Unity -> ROS）
-  - (建機のns)/base_link/pose [geometry_msgs/PoseStamped]  
-    建機のベースリンクの座標（x[m], y[m], z[m], qx[-], qy[-], qz[-], qw[-]）
-    Unity内のworld座標系に対する座標の真値
-  - (建機のns)/odom [nav_msgs/Odometry]  
-    建機のオドメトリ計算結果．初期位置を原点として算出している．
-  - (建機のns)/joint_states [sensor_msgs/JointState]  
-    建機の関節角度[rad], 角速度[rad/s]が格納されている．（現在、effortは常に0.0）
+     
+| データの内容 | トピック名 | トピック型 | 物理量 | 単位 | 備考 |
+| ----  |  ---- | ---- | ---- | ---- | ---- |
+| 建機のベースリンクの座標 | /(建機のns)  /base_link/pose | geometry_msgs/PoseStamped | 位置・姿勢 | 位置:[m]  姿勢:[-] | Unity内のworld座標系に対する座標の真値 |
+| 建機のオドメトリ計算結果 | /(建機のns)  /vessel/cmd | nav_msgs/Odometry | オドメトリ | [rad] | 初期位置を原点として算出している |
+| 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | 現在、effortは常に0.0 |
