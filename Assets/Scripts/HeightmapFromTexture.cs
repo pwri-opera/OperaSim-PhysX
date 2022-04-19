@@ -15,7 +15,7 @@ public class HeightmapFromTexture{
     	TerrainData terrain = Terrain.activeTerrain.terrainData;
     	int w = heightmap.width;
     	int h = heightmap.height;
-    	int w2 = terrain.heightmapWidth;
+    	int w2 = terrain.heightmapResolution;
     	float[,] heightmapData = terrain.GetHeights(0, 0, w2, w2);
     	Color[] mapColors = heightmap.GetPixels();
     	Color[] map = new Color[w2 * w2];
