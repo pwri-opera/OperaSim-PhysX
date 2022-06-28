@@ -55,13 +55,7 @@ Simulator on Unity + PhysX communicating with ROS
   ```bash
   $ roscore  #別のターミナルで実行する必要
   ```
-  
-  <!--
-- ROS側でendpoint.launchを実行する
-  ```bash
-  $ roslaunch ros_tcp_endpoint endpoint.launch
-  ```
--->
+
 - Unity Editor上部の実行ボタンをクリックする
 
 ![play_icon](https://user-images.githubusercontent.com/24404939/159396113-993ff0b2-d2bb-4567-ac68-0eafc9f524ac.png)
