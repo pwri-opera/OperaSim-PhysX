@@ -47,14 +47,21 @@ Simulator on Unity + PhysX communicating with ROS
   $ git clone https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
   $ cd ./ROS-TCP-Endpoint/
   $ sudo chmod +x setup.py
-  $ ./setup.py
-  $ catkin build ros_tcp_endpoint
-  $ source ../../devel/setup.bash
+  $ python setup.py build
+  $ cd build/lib/ros_tcp_endpoint
+  $ python default_server_endpoint.py
   ```
+- ROS Masterを起動する。
+  ```bash
+  $ roscore  #別のターミナルで実行する必要
+  ```
+  
+  <!--
 - ROS側でendpoint.launchを実行する
   ```bash
   $ roslaunch ros_tcp_endpoint endpoint.launch
   ```
+-->
 - Unity Editor上部の実行ボタンをクリックする
 
 ![play_icon](https://user-images.githubusercontent.com/24404939/159396113-993ff0b2-d2bb-4567-ac68-0eafc9f524ac.png)
