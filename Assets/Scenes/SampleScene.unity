@@ -10715,7 +10715,7 @@ ArticulationBody:
   m_GameObject: {fileID: 300612126}
   m_Enabled: 1
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 50
   m_ParentAnchorPosition: {x: 0.16000009, y: 0.78100014, z: 0.14000034}
   m_ParentAnchorRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -15194,7 +15194,7 @@ ArticulationBody:
   m_GameObject: {fileID: 371847284}
   m_Enabled: 1
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 250
   m_ParentAnchorPosition: {x: 0.00000008940697, y: 4.6000013, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -68181,7 +68181,7 @@ ArticulationBody:
   m_GameObject: {fileID: 1575849226}
   m_Enabled: 1
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 100
   m_ParentAnchorPosition: {x: 0.00000008940697, y: 2.519006, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -70127,7 +70127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topicName: zx120/joint_states
-  publishMessageInterval: 0.5
+  publishMessageInterval: 0.04
 --- !u!114 &1618948507
 MonoBehaviour:
   m_ObjectHideFlags: 0

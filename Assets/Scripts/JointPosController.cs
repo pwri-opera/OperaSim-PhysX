@@ -23,7 +23,7 @@ public class JointPosController : MonoBehaviour
         if (joint)
         {
             var drive = joint.xDrive;
-            drive.stiffness = 1000000;
+            drive.stiffness = 200000;
             drive.damping = 100000;
             drive.forceLimit = 100000;
             joint.xDrive = drive;
