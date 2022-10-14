@@ -68,10 +68,12 @@ Simulator on Unity + PhysX communicating with ROS
   ```bash
   $ roslaunch ic120_unity ic120_standby.launch
   ```
+  <!--
   - 油圧ショベルとクローラダンプの両方
   ```bash
   $ roslaunch zx120_ic120_standby.launch
   ```
+  -->
  #### ROSと連携時の送受信データ
 - Cmd (ROS -> Unity) 
 
