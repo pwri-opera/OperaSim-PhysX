@@ -24,7 +24,7 @@ public class GroundTruthPublisher : MonoBehaviour
         message.header = new RosMessageTypes.Std.HeaderMsg();
         message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
 
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<OdometryMsg>(topicName);
     }
 
@@ -57,7 +57,7 @@ public class GroundTruthPublisher : MonoBehaviour
 
             message.pose.covariance = new double[] {0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1};
 
-            ros.Send(topicName, message);
+            ros.Publish(topicName, message);
             timeElapsed = 0.0f;
         }
     }

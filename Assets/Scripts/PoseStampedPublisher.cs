@@ -24,7 +24,7 @@ public class PoseStampedPublisher : MonoBehaviour
         message.header = new RosMessageTypes.Std.HeaderMsg();
         message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
 
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<PoseStampedMsg>(topicName);
     }
 
@@ -57,7 +57,7 @@ public class PoseStampedPublisher : MonoBehaviour
             message.pose.orientation.z = - this.transform.rotation.y;
             message.pose.orientation.w = this.transform.rotation.w;
 
-            ros.Send(topicName, message);
+            ros.Publish(topicName, message);
             timeElapsed = 0.0f;
         }
     }

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
-using RosMessageTypes.Control;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Nav;
 
@@ -39,7 +38,7 @@ public class DiffDriveController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         leftBodies = new List<ArticulationBody>();
         rightBodies = new List<ArticulationBody>();
         twist = new TwistMsg();
@@ -184,7 +183,7 @@ public class DiffDriveController : MonoBehaviour
             odomMessage.header.stamp.nanosec = nsecs;
             odomMessage.child_frame_id = childFrameName;
 
-            ros.Send(OdomTopicName, odomMessage);
+            ros.Publish(OdomTopicName, odomMessage);
             timeElapsed = 0.0f;
         }
 

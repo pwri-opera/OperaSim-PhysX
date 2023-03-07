@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
-using RosMessageTypes.Control;
-using RosMessageTypes.Trajectory;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
 
@@ -22,7 +20,7 @@ public class FollowJointTrajectoryAction : MonoBehaviour
     void Start()
     {
         currentPose = new JointStateMsg();
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         jointArticulationBodies = new Dictionary<string, ArticulationBody>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
         {

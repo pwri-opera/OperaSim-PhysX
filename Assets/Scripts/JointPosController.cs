@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
-using Unity.Robotics.UrdfImporter;
 
 public class JointPosController : MonoBehaviour
 {
@@ -16,7 +15,7 @@ public class JointPosController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();
 

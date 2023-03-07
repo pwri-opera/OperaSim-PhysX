@@ -15,7 +15,7 @@ public class WorldClock : MonoBehaviour
     void Start()
     {
         message = new ClockMsg();
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<ClockMsg>(topicName);
     }
 
@@ -27,6 +27,6 @@ public class WorldClock : MonoBehaviour
         uint nsecs = (uint)((sim_time % 1) * 1e9);
         message.clock.sec = secs;
         message.clock.nanosec = nsecs;
-        ros.Send(topicName, message);
+        ros.Publish(topicName, message);
     }
 }

@@ -25,7 +25,7 @@ public class OdomPublisher : MonoBehaviour
         message.header = new RosMessageTypes.Std.HeaderMsg();
         message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
 
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<OdometryMsg>(topicName);
     }
 
@@ -75,7 +75,7 @@ public class OdomPublisher : MonoBehaviour
 
             message.twist.covariance = new double[] {0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000.0};
 
-            ros.Send(topicName, message);
+            ros.Publish(topicName, message);
             timeElapsed = 0.0f;
         }
     }

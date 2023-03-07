@@ -37,7 +37,7 @@ public class JointStatePublisher : MonoBehaviour
         message.header = new RosMessageTypes.Std.HeaderMsg();
         message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
         message.name = jointNames.ToArray();
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<JointStateMsg>(topicName);
     }
 
@@ -63,7 +63,7 @@ public class JointStatePublisher : MonoBehaviour
                 message.velocity[i] = joints[i].jointVelocity[0];
                 message.effort[i] = joints[i].jointForce[0];
             }
-            ros.Send(topicName, message);
+            ros.Publish(topicName, message);
             timeElapsed = 0.0f;
         }
     }
