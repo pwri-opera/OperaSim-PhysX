@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
+using RosMessageTypes.BuiltinInterfaces;
+using RosMessageTypes.Std;
 using RosMessageTypes.Nav;
+using Unity.Robotics.Core;
 
 public class OdomPublisher : MonoBehaviour
 {
@@ -22,8 +25,8 @@ public class OdomPublisher : MonoBehaviour
     void Start()
     {
         message = new OdometryMsg();
-        message.header = new RosMessageTypes.Std.HeaderMsg();
-        message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
+        message.header = new HeaderMsg();
+        message.header.stamp = new TimeMsg();
 
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<OdometryMsg>(topicName);
@@ -38,12 +41,8 @@ public class OdomPublisher : MonoBehaviour
 
         if (timeElapsed >= publishMessageInterval)
         {
-            float sim_time = Time.time;
-            uint secs = (uint)sim_time;
-            uint nsecs = (uint)((sim_time % 1) * 1e9);
             message.header.frame_id = robotName + "_tf/odom";
-            message.header.stamp.sec = secs;
-            message.header.stamp.nanosec = nsecs;
+            message.header.stamp = new TimeStamp(Clock.time);
             message.child_frame_id = childFrameName;
 
             // Unity -> ROS transformation

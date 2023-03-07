@@ -2,7 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
+using RosMessageTypes.Std;
 using RosMessageTypes.Geometry;
+using RosMessageTypes.BuiltinInterfaces;
+using Unity.Robotics.Core;
+
 
 public class PoseStampedPublisher : MonoBehaviour
 {
@@ -21,8 +25,8 @@ public class PoseStampedPublisher : MonoBehaviour
     void Start()
     {
         message = new PoseStampedMsg();
-        message.header = new RosMessageTypes.Std.HeaderMsg();
-        message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
+        message.header = new HeaderMsg();
+        message.header.stamp = new TimeMsg();
 
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<PoseStampedMsg>(topicName);
@@ -38,12 +42,8 @@ public class PoseStampedPublisher : MonoBehaviour
 
         if (timeElapsed >= publishMessageInterval)
         {
-            float sim_time = Time.time;
-            uint secs = (uint)sim_time;
-            uint nsecs = (uint)((sim_time % 1) * 1e9);
             message.header.frame_id = "world";
-            message.header.stamp.sec = secs;
-            message.header.stamp.nanosec = nsecs;
+            message.header.stamp = new TimeStamp(Clock.time);
 
             // Unity -> ROS transformation
             // Position: Unity(x,y,z) -> ROS(z,-x,y)
