@@ -153,7 +153,7 @@ public class DiffDriveController : MonoBehaviour
 
         // Debug.Log("x:"+odomMessage.pose.pose.position.x);
         // Debug.Log("y:"+odomMessage.pose.pose.position.y);
-        Debug.Log("yaw:"+yaw);
+        // Debug.Log("yaw:"+yaw);
 
         Quaternion rotation = Quaternion.Euler(0, 0, (float)(yaw*180.0/(double)Mathf.PI));
 
