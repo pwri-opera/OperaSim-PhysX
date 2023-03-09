@@ -581,7 +581,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    1: 
+    1: ROS2
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

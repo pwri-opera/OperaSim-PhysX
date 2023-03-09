@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
-using RosMessageTypes.Geometry;
-using Unity.Robotics.UrdfImporter;
 
 public class VesselController : MonoBehaviour
 {
@@ -16,7 +14,7 @@ public class VesselController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         dump_joint = this.GetComponent<ArticulationBody>();
         target_pos = new Float64Msg();
 

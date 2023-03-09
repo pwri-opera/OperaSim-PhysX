@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
-using RosMessageTypes.Control;
+using RosMessageTypes.BuiltinInterfaces;
+using RosMessageTypes.Std;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Nav;
+using Unity.Robotics.Core;
 
 public class DiffDriveController : MonoBehaviour
 {
@@ -39,14 +41,14 @@ public class DiffDriveController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         leftBodies = new List<ArticulationBody>();
         rightBodies = new List<ArticulationBody>();
         twist = new TwistMsg();
 
         odomMessage = new OdometryMsg();
-        odomMessage.header = new RosMessageTypes.Std.HeaderMsg();
-        odomMessage.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
+        odomMessage.header = new HeaderMsg();
+        odomMessage.header.stamp = new TimeMsg();
 
         /* Get ArticulationBody-type Components in Left Wheels and Set Parameters for xDrive in each Component */
         foreach (GameObject left in leftWheels)
@@ -153,7 +155,7 @@ public class DiffDriveController : MonoBehaviour
 
         // Debug.Log("x:"+odomMessage.pose.pose.position.x);
         // Debug.Log("y:"+odomMessage.pose.pose.position.y);
-        Debug.Log("yaw:"+yaw);
+        // Debug.Log("yaw:"+yaw);
 
         Quaternion rotation = Quaternion.Euler(0, 0, (float)(yaw*180.0/(double)Mathf.PI));
 
@@ -176,15 +178,11 @@ public class DiffDriveController : MonoBehaviour
         
         if (timeElapsed >= publishMessageInterval)
         {
-            float sim_time = Time.time;
-            uint secs = (uint)sim_time;
-            uint nsecs = (uint)((sim_time % 1) * 1e9);
             odomMessage.header.frame_id = robotName + "_tf/odom";
-            odomMessage.header.stamp.sec = secs;
-            odomMessage.header.stamp.nanosec = nsecs;
+            odomMessage.header.stamp = new TimeStamp(Clock.time);
             odomMessage.child_frame_id = childFrameName;
 
-            ros.Send(OdomTopicName, odomMessage);
+            ros.Publish(OdomTopicName, odomMessage);
             timeElapsed = 0.0f;
         }
 

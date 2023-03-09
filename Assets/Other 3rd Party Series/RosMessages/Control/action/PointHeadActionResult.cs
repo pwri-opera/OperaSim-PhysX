@@ -33,5 +33,15 @@ namespace RosMessageTypes.Control
             serializer.Write(this.result);
         }
 
+
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnLoadMethod]
+#else
+        [UnityEngine.RuntimeInitializeOnLoadMethod]
+#endif
+        public static void Register()
+        {
+            MessageRegistry.Register(k_RosMessageName, Deserialize);
+        }
     }
 }
