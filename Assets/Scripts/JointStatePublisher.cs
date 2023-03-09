@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
+using RosMessageTypes.BuiltinInterfaces;
+using RosMessageTypes.Std;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
+using Unity.Robotics.Core;
 
 public class JointStatePublisher : MonoBehaviour
 {
@@ -34,10 +37,10 @@ public class JointStatePublisher : MonoBehaviour
             }
         }
         message = new JointStateMsg();
-        message.header = new RosMessageTypes.Std.HeaderMsg();
-        message.header.stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
+        message.header = new HeaderMsg();
+        message.header.stamp = new TimeMsg();
         message.name = jointNames.ToArray();
-        ros = ROSConnection.instance;
+        ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<JointStateMsg>(topicName);
     }
 
@@ -48,12 +51,8 @@ public class JointStatePublisher : MonoBehaviour
 
         if (timeElapsed >= publishMessageInterval)
         {
-            float sim_time = Time.time;
-            uint secs = (uint)sim_time;
-            uint nsecs = (uint)((sim_time % 1) * 1e9);
             message.header.frame_id = "world";
-            message.header.stamp.sec = secs;
-            message.header.stamp.nanosec = nsecs;
+            message.header.stamp = new TimeStamp(Clock.time);
             message.position = new double[joints.Count];
             message.velocity = new double[joints.Count];
             message.effort = new double[joints.Count];
@@ -63,7 +62,7 @@ public class JointStatePublisher : MonoBehaviour
                 message.velocity[i] = joints[i].jointVelocity[0];
                 message.effort[i] = joints[i].jointForce[0];
             }
-            ros.Send(topicName, message);
+            ros.Publish(topicName, message);
             timeElapsed = 0.0f;
         }
     }

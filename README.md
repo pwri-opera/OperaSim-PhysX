@@ -33,7 +33,7 @@ Simulator on Unity + PhysX communicating with ROS
 - UnityHubを起動し、`sim_physx`をクリックする（初回起動時には数分程度の時間がかかります）
 
 ### 3. Sceneファイルの選択
-- デモ用のサンプルSceneファイルが`Asset/OpenConstructionSim/Scenes/SampleScene.unity`にあるので、これを開く.  
+- デモ用のサンプルSceneファイルが`Asset/Scenes/SampleScene.unity`にあるので、これを開く.  
 
 ### 4. ROS-TCP-Connectorの設定
 - UnityEditorの上部ツールバーからRobotics > ROS Settingを開き"ROS IP Address", "ROS Port"のところにROS側のIPアドレスおよびポート番号(defaultは10000)を入力する
@@ -68,10 +68,12 @@ Simulator on Unity + PhysX communicating with ROS
   ```bash
   $ roslaunch ic120_unity ic120_standby.launch
   ```
+  <!--
   - 油圧ショベルとクローラダンプの両方
   ```bash
   $ roslaunch zx120_ic120_standby.launch
   ```
+  -->
  #### ROSと連携時の送受信データ
 - Cmd (ROS -> Unity) 
 
