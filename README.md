@@ -37,6 +37,7 @@ Simulator on Unity + PhysX communicating with ROS
 
 ### 4. ROS-TCP-Connectorの設定
 - UnityEditorの上部ツールバーからRobotics > ROS Settingを開き"ROS IP Address", "ROS Port"のところにROS側のIPアドレスおよびポート番号(defaultは10000)を入力する
+- もしROS2を利用する場合は"Protocol"のところを"ROS1"->"ROS2"へ変更する
 
 ![ros_ip_setting](https://user-images.githubusercontent.com/24404939/159395478-46617a2f-b05c-4227-9fc9-d93712dc4b9f.jpg)
 
