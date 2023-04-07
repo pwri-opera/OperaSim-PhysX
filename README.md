@@ -1,4 +1,4 @@
-# sim_physx
+# OperaSim-PhysX
 Simulator on Unity + PhysX communicating with ROS
 
 ## 概説
