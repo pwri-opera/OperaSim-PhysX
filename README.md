@@ -92,5 +92,5 @@ Simulator on Unity + PhysX communicating with ROS
 | データの内容 | トピック名 | トピック型 | 物理量 | 単位 | 備考 |
 | ----  |  ---- | ---- | ---- | ---- | ---- |
 | 建機のベースリンクの座標 | /(建機のns)  /base_link/pose | geometry_msgs/PoseStamped | 位置・姿勢 | 位置:[m]  姿勢:[-] | Unity内のworld座標系に対する座標の真値 |
-| 建機のオドメトリ計算結果 | /(建機のns)  /vessel/cmd | nav_msgs/Odometry | オドメトリ | [rad] | 初期位置を原点として算出している |
+| 建機のオドメトリ計算結果 | /(建機のns)  /odom | nav_msgs/Odometry | オドメトリ | 位置:[m]  姿勢:[-] | 初期位置を原点として算出している |
 | 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | 現在、effortは常に0.0 |
