@@ -52,9 +52,9 @@ public class FollowJointTrajectoryAction : MonoBehaviour
         ros.Subscribe<JointStateMsg>(fakeControllerTopicName, ExecuteTrajectory);
     }
 
-    // Update is called once per frame
-    void Update()
+    void ExecuteTrajectory(JointStateMsg trajectory)
     {
+        currentPose = trajectory;
         for (int i = 0; i < currentPose.name.Length; i++)
         {
             var joint = jointArticulationBodies[currentPose.name[i]];
@@ -62,10 +62,5 @@ public class FollowJointTrajectoryAction : MonoBehaviour
             drive.target = (float)currentPose.position[i] * Mathf.Rad2Deg;
             joint.xDrive = drive;
         }
-    }
-
-    void ExecuteTrajectory(JointStateMsg trajectory)
-    {
-        currentPose = trajectory;
     }
 }

@@ -36,18 +36,12 @@ public class JointPosController : MonoBehaviour
         ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //Debug.Log("Joint Target Position:" + targetPos.data);
-        var drive = joint.xDrive;
-        drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
-        joint.xDrive = drive;
-    }
-
     void ExecuteJointPosControl(Float64Msg msg)
     {
         targetPos = msg;
+        var drive = joint.xDrive;
+        drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
+        joint.xDrive = drive;
         Debug.Log("Joint Target Position:" + targetPos.data);
     }
 }
