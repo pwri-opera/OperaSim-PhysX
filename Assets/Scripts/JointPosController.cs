@@ -22,9 +22,12 @@ public class JointPosController : MonoBehaviour
         if (joint)
         {
             var drive = joint.xDrive;
-            drive.stiffness = 200000;
-            drive.damping = 100000;
-            drive.forceLimit = 100000;
+            if (drive.stiffness == 0)
+                drive.stiffness = 200000;
+            if (drive.damping == 0)
+                drive.damping = 100000;
+            if (drive.forceLimit == 0)
+                drive.forceLimit = 100000;
             joint.xDrive = drive;
         }
         else
