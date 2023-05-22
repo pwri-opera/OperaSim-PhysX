@@ -29,9 +29,12 @@ public class FollowJointTrajectoryAction : MonoBehaviour
             {
                 jointArticulationBodies.Add(ujoint.jointName, joint);
                 ArticulationDrive drive = joint.xDrive;
-                drive.stiffness = 100000;
-                drive.damping = 100000;
-                drive.forceLimit = 100000;
+                if (drive.stiffness == 0)
+                    drive.stiffness = 200000;
+                if (drive.damping == 0)
+                    drive.damping = 100000;
+                if (drive.forceLimit == 0)
+                    drive.forceLimit = 100000;
                 joint.xDrive = drive;
             }
         }
@@ -52,9 +55,9 @@ public class FollowJointTrajectoryAction : MonoBehaviour
         ros.Subscribe<JointStateMsg>(fakeControllerTopicName, ExecuteTrajectory);
     }
 
-    // Update is called once per frame
-    void Update()
+    void ExecuteTrajectory(JointStateMsg trajectory)
     {
+        currentPose = trajectory;
         for (int i = 0; i < currentPose.name.Length; i++)
         {
             var joint = jointArticulationBodies[currentPose.name[i]];
@@ -62,10 +65,5 @@ public class FollowJointTrajectoryAction : MonoBehaviour
             drive.target = (float)currentPose.position[i] * Mathf.Rad2Deg;
             joint.xDrive = drive;
         }
-    }
-
-    void ExecuteTrajectory(JointStateMsg trajectory)
-    {
-        currentPose = trajectory;
     }
 }

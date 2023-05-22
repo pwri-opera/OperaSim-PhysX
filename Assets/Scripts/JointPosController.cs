@@ -22,9 +22,12 @@ public class JointPosController : MonoBehaviour
         if (joint)
         {
             var drive = joint.xDrive;
-            drive.stiffness = 200000;
-            drive.damping = 100000;
-            drive.forceLimit = 100000;
+            if (drive.stiffness == 0)
+                drive.stiffness = 200000;
+            if (drive.damping == 0)
+                drive.damping = 100000;
+            if (drive.forceLimit == 0)
+                drive.forceLimit = 100000;
             joint.xDrive = drive;
         }
         else
@@ -36,18 +39,12 @@ public class JointPosController : MonoBehaviour
         ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //Debug.Log("Joint Target Position:" + targetPos.data);
-        var drive = joint.xDrive;
-        drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
-        joint.xDrive = drive;
-    }
-
     void ExecuteJointPosControl(Float64Msg msg)
     {
         targetPos = msg;
+        var drive = joint.xDrive;
+        drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
+        joint.xDrive = drive;
         Debug.Log("Joint Target Position:" + targetPos.data);
     }
 }

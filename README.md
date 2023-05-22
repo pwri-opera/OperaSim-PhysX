@@ -95,3 +95,38 @@ Simulator on Unity + PhysX communicating with ROS
 | 建機のベースリンクの座標 | /(建機のns)  /base_link/pose | geometry_msgs/PoseStamped | 位置・姿勢 | 位置:[m]  姿勢:[-] | Unity内のworld座標系に対する座標の真値 |
 | 建機のオドメトリ計算結果 | /(建機のns)  /odom | nav_msgs/Odometry | オドメトリ | 位置:[m]  姿勢:[-] | 初期位置を原点として算出している |
 | 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | 現在、effortは常に0.0 |
+
+## パラメータのチューニング方法
+
+### 関節制御パラメータのチューニング
+
+各関節の制御パラメータは、ゲームオブジェクトのXDriveパラメータを変更することで可能です。
+
+![Joint Properties](images/joint_properties.png)
+
+| プロパティ名 | 説明 |
+| ----  |  ---- |
+| Lower Limit | 関節可動角の下限（単位はdegree）。可動角制限を有効にするには、Motionプロパティを「Limited」に設定してください |
+| Upper Limit | 関節可動角の上限（単位はdegree）。可動角制限を有効にするには、Motionプロパティを「Limited」に設定してください |
+| Stiffness | 関節の剛性係数。係数の意味は下の式を参照。0の場合はデフォルト値20000を使用します |
+| Damping | 関節の減衰係数。係数の意味は下の式を参照。0の場合はデフォルト値10000を使用します |
+| Force Limit | 制御中に加えられるトルクの最大値（単位はnewton）。0の場合はデフォルト値10000を使用します |
+
+Stiffness（剛性）とDamping（減衰）の各係数は、下の式に用いられます。
+
+加えられるトルク = 剛性係数 * (駆動位置 - ターゲット位置) - 減衰係数 * (駆動速度 - ターゲット速度)
+
+上記、各パラメータの詳しい説明は、Unityの公式マニュアルも参照ください。
+
+https://docs.unity3d.com/ja/2023.2/Manual/class-ArticulationBody.html#joint-drive-properties
+
+### 関節制御が振動的になった際のシミュレーションパラメータのチューニング
+
+長いリンクのある多関節の重機をシミュレーションする際に、関節制御が振動的になることがあります。
+この症状は、以下の調整を行うことで軽減できます。
+
+メニューから `Edit > Project Settings...` を選択し `Physics` 項目を選択します。
+
+![Physics Properties](images/physics_properties.png)
+
+`Default Solver Iterations` プロパティの数値を大きな値に変更してください。
