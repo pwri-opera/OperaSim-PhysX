@@ -26,7 +26,7 @@ Simulator on Unity + PhysX communicating with ROS
    ```bash
    $ ./UnityHub.AppImage
    ```
-  UnityHubを利用するためのライセンス認証手続きを行った後、Unity Editor（version: `2020.3.16f1`）を以下のアーカイブサイトより選択してインストールする
+  UnityHubを利用するためのライセンス認証手続きを行った後、Unity Editor（version: `2021.3.25f1`）を以下のアーカイブサイトより選択してインストールする
 
 [https://unity3d.com/get-unity/download/archive](https://unity3d.com/get-unity/download/archive)
 
@@ -45,9 +45,20 @@ Simulator on Unity + PhysX communicating with ROS
 ### 5. ROSとの連携方法
 ![ros-unity](https://user-images.githubusercontent.com/24404939/161001271-0f81d211-4c8e-4341-8f9f-86a02e958c4d.jpg)
 - 【初回のみ】ROS側で[ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint)パッケージをcloneし、buildとセットアップを行う。
+ROS 1 の場合
   ```bash
   $ cd (rosワークスペース)/src
   $ git clone https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
+  $ cd ./ROS-TCP-Endpoint/
+  $ sudo chmod +x setup.py
+  $ ./setup.py
+  $ catkin build ros_tcp_endpoint
+  $ source ../../devel/setup.bash
+  ```
+ROS 2 の場合
+  ```bash
+  $ cd (rosワークスペース)/src
+  $ git clone -b https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
   $ cd ./ROS-TCP-Endpoint/
   $ sudo chmod +x setup.py
   $ ./setup.py
