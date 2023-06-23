@@ -52,7 +52,7 @@ public class BucketRocks : MonoBehaviour
 
 		for (int i = 0; i < 100; i++)
 		{
-			points.Add(Random.insideUnitSphere * 0.2f);
+			points.Add(Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
 		}
 
 		calc.GenerateHull(points, true, ref verts, ref tris, ref normals);
@@ -129,13 +129,13 @@ public class BucketRocks : MonoBehaviour
 			{
 				var rock2 = rocks[j];
 				float dist = Vector3.Distance(rock1.transform.position, rock2.transform.position);
-				if (dist < 0.25)
+				if (dist < SoilParticleSettings.instance.partileStickDistance)
                 {
 					repulvector += rock1.transform.position - rock2.transform.position;
                 }
 			}
 			repulvector.Normalize();
-			rock1.GetComponent<Rigidbody>().AddForce(-repulvector * 30.0f);
+			rock1.GetComponent<Rigidbody>().AddForce(-repulvector * SoilParticleSettings.instance.stickForce);
         }
     }
 }
