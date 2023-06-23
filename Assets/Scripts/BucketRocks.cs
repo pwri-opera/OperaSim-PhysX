@@ -23,6 +23,7 @@ public class RockObjectDetector : MonoBehaviour
 		if (touchground)
 		{
 			var rigidbody = GetComponent<Rigidbody>();
+			rigidbody.drag = 20;
 			var velocity = rigidbody.velocity.sqrMagnitude;
 			if (velocity < 0.1)
 			{
