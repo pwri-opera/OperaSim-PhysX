@@ -60,7 +60,7 @@ public class JointStatePublisher : MonoBehaviour
             {
                 message.position[i] = joints[i].jointPosition[0];
                 message.velocity[i] = joints[i].jointVelocity[0];
-                message.effort[i] = joints[i].jointForce[0];
+                message.effort[i] = joints[i].driveForce[0];
             }
             ros.Publish(topicName, message);
             timeElapsed = 0.0f;
