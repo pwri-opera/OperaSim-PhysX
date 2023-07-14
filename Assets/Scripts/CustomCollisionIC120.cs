@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CostomCollisionIC120 : MonoBehaviour
+public class CustomCollisionIC120 : MonoBehaviour
 {
     Transform base_link;
     Transform vessel_link;
