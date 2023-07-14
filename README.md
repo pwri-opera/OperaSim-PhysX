@@ -141,3 +141,20 @@ https://docs.unity3d.com/ja/2023.2/Manual/class-ArticulationBody.html#joint-driv
 ![Physics Properties](images/physics_properties.png)
 
 `Default Solver Iterations` プロパティの数値を大きな値に変更してください。
+
+### 粒子シミュレーションの挙動の調整
+
+土砂の粒子シミュレーションのパラメータは、TerrainゲームオブジェクトのSoil Particle Settingで変更できます。
+
+![Soil Particle Setting](images/soil_particle_setting.png)
+
+| プロパティ名 | 説明 |
+| ----  |  ---- |
+| Enable | 土砂の粒子シミュレーションをオフにしたい時には、このチェックボックスのチェックを外してください。 |
+| Particle Visual Radius | 粒子の見た目上の半径を設定します。粒子同士が干渉する半径を設定するには、下のRockPrefabの設定も合わせて調整してください。 |
+| Particle Stick Distance | 近くの粒子との間に引力を働かせることで、土砂の粘性を再現できます。引力を発生させる範囲を設定します。 |
+| Stick Force | 近くの粒子との間に発生させる引力の強さを設定します。 |
+
+粒子が周囲の粒子と干渉する半径を調整するには、RockPrefabのSphere ColliderのRadius値を変更してください。
+
+![Soil Particle Collision Radius](images/soil_particle_collision_radius.png)
