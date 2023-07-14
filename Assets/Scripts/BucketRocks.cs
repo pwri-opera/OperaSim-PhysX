@@ -102,7 +102,9 @@ public class BucketRocks : MonoBehaviour
 
 	private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject == terrain)
+		if (SoilParticleSettings.instance.enable == false) return;
+
+		if (other.gameObject == terrain)
         {
 			var position = transform.TransformPoint(bounds.center);
 			var point = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(position);
@@ -121,7 +123,9 @@ public class BucketRocks : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        for (var i = 0; i < rocks.Count; i++)
+		if (SoilParticleSettings.instance.enable == false) return;
+
+		for (var i = 0; i < rocks.Count; i++)
         {
 			var rock1 = rocks[i];
 			var repulvector = new Vector3();
