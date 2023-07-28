@@ -105,7 +105,16 @@ ROS 2 の場合
 | ----  |  ---- | ---- | ---- | ---- | ---- |
 | 建機のベースリンクの座標 | /(建機のns)  /base_link/pose | geometry_msgs/PoseStamped | 位置・姿勢 | 位置:[m]  姿勢:[-] | Unity内のworld座標系に対する座標の真値 |
 | 建機のオドメトリ計算結果 | /(建機のns)  /odom | nav_msgs/Odometry | オドメトリ | 位置:[m]  姿勢:[-] | 初期位置を原点として算出している |
-| 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | 現在、effortは常に0.0 |
+| 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | effortについては次節を参照 |
+
+### 関節トルクセンサの有効化
+
+各ゲームオブジェクトに設定された`Joint State Publisher`スクリプトの`Enable Joint Effort Sensor`をチェックすることで、joint_statesトピックからeffort値を出力させることができます。
+
+![Enable Joint Effort Sensor](images/enable_joint_effort_sensor.png)
+
+> **Note**
+> 関節トルクセンサは実機では利用できないことが多いのでご注意ください。
 
 ## パラメータのチューニング方法
 
