@@ -31,11 +31,14 @@ public class JointStatePublisher : MonoBehaviour
         jointNames = new List<string>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
         {
-            var ujoint = joint.GetComponent<UrdfJoint>();
-            if (ujoint && !(ujoint is UrdfJointFixed))
+            if (joint.isActiveAndEnabled)
             {
-                joints.Add(joint);
-                jointNames.Add(ujoint.jointName);
+                var ujoint = joint.GetComponent<UrdfJoint>();
+                if (ujoint && !(ujoint is UrdfJointFixed))
+                {
+                    joints.Add(joint);
+                    jointNames.Add(ujoint.jointName);
+                }
             }
         }
         message = new JointStateMsg();
