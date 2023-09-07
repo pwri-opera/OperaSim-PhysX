@@ -7,6 +7,8 @@ using RosMessageTypes.Std;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Nav;
 using Unity.Robotics.Core;
+using System;
+using PID_Controller;
 
 public class DiffDriveController : MonoBehaviour
 {
@@ -22,10 +24,13 @@ public class DiffDriveController : MonoBehaviour
     public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
     public string childFrameName = "robot_name/base_link";
     public double treadCollectionFactor = 2.0; // Factor Collecting Yaw angle of base_link. This Parameter is multiplied to tread to calculate angular velocity based on Vehicle's Kinematics.
-    private List<ArticulationBody> leftBodies;
-    private List<ArticulationBody> rightBodies;
-    private ArticulationBody leftMiddleWheel;
-    private ArticulationBody rightMiddleWheel;
+    private List<WheelCollider> leftWheelColliders;
+    private List<WheelCollider> rightWheelColliders;
+    private WheelCollider leftMiddleWheel;
+    private WheelCollider rightMiddleWheel;
+
+    private List<PID> leftWheelControllers;
+    private List<PID> rightWheelControllers;
 
     private TwistMsg twist;
     private double tread_half = 2.0;
@@ -42,9 +47,12 @@ public class DiffDriveController : MonoBehaviour
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
-        leftBodies = new List<ArticulationBody>();
-        rightBodies = new List<ArticulationBody>();
+        leftWheelColliders = new List<WheelCollider>();
+        rightWheelColliders = new List<WheelCollider>();
         twist = new TwistMsg();
+
+        leftWheelControllers = new List<PID>();
+        rightWheelControllers = new List<PID>();
 
         odomMessage = new OdometryMsg();
         odomMessage.header = new HeaderMsg();
@@ -53,42 +61,28 @@ public class DiffDriveController : MonoBehaviour
         /* Get ArticulationBody-type Components in Left Wheels and Set Parameters for xDrive in each Component */
         foreach (GameObject left in leftWheels)
         {
-            var body = left.GetComponent<ArticulationBody>();
-            var drive = body.xDrive;
-            /* These parametaers has no reason to be set as each value (eiya!) */
-            body.mass = 50.0f;
-            drive.stiffness = 0;
-            drive.damping = 100000;
-            drive.forceLimit = 100000;
-            /* These parametaers has no reason to be set as each value (eiya!) */
-            body.xDrive = drive;
-            leftBodies.Add(body);
+            var body = left.GetComponent<WheelCollider>();
+            leftWheelColliders.Add(body);
             Debug.Log("Check left!");
 
             /* Get ArticulationBody-type Component named "left_middle_wheel_link" */
             if(left.name == "left_middle_wheel_link"){
                 leftMiddleWheel = body;
             }
+            leftWheelControllers.Add(new PID(10, 0, 0, 1, 1000, -1000));
         }
         /* Get ArticulationBody-type Components in Right Wheels and Set Parameters for xDrive in each Component */
         foreach (GameObject right in rightWheels)
         {
-            var body = right.GetComponent<ArticulationBody>();
-            var drive = body.xDrive;
-            /* These parametaers has no reason to be set as each value (eiya!) */
-            body.mass = 50.0f;
-            drive.stiffness = 0;
-            drive.damping = 100000;
-            drive.forceLimit = 100000;
-            /* These parametaers has no reason to be set as each value (eiya!) */
-            body.xDrive = drive;
-            rightBodies.Add(body);
+            var body = right.GetComponent<WheelCollider>();
+            rightWheelColliders.Add(body);
             Debug.Log("Check right!");
             
             /* Get ArticulationBody-type Component named "right_middle_wheel_link" */
             if(right.name == "right_middle_wheel_link"){
                 rightMiddleWheel = body;
             }
+            rightWheelControllers.Add(new PID(10, 0, 0, 1, 1000, -1000));
         }
         tread_half = Mathf.Abs(leftWheels[0].transform.localPosition.x - rightWheels[0].transform.localPosition.x)/2;
 
@@ -98,7 +92,7 @@ public class DiffDriveController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //const float speed = 100.0f;
         float leftVelCmd = 0.0f; // Velocity Command for Left Track
@@ -110,26 +104,19 @@ public class DiffDriveController : MonoBehaviour
 
         double time = Time.fixedTimeAsDouble;
         double deltaTime = time - previousTime;
-    
-        double leftTrackRadius = 0.0;
-        double rightTrackRadius = 0.0;
-        ArticulationReducedSpace leftTrackVelArs;
-        ArticulationReducedSpace rightTrackVelArs;
 
-        leftTrackVelArs = leftMiddleWheel.jointVelocity; // Unit is [rad/s]
-        rightTrackVelArs = rightMiddleWheel.jointVelocity; // Unit is [rad/s]
+        double leftTrackVel = Math.PI * leftMiddleWheel.rotationSpeed / 180.0; // Unit is [rad/s]
+        double rightTrackVel = Math.PI * rightMiddleWheel.rotationSpeed / 180.0; // Unit is [rad/s]
 
         /* To Get Track's Radius use wheel collider parameter*/
-        var leftWheelCollider = leftMiddleWheel.GetComponent<WheelCollider>();
-        var rightWheelCollider = rightMiddleWheel.GetComponent<WheelCollider>();
-        leftTrackRadius = leftWheelCollider.radius;
-        rightTrackRadius = rightWheelCollider.radius;
+        double leftTrackRadius = leftMiddleWheel.radius;
+        double rightTrackRadius = rightMiddleWheel.radius;
         //Debug.Log("LeftTrackRadius:"+leftTrackRadius);
         //Debug.Log("RightTrackRadius:"+rightTrackRadius);
 
         /* velocity =  angular velocity[rad/s] * radius[m] */
-        leftVelMes = leftTrackVelArs[0] * leftTrackRadius; // Unit is [m/s]
-        rightVelMes = rightTrackVelArs[0] * rightTrackRadius; // Unit is [rad/s]
+        leftVelMes = leftTrackVel * leftTrackRadius; // Unit is [m/s]
+        rightVelMes = rightTrackVel * rightTrackRadius; // Unit is [m/s]
         // Debug.Log("LeftJointVelocity:"+leftVelMes);
         // Debug.Log("RightJointVelocity:"+rightVelMes);
 
@@ -192,17 +179,37 @@ public class DiffDriveController : MonoBehaviour
 
 
         /* Set targetVelocity in xDrive in wheels */
-        foreach (ArticulationBody left in leftBodies)
-        {
-            var drive = left.xDrive;
-            drive.targetVelocity = leftVelCmd;
-            left.xDrive = drive;
+        var ts = TimeSpan.FromSeconds(deltaTime);
+        for (var i = 0; i < leftWheelColliders.Count; i++) {
+            var left = leftWheelColliders[i];
+            var pid = leftWheelControllers[i];
+            var v = (float)pid.PID_iterate(leftVelCmd, leftTrackVel, ts);
+            if (Math.Abs(leftVelCmd) < 0.001)
+            {
+                left.brakeTorque = 10000.0F;
+                left.motorTorque = 0.0F;
+            }
+            else
+            {
+                left.brakeTorque = 0.0F;
+                left.motorTorque = v;
+            }
         }
-        foreach (ArticulationBody right in rightBodies)
+        for (var i = 0; i < rightWheelColliders.Count; i++)
         {
-            var drive = right.xDrive;
-            drive.targetVelocity = rightVelCmd;
-            right.xDrive = drive;
+            var right = rightWheelColliders[i];
+            var pid = rightWheelControllers[i];
+            var v = (float)pid.PID_iterate(rightVelCmd, rightTrackVel, ts);
+            if (Math.Abs(rightVelCmd) < 0.001)
+            {
+                right.brakeTorque = 10000.0F;
+                right.motorTorque = 0.0F;
+            }
+            else
+            {
+                right.brakeTorque = 0.0F;
+                right.motorTorque = v;
+            }
         }
 
         previousTime = time;
