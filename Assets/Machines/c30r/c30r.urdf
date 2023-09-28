@@ -329,4 +329,6 @@
     <kd value="0.001"/>
   </gazebo>
 
+  <disable_collision link1="base_link" link2="vessel_link"></disable_collision>
+  <disable_collision link1="vessel_link" link2="tailgate_link"></disable_collision>
 </robot>
