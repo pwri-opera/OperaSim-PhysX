@@ -69,7 +69,7 @@ public class DiffDriveController : MonoBehaviour
             if(left.name == "left_middle_wheel_link"){
                 leftMiddleWheel = body;
             }
-            leftWheelControllers.Add(new PID(10, 0, 0, 1, 1000, -1000));
+            leftWheelControllers.Add(new PID(100, 0, 0, 1, 1000, -1000));
         }
         /* Get ArticulationBody-type Components in Right Wheels and Set Parameters for xDrive in each Component */
         foreach (GameObject right in rightWheels)
@@ -82,7 +82,7 @@ public class DiffDriveController : MonoBehaviour
             if(right.name == "right_middle_wheel_link"){
                 rightMiddleWheel = body;
             }
-            rightWheelControllers.Add(new PID(10, 0, 0, 1, 1000, -1000));
+            rightWheelControllers.Add(new PID(100, 0, 0, 1, 1000, -1000));
         }
         tread_half = Mathf.Abs(leftWheels[0].transform.localPosition.x - rightWheels[0].transform.localPosition.x)/2;
 
@@ -107,12 +107,14 @@ public class DiffDriveController : MonoBehaviour
 
         double leftTrackVel = Math.PI * leftMiddleWheel.rotationSpeed / 180.0; // Unit is [rad/s]
         double rightTrackVel = Math.PI * rightMiddleWheel.rotationSpeed / 180.0; // Unit is [rad/s]
+        // Debug.Log("LeftTrackVelocity:" + leftTrackVel);
+        // Debug.Log("RightTrackVelocity:" + rightTrackVel);
 
         /* To Get Track's Radius use wheel collider parameter*/
         double leftTrackRadius = leftMiddleWheel.radius;
         double rightTrackRadius = rightMiddleWheel.radius;
-        //Debug.Log("LeftTrackRadius:"+leftTrackRadius);
-        //Debug.Log("RightTrackRadius:"+rightTrackRadius);
+        // Debug.Log("LeftTrackRadius:"+leftTrackRadius);
+        // Debug.Log("RightTrackRadius:"+rightTrackRadius);
 
         /* velocity =  angular velocity[rad/s] * radius[m] */
         leftVelMes = leftTrackVel * leftTrackRadius; // Unit is [m/s]
@@ -174,9 +176,10 @@ public class DiffDriveController : MonoBehaviour
         }
 
         /* Calculate velocity command value based on inverse kinematics */
-        rightVelCmd = (float)(twist.linear.x + tread_half * twist.angular.z) * Mathf.Rad2Deg / (float)rightTrackRadius; // Unit is [rad/s]
-        leftVelCmd = (float)(twist.linear.x - tread_half * twist.angular.z) * Mathf.Rad2Deg / (float)leftTrackRadius; // Unit is [rad/s]
-
+        rightVelCmd = (float)(twist.linear.x + tread_half * twist.angular.z) / (float)rightTrackRadius; // Unit is [rad/s]
+        leftVelCmd = (float)(twist.linear.x - tread_half * twist.angular.z) / (float)leftTrackRadius; // Unit is [rad/s]
+        // Debug.Log("LeftJointVelocityCommand:" + leftVelCmd);
+        // Debug.Log("RightJointVelocityCommand:" + rightVelCmd);
 
         /* Set targetVelocity in xDrive in wheels */
         var ts = TimeSpan.FromSeconds(deltaTime);
