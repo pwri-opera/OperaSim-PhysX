@@ -29,6 +29,9 @@ public class DiffDriveController : MonoBehaviour
     private WheelCollider leftMiddleWheel;
     private WheelCollider rightMiddleWheel;
 
+    public double pGain = 100.0;
+    public double iGain = 0.0;
+    public double dGain = 0.0;
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
 
@@ -69,7 +72,7 @@ public class DiffDriveController : MonoBehaviour
             if(left.name == "left_middle_wheel_link"){
                 leftMiddleWheel = body;
             }
-            leftWheelControllers.Add(new PID(100, 0, 0, 1, 1000, -1000));
+            leftWheelControllers.Add(new PID(pGain, iGain, dGain, 1, 1000, -1000));
         }
         /* Get ArticulationBody-type Components in Right Wheels and Set Parameters for xDrive in each Component */
         foreach (GameObject right in rightWheels)
@@ -82,7 +85,7 @@ public class DiffDriveController : MonoBehaviour
             if(right.name == "right_middle_wheel_link"){
                 rightMiddleWheel = body;
             }
-            rightWheelControllers.Add(new PID(100, 0, 0, 1, 1000, -1000));
+            rightWheelControllers.Add(new PID(pGain, iGain, dGain, 1, 1000, -1000));
         }
         tread_half = Mathf.Abs(leftWheels[0].transform.localPosition.x - rightWheels[0].transform.localPosition.x)/2;
 
