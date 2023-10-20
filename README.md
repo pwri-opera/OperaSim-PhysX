@@ -105,7 +105,16 @@ ROS 2 の場合
 | ----  |  ---- | ---- | ---- | ---- | ---- |
 | 建機のベースリンクの座標 | /(建機のns)  /base_link/pose | geometry_msgs/PoseStamped | 位置・姿勢 | 位置:[m]  姿勢:[-] | Unity内のworld座標系に対する座標の真値 |
 | 建機のオドメトリ計算結果 | /(建機のns)  /odom | nav_msgs/Odometry | オドメトリ | 位置:[m]  姿勢:[-] | 初期位置を原点として算出している |
-| 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | 現在、effortは常に0.0 |
+| 建機の関節角度・角速度 | /(建機のns)  /joint_states | sensor_msgs/JointState | 角度・角速度 | 角度:[rad]  角速度:[rad/s] | effortについては次節を参照 |
+
+### 関節トルクセンサの有効化
+
+各ゲームオブジェクトに設定された`Joint State Publisher`スクリプトの`Enable Joint Effort Sensor`をチェックすることで、joint_statesトピックからeffort値を出力させることができます。
+
+![Enable Joint Effort Sensor](images/enable_joint_effort_sensor.png)
+
+> **Note**
+> 関節トルクセンサは実機では利用できないことが多いのでご注意ください。
 
 ## パラメータのチューニング方法
 
@@ -141,3 +150,20 @@ https://docs.unity3d.com/ja/2023.2/Manual/class-ArticulationBody.html#joint-driv
 ![Physics Properties](images/physics_properties.png)
 
 `Default Solver Iterations` プロパティの数値を大きな値に変更してください。
+
+### 粒子シミュレーションの挙動の調整
+
+土砂の粒子シミュレーションのパラメータは、TerrainゲームオブジェクトのSoil Particle Settingで変更できます。
+
+![Soil Particle Setting](images/soil_particle_setting.png)
+
+| プロパティ名 | 説明 |
+| ----  |  ---- |
+| Enable | 土砂の粒子シミュレーションをオフにしたい時には、このチェックボックスのチェックを外してください。 |
+| Particle Visual Radius | 粒子の見た目上の半径を設定します。粒子同士が干渉する半径を設定するには、下のRockPrefabの設定も合わせて調整してください。 |
+| Particle Stick Distance | 近くの粒子との間に引力を働かせることで、土砂の粘性を再現できます。引力を発生させる範囲を設定します。 |
+| Stick Force | 近くの粒子との間に発生させる引力の強さを設定します。 |
+
+粒子が周囲の粒子と干渉する半径を調整するには、RockPrefabのSphere ColliderのRadius値を変更してください。
+
+![Soil Particle Collision Radius](images/soil_particle_collision_radius.png)
