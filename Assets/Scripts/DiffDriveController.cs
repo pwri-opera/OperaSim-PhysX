@@ -32,6 +32,8 @@ public class DiffDriveController : MonoBehaviour
     public double pGain = 100.0;
     public double iGain = 0.0;
     public double dGain = 0.0;
+    public double torqueLimit = 1000.0;
+    public float brakeTorque = 10000.0F;
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
 
@@ -72,7 +74,7 @@ public class DiffDriveController : MonoBehaviour
             if(left.name == "left_middle_wheel_link"){
                 leftMiddleWheel = body;
             }
-            leftWheelControllers.Add(new PID(pGain, iGain, dGain, 1, 1000, -1000));
+            leftWheelControllers.Add(new PID(pGain, iGain, dGain, 1, torqueLimit, -torqueLimit));
         }
         /* Get ArticulationBody-type Components in Right Wheels and Set Parameters for xDrive in each Component */
         foreach (GameObject right in rightWheels)
@@ -85,7 +87,7 @@ public class DiffDriveController : MonoBehaviour
             if(right.name == "right_middle_wheel_link"){
                 rightMiddleWheel = body;
             }
-            rightWheelControllers.Add(new PID(pGain, iGain, dGain, 1, 1000, -1000));
+            rightWheelControllers.Add(new PID(pGain, iGain, dGain, 1, torqueLimit, -torqueLimit));
         }
         tread_half = Mathf.Abs(leftWheels[0].transform.localPosition.x - rightWheels[0].transform.localPosition.x)/2;
 
@@ -108,8 +110,8 @@ public class DiffDriveController : MonoBehaviour
         double time = Time.fixedTimeAsDouble;
         double deltaTime = time - previousTime;
 
-        double leftTrackVel = Math.PI * leftMiddleWheel.rotationSpeed / 180.0; // Unit is [rad/s]
-        double rightTrackVel = Math.PI * rightMiddleWheel.rotationSpeed / 180.0; // Unit is [rad/s]
+        double leftTrackVel = Math.PI * leftMiddleWheel.rpm / 60.0 / 180.0; // Unit is [rad/s]
+        double rightTrackVel = Math.PI * rightMiddleWheel.rpm / 60.0 / 180.0; // Unit is [rad/s]
         // Debug.Log("LeftTrackVelocity:" + leftTrackVel);
         // Debug.Log("RightTrackVelocity:" + rightTrackVel);
 
@@ -192,7 +194,7 @@ public class DiffDriveController : MonoBehaviour
             var v = (float)pid.PID_iterate(leftVelCmd, leftTrackVel, ts);
             if (Math.Abs(leftVelCmd) < 0.001)
             {
-                left.brakeTorque = 10000.0F;
+                left.brakeTorque = brakeTorque;
                 left.motorTorque = 0.0F;
             }
             else
@@ -208,7 +210,7 @@ public class DiffDriveController : MonoBehaviour
             var v = (float)pid.PID_iterate(rightVelCmd, rightTrackVel, ts);
             if (Math.Abs(rightVelCmd) < 0.001)
             {
-                right.brakeTorque = 10000.0F;
+                right.brakeTorque = brakeTorque;
                 right.motorTorque = 0.0F;
             }
             else
