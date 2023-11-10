@@ -34,6 +34,8 @@ public class DiffDriveController : MonoBehaviour
     public double dGain = 0.0;
     public double torqueLimit = 1000.0;
     public float brakeTorque = 10000.0F;
+    public double maxLinearVelocity = 3.00;  // unit is m/sec
+    public double maxAngularVelocity = Math.PI * 2.0 * 5.0 / 360.0;  // unit is rad/sec
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
 
@@ -67,6 +69,7 @@ public class DiffDriveController : MonoBehaviour
         foreach (GameObject left in leftWheels)
         {
             var body = left.GetComponent<WheelCollider>();
+            body.ConfigureVehicleSubsteps(5f, 100, 100);
             leftWheelColliders.Add(body);
             Debug.Log("Check left!");
 
@@ -80,6 +83,7 @@ public class DiffDriveController : MonoBehaviour
         foreach (GameObject right in rightWheels)
         {
             var body = right.GetComponent<WheelCollider>();
+            body.ConfigureVehicleSubsteps(5f, 100, 100);
             rightWheelColliders.Add(body);
             Debug.Log("Check right!");
             
@@ -110,8 +114,10 @@ public class DiffDriveController : MonoBehaviour
         double time = Time.fixedTimeAsDouble;
         double deltaTime = time - previousTime;
 
-        double leftTrackVel = Math.PI * leftMiddleWheel.rpm / 60.0 / 180.0; // Unit is [rad/s]
-        double rightTrackVel = Math.PI * rightMiddleWheel.rpm / 60.0 / 180.0; // Unit is [rad/s]
+        double leftTrackVel = 2.0 * Math.PI * leftMiddleWheel.rpm / 60.0; // Unit is [rad/s]
+        double rightTrackVel = 2.0 * Math.PI * rightMiddleWheel.rpm / 60.0; // Unit is [rad/s]
+        Debug.Log("LeftTrackRPM:" + leftMiddleWheel.rpm);
+        Debug.Log("RightTrackRPM:" + rightMiddleWheel.rpm);
         // Debug.Log("LeftTrackVelocity:" + leftTrackVel);
         // Debug.Log("RightTrackVelocity:" + rightTrackVel);
 
@@ -181,8 +187,14 @@ public class DiffDriveController : MonoBehaviour
         }
 
         /* Calculate velocity command value based on inverse kinematics */
-        rightVelCmd = (float)(twist.linear.x + tread_half * twist.angular.z) / (float)rightTrackRadius; // Unit is [rad/s]
-        leftVelCmd = (float)(twist.linear.x - tread_half * twist.angular.z) / (float)leftTrackRadius; // Unit is [rad/s]
+        var cmdLinearVel = twist.linear.x;
+        cmdLinearVel = Math.Min(cmdLinearVel, maxLinearVelocity);
+        cmdLinearVel = Math.Max(cmdLinearVel, -maxLinearVelocity);
+        var cmdAngularVel = twist.angular.z;
+        cmdAngularVel = Math.Min(cmdAngularVel, maxAngularVelocity);
+        cmdAngularVel = Math.Max(cmdAngularVel, -maxAngularVelocity);
+        leftVelCmd = (float)(cmdLinearVel - tread_half * cmdAngularVel); // Unit is [m/s]
+        rightVelCmd = (float)(cmdLinearVel + tread_half * cmdAngularVel); // Unit is [m/s]
         // Debug.Log("LeftJointVelocityCommand:" + leftVelCmd);
         // Debug.Log("RightJointVelocityCommand:" + rightVelCmd);
 
@@ -191,7 +203,7 @@ public class DiffDriveController : MonoBehaviour
         for (var i = 0; i < leftWheelColliders.Count; i++) {
             var left = leftWheelColliders[i];
             var pid = leftWheelControllers[i];
-            var v = (float)pid.PID_iterate(leftVelCmd, leftTrackVel, ts);
+            var v = (float)pid.PID_iterate(leftVelCmd, leftVelMes, ts);
             if (Math.Abs(leftVelCmd) < 0.001)
             {
                 left.brakeTorque = brakeTorque;
@@ -202,12 +214,13 @@ public class DiffDriveController : MonoBehaviour
                 left.brakeTorque = 0.0F;
                 left.motorTorque = v;
             }
+            //Debug.Log("LeftJointVelocityPID:" + v);
         }
         for (var i = 0; i < rightWheelColliders.Count; i++)
         {
             var right = rightWheelColliders[i];
             var pid = rightWheelControllers[i];
-            var v = (float)pid.PID_iterate(rightVelCmd, rightTrackVel, ts);
+            var v = (float)pid.PID_iterate(rightVelCmd, rightVelMes, ts);
             if (Math.Abs(rightVelCmd) < 0.001)
             {
                 right.brakeTorque = brakeTorque;
@@ -218,7 +231,11 @@ public class DiffDriveController : MonoBehaviour
                 right.brakeTorque = 0.0F;
                 right.motorTorque = v;
             }
+            //Debug.Log("RightJointVelocityPID:" + v);
         }
+
+        //Debug.Log("LeftJointVelocityDiff:" + (leftVelCmd - leftTrackVel));
+        //Debug.Log("RightJointVelocityDiff:" + (rightVelCmd - rightTrackVel));
 
         previousTime = time;
     }
