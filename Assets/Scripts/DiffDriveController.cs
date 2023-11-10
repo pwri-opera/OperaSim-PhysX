@@ -116,8 +116,8 @@ public class DiffDriveController : MonoBehaviour
 
         double leftTrackVel = 2.0 * Math.PI * leftMiddleWheel.rpm / 60.0; // Unit is [rad/s]
         double rightTrackVel = 2.0 * Math.PI * rightMiddleWheel.rpm / 60.0; // Unit is [rad/s]
-        Debug.Log("LeftTrackRPM:" + leftMiddleWheel.rpm);
-        Debug.Log("RightTrackRPM:" + rightMiddleWheel.rpm);
+        // Debug.Log("LeftTrackRPM:" + leftMiddleWheel.rpm);
+        // Debug.Log("RightTrackRPM:" + rightMiddleWheel.rpm);
         // Debug.Log("LeftTrackVelocity:" + leftTrackVel);
         // Debug.Log("RightTrackVelocity:" + rightTrackVel);
 
