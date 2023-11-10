@@ -26,7 +26,7 @@ Simulator on Unity + PhysX communicating with ROS
    ```bash
    $ ./UnityHub.AppImage
    ```
-  UnityHubを利用するためのライセンス認証手続きを行った後、Unity Editor（version: `2021.3.25f1`）を以下のアーカイブサイトより選択してインストールする
+  UnityHubを利用するためのライセンス認証手続きを行った後、Unity Editor（version: `2022.3.4f1`）を以下のアーカイブサイトより選択してインストールする
 
 [https://unity3d.com/get-unity/download/archive](https://unity3d.com/get-unity/download/archive)
 
