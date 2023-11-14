@@ -17,20 +17,6 @@ Simulator on Unity + PhysX communicating with ROS
 
 - windows 又は Macの場合: [https://unity3d.com/jp/get-unity/download](https://unity3d.com/jp/get-unity/download)
 - Linuxの場合(Linux版は動作確認していない):[https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download)
- 
- 上記のサイトにて"Download Unity Hub"をクリックし、最新の`UnityHub.AppImage`をダウンロード後、実行権限を付与する(Linux版で必要な工程であるがREADME.md編集者自身は実行しなくても問題なかった)
-  ```bash
-  $ sudo chmod +x UnityHub.AppImage
-  ```
-  UnityHub.AppImageを実行する
-   ```bash
-   $ ./UnityHub.AppImage
-   ```
-  UnityHubを利用するためのライセンス認証手続きを行った後、Unity Editor（version: `2022.3.4f1`）を以下のアーカイブサイトより選択してインストールする
-  ※ 2. Projectファイルの開き方でクリックした際に指定のバージョンがダウンロードされるため行わなくても良い。（編集者確認済み）
-
-
-[https://unity3d.com/get-unity/download/archive](https://unity3d.com/get-unity/download/archive)
 
 ### 2. Projectファイルの開き方
 - UnityHubを起動し、画面右上の「追加」から`OperaSim_PhysX`(Githubから自身のPCにダウンロードしたもの)選択し、クリックする（初回起動時には数分程度の時間がかかります）
