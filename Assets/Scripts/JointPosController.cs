@@ -15,6 +15,9 @@ public class JointPosController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var robotName = this.transform.root.name;
+        setpointTopicName = setpointTopicName.Replace("robot_name/", robotName + "/");
+
         ros = ROSConnection.GetOrCreateInstance();
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();

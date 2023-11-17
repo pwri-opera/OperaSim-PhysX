@@ -10,7 +10,7 @@ using Unity.Robotics.Core;
 public class OdomPublisher : MonoBehaviour
 {
     ROSConnection ros;
-    public string robotName = "robot_name";
+    private string robotName = "robot_name";
     public string topicName = "robot_name/diff_drive_controller/odom";
     public string childFrameName = "robot_name/base_link";
     private OdometryMsg message;
@@ -24,6 +24,10 @@ public class OdomPublisher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        robotName = this.transform.root.name;
+        topicName = topicName = .Replace("robot_name/", robotName + "/");
+        childFrameName = childFrameName.Replace("robot_name/", robotName + "/");
+
         message = new OdometryMsg();
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();

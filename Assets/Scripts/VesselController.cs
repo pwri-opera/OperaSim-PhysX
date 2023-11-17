@@ -7,13 +7,16 @@ using RosMessageTypes.Std;
 public class VesselController : MonoBehaviour
 {
     private ROSConnection ros;
-    public string DumpTopicName = "dump/cmd";
+    public string DumpTopicName = "robot_name/dump/cmd";
     public ArticulationBody dump_joint;
     private Float64Msg target_pos;
 
     // Start is called before the first frame update
     void Start()
     {
+        var robotName = this.transform.root.name;
+        DumpTopicName = DumpTopicName.Replace("robot_name/", robotName + "/");
+
         ros = ROSConnection.GetOrCreateInstance();
         dump_joint = this.GetComponent<ArticulationBody>();
         target_pos = new Float64Msg();

@@ -11,7 +11,7 @@ using Unity.Robotics.Core;
 public class PoseStampedPublisher : MonoBehaviour
 {
     ROSConnection ros;
-    public string robotName = "robot_name";
+    private string robotName = "robot_name";
     public string topicName = "robot_name/unity/pose_stmp";
     private PoseStampedMsg message;
 
@@ -24,6 +24,9 @@ public class PoseStampedPublisher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        robotName = this.transform.root.name;
+        topicName = topicName.Replace("robot_name/", robotName + "/");
+
         message = new PoseStampedMsg();
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();

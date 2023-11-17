@@ -23,6 +23,9 @@ public class GroundTruthPublisher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var robotName = this.transform.root.name;
+        topicName = topicName.Replace("robot_name/", robotName + "/");
+
         message = new OdometryMsg();
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();

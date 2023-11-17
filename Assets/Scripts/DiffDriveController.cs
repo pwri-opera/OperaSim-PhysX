@@ -17,7 +17,7 @@ public class DiffDriveController : MonoBehaviour
 
     private OdometryMsg odomMessage;
 
-    public string robotName = "robot_name";
+    private string robotName = "robot_name";
     public string TwistTopicName = "robot_name/tracks/cmd_vel"; // Subscribe Messsage Topic Name
     public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
     public string childFrameName = "robot_name/base_link";
@@ -41,6 +41,9 @@ public class DiffDriveController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        robotName = this.transform.root.name;
+        TwistTopicName = TwistTopicName.Replace("robot_name/", robotName + "/");
+
         ros = ROSConnection.GetOrCreateInstance();
         leftBodies = new List<ArticulationBody>();
         rightBodies = new List<ArticulationBody>();

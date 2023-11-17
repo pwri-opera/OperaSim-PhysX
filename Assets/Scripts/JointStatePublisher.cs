@@ -11,7 +11,7 @@ using Unity.Robotics.Core;
 public class JointStatePublisher : MonoBehaviour
 {
     ROSConnection ros;
-    public string topicName = "joint_states";
+    public string topicName = "robot_name/joint_states";
     private JointStateMsg message;
     private List<ArticulationBody> joints;
     private List<string> jointNames;
@@ -27,6 +27,9 @@ public class JointStatePublisher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var robotName = this.transform.root.name;
+        topicName = topicName.Replace("robot_name/", robotName + "/");
+
         joints = new List<ArticulationBody>();
         jointNames = new List<string>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
