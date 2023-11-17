@@ -10,6 +10,10 @@ public class GroundTruthTFPublisher : MonoBehaviour
 {
     [SerializeField]
     float m_PublishRateHz = 20f;
+    [SerializeField]
+    string m_FramePrefix = "";
+    [SerializeField]
+    string m_FrameSuffix = "_groundtruth";
 
     float m_LastPublishTimeSeconds;
 
@@ -58,7 +62,7 @@ public class GroundTruthTFPublisher : MonoBehaviour
             message.header.stamp.sec = secs;
             message.header.stamp.nanosec = nsecs;
             message.header.frame_id = "map";
-            message.child_frame_id = base_link.Key;
+            message.child_frame_id = m_FramePrefix + base_link.Key + m_FrameSuffix;
             message.transform.translation = base_link.Value.transform.position.To<FLU>();
             message.transform.rotation = base_link.Value.transform.rotation.To<FLU>();
             tfMessageList.Add(message);
