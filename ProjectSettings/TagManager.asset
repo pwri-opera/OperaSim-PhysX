@@ -11,13 +11,13 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ignore Collision
   - Water
   - UI
   - Bucket
   - SoilParticle
-  - Ic120_body
-  - Ic120_dummy_wheel
+  - 
+  - 
   - 
   - 
   - 

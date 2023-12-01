@@ -16,6 +16,8 @@ public class JointStatePublisher : MonoBehaviour
     private List<ArticulationBody> joints;
     private List<string> jointNames;
 
+    public bool enableJointEffortSensor = false;
+
     // Publish the cube's position and rotation every N seconds
     public float publishMessageInterval = 0.5f;
 
@@ -29,11 +31,14 @@ public class JointStatePublisher : MonoBehaviour
         jointNames = new List<string>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
         {
-            var ujoint = joint.GetComponent<UrdfJoint>();
-            if (ujoint && !(ujoint is UrdfJointFixed))
+            if (joint.isActiveAndEnabled)
             {
-                joints.Add(joint);
-                jointNames.Add(ujoint.jointName);
+                var ujoint = joint.GetComponent<UrdfJoint>();
+                if (ujoint && !(ujoint is UrdfJointFixed))
+                {
+                    joints.Add(joint);
+                    jointNames.Add(ujoint.jointName);
+                }
             }
         }
         message = new JointStateMsg();
@@ -60,7 +65,7 @@ public class JointStatePublisher : MonoBehaviour
             {
                 message.position[i] = joints[i].jointPosition[0];
                 message.velocity[i] = joints[i].jointVelocity[0];
-                message.effort[i] = joints[i].jointForce[0];
+                message.effort[i] = enableJointEffortSensor ? joints[i].driveForce[0] : 0.0;
             }
             ros.Publish(topicName, message);
             timeElapsed = 0.0f;

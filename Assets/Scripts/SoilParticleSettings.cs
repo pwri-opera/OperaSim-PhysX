@@ -6,6 +6,7 @@ public class SoilParticleSettings : MonoBehaviour
 {
     public static SoilParticleSettings instance = null;
 
+    public bool enable = true;
     public float particleVisualRadius = 0.2f;
     public double partileStickDistance = 0.25;
     public float stickForce = 30.0f;
