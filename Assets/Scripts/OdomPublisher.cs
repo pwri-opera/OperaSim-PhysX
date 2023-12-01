@@ -25,8 +25,8 @@ public class OdomPublisher : MonoBehaviour
     void Start()
     {
         robotName = this.transform.root.name;
-        topicName = topicName = .Replace("robot_name/", robotName + "/");
-        childFrameName = childFrameName.Replace("robot_name/", robotName + "/");
+        topicName = topicName.Replace("robot_name/", robotName + "/");
+        childFrameName = childFrameName.Replace("robot_name", robotName);
 
         message = new OdometryMsg();
         message.header = new HeaderMsg();

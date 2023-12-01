@@ -55,6 +55,8 @@ public class DiffDriveController : MonoBehaviour
     {
         robotName = this.transform.root.name;
         TwistTopicName = TwistTopicName.Replace("robot_name/", robotName + "/");
+        OdomTopicName = OdomTopicName.Replace("robot_name/", robotName + "/");
+        childFrameName = childFrameName.Replace("robot_name", robotName);
 
         ros = ROSConnection.GetOrCreateInstance();
         leftWheelColliders = new List<WheelCollider>();

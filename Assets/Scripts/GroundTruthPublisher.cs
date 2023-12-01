@@ -25,6 +25,7 @@ public class GroundTruthPublisher : MonoBehaviour
     {
         var robotName = this.transform.root.name;
         topicName = topicName.Replace("robot_name/", robotName + "/");
+        childFrameName = childFrameName.Replace("robot_name", robotName);
 
         message = new OdometryMsg();
         message.header = new HeaderMsg();
