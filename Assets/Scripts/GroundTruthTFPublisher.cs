@@ -29,6 +29,12 @@ public class GroundTruthTFPublisher : MonoBehaviour
     {
         ros = ROSConnection.GetOrCreateInstance();
         ros.RegisterPublisher<TFMessageMsg>("/tf");
+        UpdateRobotsList();
+        m_LastPublishTimeSeconds = Time.time + PublishPeriodSeconds;
+    }
+
+    void UpdateRobotsList()
+    {
         base_links = new Dictionary<string, Component>();
         foreach (var robot in GameObject.FindGameObjectsWithTag("robot"))
         {
@@ -45,7 +51,6 @@ public class GroundTruthTFPublisher : MonoBehaviour
                 }
             }
         }
-        m_LastPublishTimeSeconds = Time.time + PublishPeriodSeconds;
     }
 
     void PublishMessage()

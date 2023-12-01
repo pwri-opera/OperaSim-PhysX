@@ -12,6 +12,7 @@ public class SpawnModelServer : MonoBehaviour
     ROSConnection ros;
     private double pub_tick;
     private const double pub_interval = 0.1;
+    private GameObject rosObject;
 
     private SpawnModelResponse LoadUrdf(SpawnModelRequest req)
     {
@@ -41,6 +42,8 @@ public class SpawnModelServer : MonoBehaviour
             models.Add(req.model_name, robotObject);
         }
 
+        rosObject.SendMessage("UpdateRobotsList");
+
         ret.success = true;
         return ret;
     }
@@ -55,6 +58,7 @@ public class SpawnModelServer : MonoBehaviour
         ros.ImplementService<SpawnModelRequest, SpawnModelResponse>("/gazebo/spawn_urdf_model", SpawnURDFModel);
         ros.ImplementService<SpawnModelRequest, SpawnModelResponse>("/gazebo/spawn_sdf_model", SpawnSDFModel);
         ros.ImplementService<SetModelConfigurationRequest, SetModelConfigurationResponse>("/gazebo/set_model_configuration", SetModelConfiguration);
+        rosObject = GameObject.Find("ROS");
     }
 
     private SpawnModelResponse SpawnURDFModel(SpawnModelRequest req)
