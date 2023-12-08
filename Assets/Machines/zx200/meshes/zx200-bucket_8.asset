@@ -7,7 +7,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: zx200-bucket_8
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -154,6 +154,7 @@ Mesh:
     m_Center: {x: 0.1243474, y: -0.1871612, z: 1.0056486}
     m_Extent: {x: 0.15790634, y: 0.28949493, z: 0.1447475}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1

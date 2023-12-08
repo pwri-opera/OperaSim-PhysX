@@ -17,6 +17,7 @@ public class CustomCollisionIC120 : MonoBehaviour
         // get each transform items
         base_link = gameObject.transform.Find("base_link");
         vessel_link = gameObject.transform.Find("base_link/vessel_link");
+        /*
         foreach (var s in wheel_sides)
         {
             foreach (var p in wheel_positions)
@@ -40,6 +41,7 @@ public class CustomCollisionIC120 : MonoBehaviour
                 Physics.IgnoreCollision(w1.GetComponent<Collider>(), w2.GetComponent<Collider>());
             }
         }
+        */
 
         // vessel should not collide with base link
         Physics.IgnoreCollision(base_link.GetComponent<Collider>(), vessel_link.GetComponent<Collider>());

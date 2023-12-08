@@ -490,5 +490,10 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
-</robot>
 
+  <disable_collision link1="base_link" link2="body_link"></disable_collision>
+  <disable_collision link1="body_link" link2="boom_link"></disable_collision>
+  <disable_collision link1="boom_link" link2="arm_link"></disable_collision>
+  <disable_collision link1="arm_link" link2="bucket_link"></disable_collision>
+  <disable_collision link1="bucket_link" link2="bucket_end_link"></disable_collision>
+</robot>
