@@ -53,7 +53,11 @@ public class GroundTruthTFPublisher : MonoBehaviour
         var tfMessageList = new List<TransformStampedMsg>();
 
         float sim_time = Time.time;
+#if !ROS2
         uint secs = (uint)sim_time;
+#else
+        int secs = (int)sim_time;
+#endif
         uint nsecs = (uint)((sim_time % 1) * 1e9);
 
         foreach(var base_link in base_links)
