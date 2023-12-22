@@ -25,20 +25,12 @@ public class BucketRocks : MonoBehaviour
 	private List<GameObject> rocks;
 	private ConvexHullCalculator calc;
 	private Bounds bounds;
-	private float[,] originalHeights;
 
 	private void Start()
     {
 		calc = new ConvexHullCalculator();
 		rocks = new List<GameObject>();
 		bounds = gameObject.GetComponent<MeshFilter>().mesh.bounds;
-		var terrainData = terrain.GetComponent<Terrain>().terrainData;
-		originalHeights = terrainData.GetHeights(0, 0,terrainData.heightmapResolution, terrainData.heightmapResolution);
-	}
-
-	private void OnApplicationQuit()
-	{
-		this.terrain.GetComponent<Terrain>().terrainData.SetHeights(0, 0, originalHeights);
 	}
 
 	private void CreateRock(Vector3 point)
@@ -80,26 +72,6 @@ public class BucketRocks : MonoBehaviour
 		rocks.Add(rock);
 	}
 
-	private void ModifyTerrain(Vector3 point, float diff)
-    {
-		var terrainData = terrain.GetComponent<Terrain>().terrainData;
-		Vector3 relpos = (point - terrain.gameObject.transform.position);
-		Vector3 pos;
-		pos.x = relpos.x / terrainData.size.x;
-		pos.y = relpos.y / terrainData.size.y;
-		pos.z = relpos.z / terrainData.size.z;
-		var posXInTerrain = (int)(pos.x * terrainData.heightmapResolution);
-		var posYInTerrain = (int)(pos.z * terrainData.heightmapResolution);
-		int size = 6;
-		int offset = size / 2;
-		float[,] heights = terrainData.GetHeights(posXInTerrain - offset, posYInTerrain - offset, size, size);
-		for (int i = 0; i < size; i++)
-			for (int j = 0; j < size; j++)
-				heights[i, j] += diff;
-		terrainData.SetHeights(posXInTerrain - offset, posYInTerrain - offset, heights);
-		terrainData.SyncHeightmap();
-	}
-
 	private void OnTriggerStay(Collider other)
     {
 		if (SoilParticleSettings.instance.enable == false) return;
@@ -108,14 +80,14 @@ public class BucketRocks : MonoBehaviour
         {
 			var position = transform.TransformPoint(bounds.center);
 			var point = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(position);
-			ModifyTerrain(point, -0.0001f);
+			SoilParticleSettings.ModifyTerrain(point, -0.0001f);
 			CreateRock(point - (position - point) * 0.1f + Random.insideUnitSphere * 0.2f);
         }
     }
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-		ModifyTerrain(rock.transform.position, 0.0001f);
+		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.0001f);
 		Destroy(rock);
 		rocks.Remove(rock);
     }

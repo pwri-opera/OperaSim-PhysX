@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
+using System;
 
 public class SoilParticleSettings : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class SoilParticleSettings : MonoBehaviour
     [SerializeField]
     public int m_ReposeJitter = 0;
     [SerializeField]
-    public float m_dt = 0.0025f;
+    public float m_ReposeTimeStep = 0.01f;
 
     public float syncPeriod = 1.0f;
 
@@ -28,9 +30,11 @@ public class SoilParticleSettings : MonoBehaviour
     RenderTexture heightmapRT0 = null;
     RenderTexture heightmapRT1 = null;
     RenderTexture sedimentRT = null;
-    RenderTexture hardnessRT = null;
-    RenderTexture reposeAngleRT = null;
-    RenderTexture collisionRT = null;
+
+    ComputeShader cs2 = null;
+    int digKernelIdx = -1;
+
+    private float[,] originalHeights;
 
     private void Awake()
     {
@@ -48,54 +52,57 @@ public class SoilParticleSettings : MonoBehaviour
         cs = AssetDatabase.LoadAssetAtPath<ComputeShader>("Packages/com.unity.terrain-tools/Editor/TerrainTools/Compute/Thermal.compute");
         if (cs == null)
         {
-            throw new MissingReferenceException("Could not find compute shader");
+            throw new MissingReferenceException("Could not find compute shader for thermal erosion");
         }
         thermalKernelIdx = cs.FindKernel("ThermalErosion");
+
+        cs2 = Instantiate(Resources.Load<ComputeShader>("Dig"));
+        if (cs2 == null)
+        {
+            throw new MissingReferenceException("Could not find compute shader fo digging");
+        }
+        digKernelIdx = cs2.FindKernel("Dig");
     }
 
     private void Start()
     {
         var terrainData = gameObject.GetComponent<Terrain>().terrainData;
+
+        originalHeights = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
+
         var terrainTexture = terrainData.heightmapTexture;
-        var terrainScale = terrainData.heightmapScale;
-        var texelSize = new Vector2(32, 32);
+        var terrainScale = terrainData.size;
 
         xRes = terrainTexture.width;
         yRes = terrainTexture.height;
 
+        var texelSize = new Vector2(terrainScale.x / xRes,
+                                    terrainScale.z / yRes);
+
         heightmapRT0 = new RenderTexture(xRes, yRes, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
         heightmapRT0.enableRandomWrite = true;
+        heightmapRT0.filterMode = FilterMode.Point;
         heightmapRT1 = new RenderTexture(xRes, yRes, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
         heightmapRT1.enableRandomWrite = true;
+        heightmapRT1.filterMode = FilterMode.Point;
         sedimentRT = new RenderTexture(xRes, yRes, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
         sedimentRT.enableRandomWrite = true;
-        hardnessRT = new RenderTexture(xRes, yRes, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-        hardnessRT.enableRandomWrite = true;
-        reposeAngleRT = new RenderTexture(xRes, yRes, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-        reposeAngleRT.enableRandomWrite = true;
-        collisionRT = new RenderTexture(xRes, yRes, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-        collisionRT.enableRandomWrite = true;
+        sedimentRT.filterMode = FilterMode.Point;
 
         Graphics.Blit(terrainTexture, heightmapRT0);
         Graphics.Blit(terrainTexture, heightmapRT1);
         Graphics.Blit(Texture2D.blackTexture, sedimentRT);
-        Graphics.Blit(Texture2D.blackTexture, hardnessRT);
-        Graphics.Blit(Texture2D.blackTexture, reposeAngleRT);
-        Graphics.Blit(Texture2D.blackTexture, collisionRT);
 
         float dx = (float)texelSize.x;
         float dy = (float)texelSize.y;
         float dxdy = Mathf.Sqrt(dx * dx + dy * dy);
 
-        cs.SetFloat("dt", m_dt);
+        cs.SetFloat("dt", m_ReposeTimeStep);
         cs.SetFloat("InvDiagMag", 1.0f / dxdy);
         cs.SetVector("dxdy", new Vector4(dx, dy, 1.0f / dx, 1.0f / dy));
         cs.SetVector("terrainDim", new Vector4(terrainScale.x, terrainScale.y, terrainScale.z));
         cs.SetVector("texDim", new Vector4((float)xRes, (float)yRes, 0.0f, 0.0f));
         cs.SetTexture(thermalKernelIdx, "Sediment", sedimentRT);
-        cs.SetTexture(thermalKernelIdx, "ReposeMask", reposeAngleRT);
-        cs.SetTexture(thermalKernelIdx, "Collision", collisionRT);
-        cs.SetTexture(thermalKernelIdx, "Hardness", hardnessRT);
 
         timeElapsed = 0.0f;
     }
@@ -105,42 +112,41 @@ public class SoilParticleSettings : MonoBehaviour
         if (heightmapRT0 != null) heightmapRT0.Release();
         if (heightmapRT1 != null) heightmapRT1.Release();
         if (sedimentRT != null) sedimentRT.Release();
-        if (hardnessRT != null) hardnessRT.Release();
-        if (reposeAngleRT != null) reposeAngleRT.Release();
-        if (collisionRT != null) collisionRT.Release();
+        gameObject.GetComponent<Terrain>().terrainData.SetHeights(0, 0, originalHeights);
     }
 
-    public void ModifyTerrain(Vector3 point, float diff)
+    public static void ModifyTerrain(Vector3 point, float diff)
     {
-        var terrainData = gameObject.GetComponent<Terrain>().terrainData;
-        Vector3 relpos = (point - gameObject.transform.position);
-        Vector3 pos;
-        pos.x = relpos.x / terrainData.size.x;
-        pos.y = relpos.y / terrainData.size.y;
-        pos.z = relpos.z / terrainData.size.z;
-        var posXInTerrain = (int)(pos.x * terrainData.heightmapResolution);
-        var posYInTerrain = (int)(pos.z * terrainData.heightmapResolution);
-        int size = 6;
-        int offset = size / 2;
-        float[,] heights = terrainData.GetHeights(posXInTerrain - offset, posYInTerrain - offset, size, size);
-        for (int i = 0; i < size; i++)
-            for (int j = 0; j < size; j++)
-                heights[i, j] += diff;
-        terrainData.SetHeights(posXInTerrain - offset, posYInTerrain - offset, heights);
-        terrainData.SyncHeightmap();
+        if (instance == null)
+            return;
+
+        RenderTexture prevRT = RenderTexture.active;
+
+        var terrainData = instance.GetComponent<Terrain>().terrainData;
+        Vector3 relpos = (point - instance.transform.position);
+        var posXInTerrain = (int)(relpos.x / terrainData.size.x * instance.xRes);
+        var posYInTerrain = (int)(relpos.z / terrainData.size.z * instance.yRes);
+
+        instance.cs2.SetTexture(instance.digKernelIdx, "heightmap", instance.heightmapRT0);
+        instance.cs2.SetFloat("diff", diff);
+        instance.cs2.SetVector("pos", new Vector2(posXInTerrain, posYInTerrain));
+
+        instance.cs2.Dispatch(instance.digKernelIdx, 1, 1, 1);
+
+        RenderTexture.active = instance.heightmapRT0;
+        RectInt rect = new RectInt(posXInTerrain - 10, posYInTerrain - 10, 20, 20);
+        terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
+
+        RenderTexture.active = prevRT;
     }
 
     // Part of this code is from:
     //  com.unity.terrain-tools/Editor/TerrainTools/Erosion/ThermalEroder.cs
     void FixedUpdate()
     {
-        int[] numWorkGroups = { 1, 1, 1 };
+        RenderTexture prevRT = RenderTexture.active;
 
         var terrainData = gameObject.GetComponent<Terrain>().terrainData;
-
-        //Graphics.Blit(terrainData.heightmapTexture, heightmapRT0);
-
-        RenderTexture prevRT = RenderTexture.active;
 
         cs.SetTexture(thermalKernelIdx, "TerrainHeightPrev", heightmapRT0);
         cs.SetTexture(thermalKernelIdx, "TerrainHeight", heightmapRT1);
@@ -151,19 +157,41 @@ public class SoilParticleSettings : MonoBehaviour
         Vector2 m = new Vector2(Mathf.Tan(jitteredTau.x * Mathf.Deg2Rad), Mathf.Tan(jitteredTau.y * Mathf.Deg2Rad));
         cs.SetVector("angleOfRepose", new Vector4(m.x, m.y, 0.0f, 0.0f));
 
-        cs.Dispatch(thermalKernelIdx, xRes / numWorkGroups[0], yRes / numWorkGroups[1], numWorkGroups[2]);
+        cs.Dispatch(thermalKernelIdx, xRes, yRes, 1);
 
         timeElapsed += Time.deltaTime;
 
         if (timeElapsed >= syncPeriod)
         {
-            Debug.Log("SoilParticle sync.");
+            //Debug.Log("SoilParticle sync.");
+
             RenderTexture.active = heightmapRT1;
-            RectInt rect = new RectInt(0, 0, xRes, yRes);
-            terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.HeightAndLod);
-            //terrainData.SyncHeightmap();
+
+            foreach (var robot in GameObject.FindGameObjectsWithTag("robot"))
+            {
+                if (robot.activeInHierarchy)
+                {
+                    Component base_link = null;
+                    try
+                    {
+                        var childs = new List<Component>(robot.GetComponentsInChildren(typeof(Component)));
+                        base_link = childs.Find(c => c.name == "base_link");
+                    }
+                    catch (ArgumentNullException e)
+                    {
+                        base_link = robot.GetComponent(typeof(Component));
+                    }
+                    Vector3 relpos = (base_link.transform.position - gameObject.transform.position);
+                    var posXInTerrain = (int)(relpos.x / terrainData.size.x * xRes);
+                    var posYInTerrain = (int)(relpos.z / terrainData.size.z * yRes);
+                    RectInt rect = new RectInt(posXInTerrain - 30, posYInTerrain - 30, 60, 60);
+                    terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
+                }
+            }
+
             timeElapsed = 0.0f;
         }
+        terrainData.SyncHeightmap();
 
         // swap
         var temp = heightmapRT0;
