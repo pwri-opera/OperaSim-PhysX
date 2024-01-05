@@ -1,0 +1,13 @@
+#pragma kernel Dig
+
+RWTexture2D<float> heightmap;
+float diff;
+int2 pos;
+
+[numthreads(1,1,1)]
+void Dig (uint3 id : SV_DispatchThreadID)
+{
+    for (int i = -1; i <= 1; i++)
+        for (int j = -1; j <= 1; j++)
+            heightmap[float2(pos.x + i, pos.y + j)] += diff;
+}
