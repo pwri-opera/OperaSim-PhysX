@@ -80,14 +80,14 @@ public class BucketRocks : MonoBehaviour
         {
 			var position = transform.TransformPoint(bounds.center);
 			var point = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(position);
-			SoilParticleSettings.ModifyTerrain(point, -0.0001f);
+			SoilParticleSettings.ModifyTerrain(point, -0.001f);
 			CreateRock(point - (position - point) * 0.1f + Random.insideUnitSphere * 0.2f);
         }
     }
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.0001f);
+		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.001f);
 		Destroy(rock);
 		rocks.Remove(rock);
     }

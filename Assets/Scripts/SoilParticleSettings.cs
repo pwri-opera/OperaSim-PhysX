@@ -13,11 +13,9 @@ public class SoilParticleSettings : MonoBehaviour
     public float stickForce = 30.0f;
 
     [SerializeField]
-    public Vector2 m_AngleOfRepose = new Vector2(32.0f, 36.0f);
+    public Vector2 m_AngleOfRepose = new Vector2(30.0f, 45.0f);
     [SerializeField]
     public int m_ReposeJitter = 0;
-    [SerializeField]
-    public float m_ReposeTimeStep = 0.01f;
 
     public float syncPeriod = 1.0f;
 
@@ -97,7 +95,7 @@ public class SoilParticleSettings : MonoBehaviour
         float dy = (float)texelSize.y;
         float dxdy = Mathf.Sqrt(dx * dx + dy * dy);
 
-        cs.SetFloat("dt", m_ReposeTimeStep);
+        cs.SetFloat("dt", Time.fixedDeltaTime);
         cs.SetFloat("InvDiagMag", 1.0f / dxdy);
         cs.SetVector("dxdy", new Vector4(dx, dy, 1.0f / dx, 1.0f / dy));
         cs.SetVector("terrainDim", new Vector4(terrainScale.x, terrainScale.y, terrainScale.z));
@@ -118,6 +116,9 @@ public class SoilParticleSettings : MonoBehaviour
     public static void ModifyTerrain(Vector3 point, float diff)
     {
         if (instance == null)
+            return;
+
+        if (!instance.enable)
             return;
 
         RenderTexture prevRT = RenderTexture.active;
@@ -144,6 +145,11 @@ public class SoilParticleSettings : MonoBehaviour
     //  com.unity.terrain-tools/Editor/TerrainTools/Erosion/ThermalEroder.cs
     void FixedUpdate()
     {
+        timeElapsed += Time.fixedDeltaTime;
+
+        if (!enable)
+            return;
+
         RenderTexture prevRT = RenderTexture.active;
 
         var terrainData = gameObject.GetComponent<Terrain>().terrainData;
@@ -158,8 +164,6 @@ public class SoilParticleSettings : MonoBehaviour
         cs.SetVector("angleOfRepose", new Vector4(m.x, m.y, 0.0f, 0.0f));
 
         cs.Dispatch(thermalKernelIdx, xRes, yRes, 1);
-
-        timeElapsed += Time.deltaTime;
 
         if (timeElapsed >= syncPeriod)
         {
