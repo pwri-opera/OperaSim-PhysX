@@ -7,14 +7,28 @@ public class RockObjectDetector : MonoBehaviour
 {
 	public GameObject manager;
 	public GameObject terrain;
+	private bool touchground = false;
 
     private void OnCollisionEnter(Collision collision)
     {
 		if (collision.gameObject == terrain)
         {
-			manager.SendMessage("OnRockTerrainCollision", this.gameObject);
+			touchground = true;
 		}
 	}
+
+    private void FixedUpdate()
+    {
+        if (touchground)
+		{
+            var rigidbody = GetComponent<Rigidbody>();
+            var velocity = rigidbody.velocity.sqrMagnitude;
+            if (velocity < 0.1)
+            {
+                manager.SendMessage("OnRockTerrainCollision", this.gameObject);
+            }
+        }
+    }
 }
 
 public class BucketRocks : MonoBehaviour
