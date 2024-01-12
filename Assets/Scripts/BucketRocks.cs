@@ -72,22 +72,22 @@ public class BucketRocks : MonoBehaviour
 		rocks.Add(rock);
 	}
 
-	private void OnTriggerStay(Collider other)
+	private void OnCollisionStay(Collision other)
     {
-		if (SoilParticleSettings.instance.enable == false) return;
+        if (SoilParticleSettings.instance.enable == false) return;
 
 		if (other.gameObject == terrain)
         {
-			var position = transform.TransformPoint(bounds.center);
-			var point = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(position);
-			SoilParticleSettings.ModifyTerrain(point, -0.001f);
-			CreateRock(point - (position - point) * 0.1f + Random.insideUnitSphere * 0.2f);
+            var position = transform.TransformPoint(bounds.center);
+            var point = other.GetContact(0).point;
+			SoilParticleSettings.ModifyTerrain(point, -0.0001f);
+			CreateRock(point + (position - point) * 0.2f);
         }
     }
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.001f);
+		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.0001f);
 		Destroy(rock);
 		rocks.Remove(rock);
     }
