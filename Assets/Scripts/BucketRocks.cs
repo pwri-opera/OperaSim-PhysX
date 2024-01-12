@@ -28,6 +28,10 @@ public class RockObjectDetector : MonoBehaviour
                 manager.SendMessage("OnRockTerrainCollision", this.gameObject);
             }
         }
+		if (this.transform.position.y < -10.0)
+		{
+			manager.SendMessage("OnRockTerrainCollision", this.gameObject);
+		}
     }
 }
 
