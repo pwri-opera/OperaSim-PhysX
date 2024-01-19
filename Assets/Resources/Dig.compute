@@ -7,7 +7,7 @@ int2 pos;
 [numthreads(1,1,1)]
 void Dig (uint3 id : SV_DispatchThreadID)
 {
-    for (int i = -2; i <= 2; i++)
-        for (int j = -2; j <= 2; j++)
-            heightmap[float2(pos.x + i, pos.y + j)] += diff / 25.0;
+    for (int i = -1; i <= 1; i++)
+        for (int j = -1; j <= 1; j++)
+            heightmap[float2(pos.x + i, pos.y + j)] += diff / 9.0 / 2.5;
 }
