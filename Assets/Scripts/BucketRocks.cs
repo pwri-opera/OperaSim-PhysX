@@ -6,7 +6,7 @@ using System;
 
 public class RockObjectDetector : MonoBehaviour
 {
-	public GameObject manager;
+	public BucketRocks manager;
 	public GameObject terrain;
 	private double timecreated = 0.0;
     private Vector3 pos_last_collision = Vector3.zero;
@@ -40,12 +40,12 @@ public class RockObjectDetector : MonoBehaviour
             var velocity = rigidbody.velocity.sqrMagnitude;
             if (velocity < 0.1 && Vector3.Distance(transform.position, pos_last_collision) < 0.1)
             {
-                manager.SendMessage("OnRockTerrainCollision", this.gameObject);
+                manager.OnRockTerrainCollision(this.gameObject);
             }
         }
         if (this.transform.position.y - pos_last_collision.y < -1.0)
 		{
-			manager.SendMessage("OnRockTerrainCollision", this.gameObject);
+			manager.OnRockTerrainCollision(this.gameObject);
 		}
     }
 }
@@ -75,7 +75,7 @@ public class BucketRocks : MonoBehaviour
         rock.transform.SetParent(transform.root, false);
         rock.transform.position = point;
         rock.AddComponent<RockObjectDetector>();
-        rock.GetComponent<RockObjectDetector>().manager = gameObject;
+        rock.GetComponent<RockObjectDetector>().manager = this;
         rock.GetComponent<RockObjectDetector>().terrain = terrain;
 
         var verts = new List<Vector3>();
@@ -105,7 +105,7 @@ public class BucketRocks : MonoBehaviour
     {
         if (SoilParticleSettings.instance.enable == false) return;
 
-		if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.1)
+		if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.05)
         {
             var point = other.GetContact(0).point;
 			SoilParticleSettings.ModifyTerrain(point, -particle_volume);
@@ -116,7 +116,7 @@ public class BucketRocks : MonoBehaviour
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-        if (Vector3.Distance(transform.position, rock.transform.position) > 3.0)
+        if (Vector3.Distance(transform.position, rock.transform.position) > 2.0)
         {
             SoilParticleSettings.ModifyTerrain(rock.transform.position, particle_volume);
             Destroy(rock);
