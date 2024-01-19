@@ -7,15 +7,35 @@ public class RockObjectDetector : MonoBehaviour
 {
 	public GameObject manager;
 	public GameObject terrain;
+	private double timecreated = 0.0;
+	private Vector3 pos_last_collision = Vector3.zero;
 	private bool touchground = false;
 
-    private void OnCollisionEnter(Collision collision)
+    private void Start()
     {
-		if (collision.gameObject == terrain)
+		timecreated = Time.timeAsDouble;
+		pos_last_collision = transform.position;
+    }
+
+	private void OnCollisionEnter(Collision collision)
+	{
+        if (collision.gameObject == terrain)
         {
-			touchground = true;
-		}
-	}
+            pos_last_collision = transform.position;
+        }
+    }
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject == terrain)
+        {
+            pos_last_collision = transform.position;
+
+            if (Time.timeAsDouble - timecreated > 1.5)
+		    {
+				touchground = true;
+			}
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -23,12 +43,19 @@ public class RockObjectDetector : MonoBehaviour
 		{
             var rigidbody = GetComponent<Rigidbody>();
             var velocity = rigidbody.velocity.sqrMagnitude;
-            if (velocity < 0.1)
+            if (velocity < 0.2)
             {
                 manager.SendMessage("OnRockTerrainCollision", this.gameObject);
             }
         }
-		if (this.transform.position.y < -10.0)
+		if (Time.timeAsDouble - timecreated > 1.5)
+		{
+            if (Vector3.Distance(transform.position, pos_last_collision) < 0.1)
+            {
+                manager.SendMessage("OnRockTerrainCollision", this.gameObject);
+            }
+        }
+        if (this.transform.position.y - pos_last_collision.y < -1.0)
 		{
 			manager.SendMessage("OnRockTerrainCollision", this.gameObject);
 		}
@@ -42,50 +69,42 @@ public class BucketRocks : MonoBehaviour
 
 	private List<GameObject> rocks;
 	private ConvexHullCalculator calc;
-	private Bounds bounds;
 
 	private void Start()
     {
 		calc = new ConvexHullCalculator();
 		rocks = new List<GameObject>();
-		bounds = gameObject.GetComponent<MeshFilter>().mesh.bounds;
 	}
 
 	private void CreateRock(Vector3 point)
     {
-		var verts = new List<Vector3>();
-		var tris = new List<int>();
-		var normals = new List<Vector3>();
-		var points = new List<Vector3>();
-
-		points.Clear();
-
-		for (int i = 0; i < 100; i++)
-		{
-			points.Add(Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
-		}
-
-		calc.GenerateHull(points, true, ref verts, ref tris, ref normals);
-
 		var rock = Instantiate(rockPrefab);
 
-		rock.AddComponent<RockObjectDetector>();
-		rock.GetComponent<RockObjectDetector>().manager = gameObject;
-		rock.GetComponent<RockObjectDetector>().terrain = terrain;
+        rock.transform.SetParent(transform.root, false);
+        rock.transform.position = point;
+        rock.AddComponent<RockObjectDetector>();
+        rock.GetComponent<RockObjectDetector>().manager = gameObject;
+        rock.GetComponent<RockObjectDetector>().terrain = terrain;
 
-		rock.transform.SetParent(transform, false);
-		rock.transform.localPosition = Vector3.zero;
-		rock.transform.localRotation = Quaternion.identity;
-		rock.transform.localScale = Vector3.one;
+        var verts = new List<Vector3>();
+        var tris = new List<int>();
+        var normals = new List<Vector3>();
+        var points = new List<Vector3>();
+
+        points.Clear();
+
+        for (int i = 0; i < 100; i++)
+        {
+            points.Add(Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
+        }
+
+        calc.GenerateHull(points, true, ref verts, ref tris, ref normals);
 
 		var mesh = new Mesh();
 		mesh.SetVertices(verts);
 		mesh.SetTriangles(tris, 0);
 		mesh.SetNormals(normals);
-
 		rock.GetComponent<MeshFilter>().sharedMesh = mesh;
-
-		rock.transform.position = point;
 
 		rocks.Add(rock);
 	}
@@ -94,18 +113,17 @@ public class BucketRocks : MonoBehaviour
     {
         if (SoilParticleSettings.instance.enable == false) return;
 
-		if (other.gameObject == terrain)
+		if (other.gameObject == terrain && rocks.Count < 16)
         {
-            var position = transform.TransformPoint(bounds.center);
             var point = other.GetContact(0).point;
-			SoilParticleSettings.ModifyTerrain(point, -0.0001f);
-			CreateRock(point + (position - point) * 0.2f);
+			SoilParticleSettings.ModifyTerrain(point, -0.0005f);
+            CreateRock(point);
         }
     }
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.0001f);
+		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.0005f);
 		Destroy(rock);
 		rocks.Remove(rock);
     }
