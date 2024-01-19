@@ -9,8 +9,7 @@ public class RockObjectDetector : MonoBehaviour
 	public GameObject manager;
 	public GameObject terrain;
 	private double timecreated = 0.0;
-	private Vector3 pos_last_collision = Vector3.zero;
-	private bool touchground = false;
+    private Vector3 pos_last_collision = Vector3.zero;
 
     private void Start()
     {
@@ -30,28 +29,16 @@ public class RockObjectDetector : MonoBehaviour
         if (collision.gameObject == terrain)
         {
             pos_last_collision = transform.position;
-
-            if (Time.timeAsDouble - timecreated > 1.5)
-		    {
-				touchground = true;
-			}
         }
     }
 
     private void FixedUpdate()
     {
-        if (touchground)
-		{
+        if (Time.timeAsDouble - timecreated > 1.5)
+        {
             var rigidbody = GetComponent<Rigidbody>();
             var velocity = rigidbody.velocity.sqrMagnitude;
-            if (velocity < 0.2)
-            {
-                manager.SendMessage("OnRockTerrainCollision", this.gameObject);
-            }
-        }
-		if (Time.timeAsDouble - timecreated > 1.5)
-		{
-            if (Vector3.Distance(transform.position, pos_last_collision) < 0.1)
+            if (velocity < 0.1 && Vector3.Distance(transform.position, pos_last_collision) < 0.1)
             {
                 manager.SendMessage("OnRockTerrainCollision", this.gameObject);
             }
@@ -71,12 +58,14 @@ public class BucketRocks : MonoBehaviour
 	private List<GameObject> rocks;
 	private ConvexHullCalculator calc;
     private float particle_volume;
+    private double last_created_time = 0.0;
 
-	private void Start()
+    private void Start()
     {
 		calc = new ConvexHullCalculator();
 		rocks = new List<GameObject>();
         particle_volume = (float)(4.0 / 3.0 * Math.PI * Math.Pow(SoilParticleSettings.instance.particleVisualRadius, 3));
+        last_created_time = Time.timeAsDouble;
     }
 
     private void CreateRock(Vector3 point)
@@ -116,19 +105,23 @@ public class BucketRocks : MonoBehaviour
     {
         if (SoilParticleSettings.instance.enable == false) return;
 
-		if (other.gameObject == terrain && rocks.Count < 16)
+		if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.1)
         {
             var point = other.GetContact(0).point;
 			SoilParticleSettings.ModifyTerrain(point, -particle_volume);
             CreateRock(point);
+            last_created_time = Time.timeAsDouble;
         }
     }
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-		SoilParticleSettings.ModifyTerrain(rock.transform.position, particle_volume);
-		Destroy(rock);
-		rocks.Remove(rock);
+        if (Vector3.Distance(transform.position, rock.transform.position) > 3.0)
+        {
+            SoilParticleSettings.ModifyTerrain(rock.transform.position, particle_volume);
+            Destroy(rock);
+            rocks.Remove(rock);
+        }
     }
 
     // Update is called once per frame
