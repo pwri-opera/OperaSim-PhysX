@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GK;
+using System;
 
 public class RockObjectDetector : MonoBehaviour
 {
@@ -69,14 +70,16 @@ public class BucketRocks : MonoBehaviour
 
 	private List<GameObject> rocks;
 	private ConvexHullCalculator calc;
+    private float particle_volume;
 
 	private void Start()
     {
 		calc = new ConvexHullCalculator();
 		rocks = new List<GameObject>();
-	}
+        particle_volume = (float)(4.0 / 3.0 * Math.PI * Math.Pow(SoilParticleSettings.instance.particleVisualRadius, 3));
+    }
 
-	private void CreateRock(Vector3 point)
+    private void CreateRock(Vector3 point)
     {
 		var rock = Instantiate(rockPrefab);
 
@@ -95,7 +98,7 @@ public class BucketRocks : MonoBehaviour
 
         for (int i = 0; i < 100; i++)
         {
-            points.Add(Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
+            points.Add(UnityEngine.Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
         }
 
         calc.GenerateHull(points, true, ref verts, ref tris, ref normals);
@@ -116,14 +119,14 @@ public class BucketRocks : MonoBehaviour
 		if (other.gameObject == terrain && rocks.Count < 16)
         {
             var point = other.GetContact(0).point;
-			SoilParticleSettings.ModifyTerrain(point, -0.0005f);
+			SoilParticleSettings.ModifyTerrain(point, -particle_volume);
             CreateRock(point);
         }
     }
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-		SoilParticleSettings.ModifyTerrain(rock.transform.position, 0.0005f);
+		SoilParticleSettings.ModifyTerrain(rock.transform.position, particle_volume);
 		Destroy(rock);
 		rocks.Remove(rock);
     }
