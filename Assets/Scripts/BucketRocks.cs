@@ -63,6 +63,7 @@ public class BucketRocks : MonoBehaviour
     private List<GameObject> rocks;
     private ConvexHullCalculator calc;
     private float particle_volume;
+    private List<Mesh> mesh_patterns;
     private double last_created_time = 0.0;
 
     private ParticleForceJob job;
@@ -76,6 +77,33 @@ public class BucketRocks : MonoBehaviour
         calc = new ConvexHullCalculator();
         rocks = new List<GameObject>();
         particle_volume = (float)(4.0 / 3.0 * Math.PI * Math.Pow(SoilParticleSettings.instance.particleVisualRadius, 3));
+
+        mesh_patterns = new List<Mesh>();
+
+        for (int i = 0; i < 10; i++)
+        {
+            var verts = new List<Vector3>();
+            var tris = new List<int>();
+            var normals = new List<Vector3>();
+            var points = new List<Vector3>();
+
+            points.Clear();
+
+            for (int j = 0; j < 100; j++)
+            {
+                points.Add(UnityEngine.Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
+            }
+
+            calc.GenerateHull(points, true, ref verts, ref tris, ref normals);
+
+            var mesh = new Mesh();
+            mesh.SetVertices(verts);
+            mesh.SetTriangles(tris, 0);
+            mesh.SetNormals(normals);
+
+            mesh_patterns.Add(mesh);
+        }
+
         last_created_time = Time.timeAsDouble;
     }
 
@@ -88,26 +116,7 @@ public class BucketRocks : MonoBehaviour
         rock.AddComponent<RockObjectDetector>();
         rock.GetComponent<RockObjectDetector>().manager = this;
         rock.GetComponent<RockObjectDetector>().terrain = terrain;
-
-        var verts = new List<Vector3>();
-        var tris = new List<int>();
-        var normals = new List<Vector3>();
-        var points = new List<Vector3>();
-
-        points.Clear();
-
-        for (int i = 0; i < 100; i++)
-        {
-            points.Add(UnityEngine.Random.insideUnitSphere * SoilParticleSettings.instance.particleVisualRadius);
-        }
-
-        calc.GenerateHull(points, true, ref verts, ref tris, ref normals);
-
-        var mesh = new Mesh();
-        mesh.SetVertices(verts);
-        mesh.SetTriangles(tris, 0);
-        mesh.SetNormals(normals);
-        rock.GetComponent<MeshFilter>().sharedMesh = mesh;
+        rock.GetComponent<MeshFilter>().sharedMesh = mesh_patterns[UnityEngine.Random.Range(0, mesh_patterns.Count)];
 
         rocks.Add(rock);
     }
