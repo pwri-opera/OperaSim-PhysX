@@ -8,23 +8,23 @@
       "url": "https://packages.unity.com"
     },
     "com.frj.unity-sensors": {
-      "version": "https://github.com/Field-Robotics-Japan/UnitySensors.git?path=/Assets/UnitySensors#v2.0.0b",
+      "version": "https://github.com/Field-Robotics-Japan/UnitySensors.git?path=/Assets/UnitySensors#v2.0.3",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.burst": "1.6.6"
       },
-      "hash": "969813c8899e50838a97d22b3e5d3f4c5c51917d"
+      "hash": "69173aeb4bf6eb3a2912dad7b90592472c68402e"
     },
     "com.frj.unity-sensors-ros": {
-      "version": "https://github.com/Field-Robotics-Japan/UnitySensors.git?path=/Assets/UnitySensorsROS#v2.0.0b",
+      "version": "https://github.com/Field-Robotics-Japan/UnitySensors.git?path=/Assets/UnitySensorsROS#v2.0.3",
       "depth": 0,
       "source": "git",
       "dependencies": {
-        "com.frj.unity-sensors": "2.0.0",
+        "com.frj.unity-sensors": "2.0.3",
         "com.unity.robotics.ros-tcp-connector": "0.7.0-preview"
       },
-      "hash": "969813c8899e50838a97d22b3e5d3f4c5c51917d"
+      "hash": "69173aeb4bf6eb3a2912dad7b90592472c68402e"
     },
     "com.unity.ai.navigation": {
       "version": "1.1.5",
