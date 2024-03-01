@@ -72,7 +72,7 @@ public class BucketRocks : MonoBehaviour
     private NativeArray<float3> job_positions;
     private NativeArray<float3> job_forces;
 
-    private void Start()
+    private void Awake()
     {
         calc = new ConvexHullCalculator();
         rocks = new List<GameObject>();
@@ -125,7 +125,7 @@ public class BucketRocks : MonoBehaviour
     {
         if (SoilParticleSettings.instance.enable == false) return;
 
-        if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.05)
+        if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.01)
         {
             var point = other.GetContact(0).point;
             SoilParticleSettings.ModifyTerrain(point, -particle_volume);
