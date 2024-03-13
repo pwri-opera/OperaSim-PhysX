@@ -45,6 +45,6 @@ public class JointPosController : MonoBehaviour
         var drive = joint.xDrive;
         drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
         joint.xDrive = drive;
-        Debug.Log("Joint Target Position:" + targetPos.data);
+        //Debug.Log("Joint Target Position:" + targetPos.data);
     }
 }
