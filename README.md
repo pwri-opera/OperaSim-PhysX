@@ -45,13 +45,14 @@ ROS 1 の場合
   ```
 ROS 2 の場合
   ```bash
-  $ cd (rosワークスペース)/src
-  $ git clone -b https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
+  $ cd (ros2ワークスペース)/src
+  $ git clone -b main-ros2 https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git
   $ cd ./ROS-TCP-Endpoint/
   $ sudo chmod +x setup.py
   $ ./setup.py
-  $ catkin build ros_tcp_endpoint
-  $ source ../../devel/setup.bash
+  $ cd ../../
+  $ colcon build --packages-select ros_tcp_endpoint
+  $ . install/setup.bash
   ```
 - ROS側でendpoint.launchを実行する
   ```bash
