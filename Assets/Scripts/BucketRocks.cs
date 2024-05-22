@@ -129,6 +129,7 @@ public class BucketRocks : MonoBehaviour
         {
             var point = other.GetContact(0).point;
             SoilParticleSettings.ModifyTerrain(point, -particle_volume);
+            point.y += SoilParticleSettings.instance.particleVisualRadius;
             CreateRock(point);
             last_created_time = Time.timeAsDouble;
         }
@@ -136,7 +137,7 @@ public class BucketRocks : MonoBehaviour
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-        if (Vector3.Distance(transform.position, rock.transform.position) > 0.5)
+        if (rock.GetComponent<RockObjectDetector>().timecreated < Time.timeAsDouble - 3.0 && Vector3.Distance(transform.position, rock.transform.position) > 0.5)
         {
             SoilParticleSettings.ModifyTerrain(rock.transform.position, particle_volume);
             Destroy(rock);
