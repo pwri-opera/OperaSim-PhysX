@@ -11,11 +11,15 @@ using Unity.Robotics.Core;
 public class PoseStampedPublisher : MonoBehaviour
 {
     ROSConnection ros;
+
+    [Tooltip("これはシミュレーションロボットのモデル名です。")]
     public string robotName = "robot_name";
+    [Tooltip("これは姿勢ポジションのトピック名です。")]
     public string topicName = "robot_name/unity/pose_stmp";
     private PoseStampedMsg message;
 
     // Publish the object's position and rotation every N seconds
+    [Tooltip("これはパブリッシャーメッセージ間隔です。")]
     public float publishMessageInterval = 0.05f;//20Hz
 
     // Used to determine how much time has elapsed since the last message was published

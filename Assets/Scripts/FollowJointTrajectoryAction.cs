@@ -12,8 +12,11 @@ public class FollowJointTrajectoryAction : MonoBehaviour
     private Dictionary<string, ArticulationBody> jointArticulationBodies;
     private JointStateMsg currentPose;
 
+    [Tooltip("これは仮想コントローラのトピック名です。")]
     public string fakeControllerTopicName = "move_group/fake_controller_joint_states";
+    [Tooltip("これは初期ポーズのオブジェクト数です。")]
     public List<GameObject> initialPoseObjects;
+    [Tooltip("これは初期ポーズの値です。")]
     public List<float> initialPoseValues;
 
     // Start is called before the first frame update

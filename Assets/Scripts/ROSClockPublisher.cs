@@ -9,12 +9,15 @@ using Unity.Robotics.Core;
 public class ROSClockPublisher : MonoBehaviour
 {
     [SerializeField]
+    [Tooltip("これはROS時計のモードです。")]
     Clock.ClockMode m_ClockMode;
 
     [SerializeField, HideInInspector]
+    [Tooltip("これはROS時計の前回のモードです。")]
     Clock.ClockMode m_LastSetClockMode;
     
-    [SerializeField] 
+    [SerializeField]
+    [Tooltip("これはROS時計の送信レートHzです。")]
     double m_PublishRateHz = 100f;
 
     double m_LastPublishTimeSeconds;

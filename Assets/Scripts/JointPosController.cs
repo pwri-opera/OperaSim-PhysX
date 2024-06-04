@@ -7,7 +7,11 @@ using RosMessageTypes.Std;
 public class JointPosController : MonoBehaviour
 {
     private ROSConnection ros;
+
+    [Tooltip("これはジョイントポジションのトピック名です。")]
     public string setpointTopicName = "joint_name/setpoint";
+
+    [Tooltip("これはジョイントポジションの初期値の回転角度です。")]
     public double initTargetPos;
     private ArticulationBody joint;
     private Float64Msg targetPos;

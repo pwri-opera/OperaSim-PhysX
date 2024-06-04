@@ -11,14 +11,18 @@ using Unity.Robotics.Core;
 public class JointStatePublisher : MonoBehaviour
 {
     ROSConnection ros;
+
+    [Tooltip("これはジョイント状態送信のトピック名です。")]
     public string topicName = "joint_states";
     private JointStateMsg message;
     private List<ArticulationBody> joints;
     private List<string> jointNames;
 
+    [Tooltip("これは有効なジョイント状態の？です。")]
     public bool enableJointEffortSensor = false;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("これはジョイントのメッセージ間隔です。")]
     public float publishMessageInterval = 0.5f;
 
     // Used to determine how much time has elapsed since the last message was published

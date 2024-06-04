@@ -11,7 +11,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 public class RockObjectDetector : MonoBehaviour
 {
+
+    [Tooltip("これはバケットのロック名です。")]
     public BucketRocks manager;
+    [Tooltip("これは掘削地形です。")]
     public GameObject terrain;
     private double timecreated = 0.0;
     private Vector3 pos_last_collision = Vector3.zero;

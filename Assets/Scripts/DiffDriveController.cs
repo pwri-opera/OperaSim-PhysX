@@ -15,26 +15,39 @@ public class DiffDriveController : MonoBehaviour
     private ROSConnection ros;
 
     public List<GameObject> leftWheels;
+        
     public List<GameObject> rightWheels;
 
     private OdometryMsg odomMessage;
 
+    [Tooltip("これはシミュレーションロボットのモデル名です。")]
     public string robotName = "robot_name";
+    [Tooltip("これはねじれトピック名です。")]
     public string TwistTopicName = "robot_name/tracks/cmd_vel"; // Subscribe Messsage Topic Name
+    [Tooltip("これはGNSSトピック名です。")]
     public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
+    [Tooltip("これはチャイルドフレーム名です。")]
     public string childFrameName = "robot_name/base_link";
+    [Tooltip("これはトレッドコレクションファクターです。")]
     public double treadCollectionFactor = 2.0; // Factor Collecting Yaw angle of base_link. This Parameter is multiplied to tread to calculate angular velocity based on Vehicle's Kinematics.
     private List<WheelCollider> leftWheelColliders;
     private List<WheelCollider> rightWheelColliders;
     private WheelCollider leftMiddleWheel;
     private WheelCollider rightMiddleWheel;
 
+    [Tooltip("これはホイールの比例動作ゲインです。")]
     public double pGain = 100.0;
+    [Tooltip("これはホイールの積分動作ゲインです。")]
     public double iGain = 0.0;
+    [Tooltip("これはホイールの微分動作ゲインです。")]
     public double dGain = 0.0;
+    [Tooltip("これはホイールのトルク上限です。")]
     public double torqueLimit = 1000.0;
+    [Tooltip("これはホイールのブレーキトルクです。")]
     public float brakeTorque = 10000.0F;
+    [Tooltip("これはホイールの最大速度です。")]
     public double maxLinearVelocity = 3.00;  // unit is m/sec
+    [Tooltip("これはホイールの最大角速度です。")]
     public double maxAngularVelocity = Math.PI * 2.0 * 5.0 / 360.0;  // unit is rad/sec
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
@@ -45,6 +58,7 @@ public class DiffDriveController : MonoBehaviour
     private double yaw = 0.0;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("これはパブリッシャーメッセージ間隔です。")]
     public float publishMessageInterval = 0.02f;//50Hz
 
     // Used to determine how much time has elapsed since the last message was published

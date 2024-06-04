@@ -10,11 +10,14 @@ using Unity.Robotics.Core;
 public class GroundTruthPublisher : MonoBehaviour
 {
     ROSConnection ros;
+    [Tooltip("これは掘削地形のトピック名です。")]
     public string topicName = "robot_name/groundtruth";
+    [Tooltip("これは掘削地形チャイルド名です。")]
     public string childFrameName = "robot_name/base_link";
     private OdometryMsg message;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("これは掘削地形のメッセージ間隔です。")]
     public float publishMessageInterval = 0.5f;//2Hz
 
     // Used to determine how much time has elapsed since the last message was published

@@ -15,10 +15,14 @@ namespace Unity.Robotics.Core
 {
     public readonly struct TimeStamp
     {
+
+        [Tooltip("これは時計のナノセック定数です。")]
         public const double k_NanosecondsInSecond = 1e9f;
 
         // TODO: specify base time this stamp is measured against (Sim 0, time since application start, etc.)
+        [Tooltip("これはROS時計のセックタイプです。")]
         public readonly RosSecsType Seconds;
+        [Tooltip("これはROS時計のナノセックタイプです。")]
         public readonly uint NanoSeconds;
 
         // (From Unity Time.time)

@@ -23,6 +23,7 @@ namespace Unity.Robotics.Core
             // ExternalClock
         }
 
+        [Tooltip("これは時計のナノセック定数です。")]
         public const double k_NanoSecondsInSeconds = 1e9;
 
         static readonly DateTime k_UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);

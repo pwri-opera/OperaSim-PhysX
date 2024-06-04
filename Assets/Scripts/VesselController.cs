@@ -7,7 +7,10 @@ using RosMessageTypes.Std;
 public class VesselController : MonoBehaviour
 {
     private ROSConnection ros;
+
+    [Tooltip("これはDumpのトピック名です。")]
     public string DumpTopicName = "dump/cmd";
+    [Tooltip("これはDumpのジョイント先です。")]
     public ArticulationBody dump_joint;
     private Float64Msg target_pos;
 

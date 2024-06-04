@@ -10,12 +10,17 @@ using Unity.Robotics.Core;
 public class OdomPublisher : MonoBehaviour
 {
     ROSConnection ros;
+
+    [Tooltip("これはシミュレーションロボットのモデル名です。")]
     public string robotName = "robot_name";
+    [Tooltip("これはGNSS　ODOMのトピック名です。")]
     public string topicName = "robot_name/diff_drive_controller/odom";
+    [Tooltip("これはチャイルドフレーム名です。")]
     public string childFrameName = "robot_name/base_link";
     private OdometryMsg message;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("これはパブリッシャーメッセージ間隔です。")]
     public float publishMessageInterval = 0.05f;//20Hz
 
     // Used to determine how much time has elapsed since the last message was published

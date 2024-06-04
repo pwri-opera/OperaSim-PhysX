@@ -7,16 +7,23 @@ public class SoilParticleSettings : MonoBehaviour
 {
     public static SoilParticleSettings instance = null;
 
+    [Tooltip("これは掘削地形の有効／無効設定です。")]
     public bool enable = true;
+    [Tooltip("これは掘削地形の粒子視覚半径設定です。")]
     public float particleVisualRadius = 0.2f;
+    [Tooltip("これは掘削地形の粒子距離設定です。")]
     public double partileStickDistance = 0.25;
+    [Tooltip("これは掘削地形の掘削力設定です。")]
     public float stickForce = 30.0f;
 
     [SerializeField]
+    [Tooltip("これは掘削地形の安息角設定です。")]
     public Vector2 m_AngleOfRepose = new Vector2(30.0f, 45.0f);
     [SerializeField]
+    [Tooltip("これは掘削地形の応答ジッタ設定です。")]
     public int m_ReposeJitter = 0;
 
+    [Tooltip("これは掘削地形の同期期間設定です。")]
     public float syncPeriod = 1.0f;
 
     private float timeElapsed = 0.0f;
