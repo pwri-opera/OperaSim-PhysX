@@ -23,7 +23,7 @@ public class Com3FrontController : MonoBehaviour
     private Dictionary<string, Com3JointInfo> joints;
     private JointCmdMsg currentCmd;
 
-    public string com3FrontControllerTopicName = "robot_name/front";
+    public string com3FrontControllerTopicName = "robot_name/front_cmd";
 
     // Start is called before the first frame update
     void Start()
