@@ -13,8 +13,8 @@ public class RockObjectDetector : MonoBehaviour
 {
     public BucketRocks manager;
     public GameObject terrain;
-    private double timecreated = 0.0;
-    private Vector3 pos_last_collision = Vector3.zero;
+    public double timecreated = 0.0;
+    public Vector3 pos_last_collision = Vector3.zero;
 
     private void Start()
     {
@@ -125,10 +125,11 @@ public class BucketRocks : MonoBehaviour
     {
         if (SoilParticleSettings.instance.enable == false) return;
 
-        if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.01)
+        if (other.gameObject == terrain && Time.timeAsDouble - last_created_time > 0.001)
         {
             var point = other.GetContact(0).point;
             SoilParticleSettings.ModifyTerrain(point, -particle_volume);
+            point.y += SoilParticleSettings.instance.particleVisualRadius;
             CreateRock(point);
             last_created_time = Time.timeAsDouble;
         }
@@ -136,7 +137,7 @@ public class BucketRocks : MonoBehaviour
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-        if (Vector3.Distance(transform.position, rock.transform.position) > 2.0)
+        if (rock.GetComponent<RockObjectDetector>().timecreated < Time.timeAsDouble - 3.0 && Vector3.Distance(transform.position, rock.transform.position) > 0.5)
         {
             SoilParticleSettings.ModifyTerrain(rock.transform.position, particle_volume);
             Destroy(rock);
@@ -195,9 +196,15 @@ public class BucketRocks : MonoBehaviour
                 {
                     var rock1 = rocks[i];
                     var f = job.forces[i];
-                    if (!float.IsNaN(f.x))
+                    var rigidbody = rock1.GetComponent<Rigidbody>();
+                    var rockobjectdetector = rock1.GetComponent<RockObjectDetector>();
+                    // apply maximum speed limit to each particle to prevent jumping behavior
+                    const float maxSpeed = 0.1f;
+                    if (rockobjectdetector.timecreated > Time.fixedTimeAsDouble - 2.0f && rigidbody.velocity.magnitude > maxSpeed) {
+                        rigidbody.AddForce(- rigidbody.velocity, ForceMode.VelocityChange);
+                    } else if (!float.IsNaN(f.x))
                     {
-                        rock1.GetComponent<Rigidbody>().AddForce(-f * SoilParticleSettings.instance.stickForce);
+                        rigidbody.AddForce(-f * SoilParticleSettings.instance.stickForce);
                     }
                 }
             }
