@@ -131,6 +131,11 @@ public class UpdateZX120Param : MonoBehaviour
 		foreach( var config in m_ConfigChangedList)
 		{
             Debug.Log("is_changed? :" + config.swing.joint_stiffness);
+
+            joints
+            jointNames
+
+
             // joint の stiffness 設定
             // joint.swing.stiffness   = config.joint_stiffness.swing;
             // joint.boom.stiffness    = config.joint_stiffness.boom;
