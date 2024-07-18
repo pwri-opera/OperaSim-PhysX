@@ -5,6 +5,12 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Unity.Robotics.UrdfImporter;
+using Unity.Robotics.Core;
+
+// For Debug
+using System.Reflection;
+
 public class UpdateZX120Param : MonoBehaviour
 {
 	private static System.IO.FileSystemWatcher m_FileSystemWatcher = null;
@@ -25,6 +31,9 @@ public class UpdateZX120Param : MonoBehaviour
         public XDriveParam bucket = new XDriveParam();
     }
 	private static List<Param> m_ConfigChangedList = new List<Param>();
+
+    private List<ArticulationBody> joints;
+    private List<string> jointNames;
 
 	//----------------------------------------------------------------------------
 	private void Awake()
@@ -55,6 +64,55 @@ public class UpdateZX120Param : MonoBehaviour
 			m_ConfigChangedList.Add( newConfig);
 		});
 		m_FileSystemWatcher.EnableRaisingEvents = true; // 監視開始
+
+
+
+        joints = new List<ArticulationBody>();
+        jointNames = new List<string>();
+
+        foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
+        {
+            Type type = joint.GetType();
+            FieldInfo[] fields = type.GetFields();
+            
+            if (joint.isActiveAndEnabled)
+            {
+                Debug.Log("type? : " + type);
+                Debug.Log("fields? : " + fields);
+
+                var ujoint = joint.GetComponent<UrdfJoint>();
+                if (ujoint && !(ujoint is UrdfJointFixed))
+                {
+                    joints.Add(joint);
+                    jointNames.Add(ujoint.jointName);
+                    Debug.Log("Name? : " + ujoint.jointName);
+                }
+
+                // var ujoint = joint.GetComponent<UrdfJoint>();
+                // Type utype = ujoint.GetType();
+                // FieldInfo[] ufields = utype.GetFields();
+
+                // Debug.Log("utype?" + utype);
+                // Debug.Log("ufields?" + ufields);
+            }
+            
+            // foreach (FieldInfo field in fields)
+            // {
+            //     // メンバー名とその値を表示
+            //     object value = field.GetValue(joint);
+            //     Debug.Log($"{field.Name}: {value}");
+            // }
+
+            // if (joint.isActiveAndEnabled)
+            // {
+            //     var ujoint = joint.GetComponent<UrdfJoint>();
+            //     if (ujoint && !(ujoint is UrdfJointFixed))
+            //     {
+            //         joints.Add(joint);
+            //         jointNames.Add(ujoint.jointName);
+            //     }
+            // }
+        }
 	}
 	//----------------------------------------------------------------------------
 	public void OnDestroy()
