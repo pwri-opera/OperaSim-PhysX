@@ -54,7 +54,7 @@ public class SoilParticleSettings : MonoBehaviour
         }
 
 
-        cs = AssetDatabase.LoadAssetAtPath<ComputeShader>("Packages/com.unity.terrain-tools/Editor/TerrainTools/Compute/Thermal.compute");
+        cs = Instantiate(Resources.Load<ComputeShader>("Thermal"));
         if (cs == null)
         {
             throw new MissingReferenceException("Could not find compute shader for thermal erosion");
@@ -164,7 +164,7 @@ public class SoilParticleSettings : MonoBehaviour
         cs.SetTexture(thermalKernelIdx, "TerrainHeightPrev", heightmapRT0);
         cs.SetTexture(thermalKernelIdx, "TerrainHeight", heightmapRT1);
 
-        Vector2 jitteredTau = m_AngleOfRepose + new Vector2(0.9f * (float)m_ReposeJitter * (UnityEngine.Random.value - 0.5f), 0.9f * (float)m_ReposeJitter * (UnityEngine.Random.value - 0.5f));
+        Vector2 jitteredTau = m_AngleOfRepose + new Vector2(0.9f * (float)m_ReposeJitter * (UnityEngine.Random.value - 0.5f), 0.9f * (float)m_ReposeJitter * (UnityEngine.Random.value - 0.5f));
         jitteredTau.x = Mathf.Clamp(jitteredTau.x, 0.0f, 89.9f);
         jitteredTau.y = Mathf.Clamp(jitteredTau.y, 0.0f, 89.9f);
         Vector2 m = new Vector2(Mathf.Tan(jitteredTau.x * Mathf.Deg2Rad), Mathf.Tan(jitteredTau.y * Mathf.Deg2Rad));
@@ -205,7 +205,7 @@ public class SoilParticleSettings : MonoBehaviour
         terrainData.SyncHeightmap();
 
         // swap
-        var temp = heightmapRT0;
+        var temp = heightmapRT0;
         heightmapRT0 = heightmapRT1;
         heightmapRT1 = temp;
 

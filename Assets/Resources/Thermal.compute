@@ -1,0 +1,130 @@
+﻿// This code is from:
+//  com.unity.terrain-tools/Editor/TerrainTools/Compute/Thermal.compute
+
+//
+// conventions
+//     left = coord.x - 1
+//     right = coord.x + 1
+//     top = coord.y + 1
+//     bottom = coord.y - 1
+//
+
+//#include "../../../Shaders/NoiseLib/Noise.hlsl"
+
+//Texture2D<float4> PrecipMask;  //defines where rainfall will occur
+Texture2D<float4> ReposeMask;
+Texture2D<float>  Collision;
+Texture2D<float>  TerrainHeightPrev;  //previous frame
+Texture2D<float>  SedimentPrev;
+Texture2D<float>  Hardness;
+
+//outputs
+RWTexture2D<float>  TerrainHeight;      //terrain heightmap
+RWTexture2D<float>  Sediment;           //suspended sediment concentration (being transported by the water)
+
+float dt;                    //the time step for the simulation
+float EffectScalar;
+
+float4 texDim;     //the dimensions of all of our textures (they must all be the same dimensions)
+float3 terrainDim; //the dimensions of the terrain in world units
+
+#define LEFT(C) C.y
+#define RIGHT(C) C.x
+#define TOP(C) C.z
+#define BOTTOM(C) C.w
+
+uint4 getSafeNeighbors(uint2 coord) {
+	return uint4(
+		(coord.x < (uint)texDim[0] - 1) ? coord.x + 1 : coord.x,  //right index
+		(coord.x > 0) ? coord.x - 1 : coord.x,                    //left index
+		(coord.y < (uint)texDim[1] - 1) ? coord.y + 1 : coord.y,  //top index
+		(coord.y > 0) ? coord.y - 1 : coord.y                     //bottom index
+		);
+}
+
+
+//
+// Thermal Erosion
+//
+float4 angleOfRepose; //actually tan(theta), which is slope (m)
+float4 dxdy; //<dx, dy, 1.0f / dx, 1.0f / dy>
+float InvDiagMag;
+
+
+void simulateThermalErosion(uint2 coord) {
+	uint4 neigh = getSafeNeighbors(coord);
+
+	float4 hCardinal = float4(TerrainHeightPrev[uint2(LEFT(neigh), coord.y)],  //left
+							  TerrainHeightPrev[uint2(RIGHT(neigh), coord.y)],  //right
+							  TerrainHeightPrev[uint2(coord.x, TOP(neigh))],  //up
+							  TerrainHeightPrev[uint2(coord.x, BOTTOM(neigh))]); //down
+
+	float4 hDiagonal = float4(TerrainHeightPrev[uint2(LEFT(neigh), TOP(neigh))],  //top left
+							  TerrainHeightPrev[uint2(RIGHT(neigh), TOP(neigh))],  //top right
+							  TerrainHeightPrev[uint2(LEFT(neigh), BOTTOM(neigh))],  //bottom left
+							  TerrainHeightPrev[uint2(RIGHT(neigh), BOTTOM(neigh))]); //bottom right
+
+	/*
+	float4 hardnessCardinal = saturate(float4(Hardness[uint2(neigh.y, coord.y)],
+									 Hardness[uint2(neigh.x, coord.y)],
+									 Hardness[uint2(coord.x, neigh.z)],
+									 Hardness[uint2(coord.x, neigh.w)]));
+
+	float4 hardnessDiagonal = saturate(float4(Hardness[uint2(neigh.y, neigh.z)],
+		                             Hardness[uint2(neigh.x, neigh.z)],
+		                             Hardness[uint2(neigh.y, neigh.w)],
+		                             Hardness[uint2(neigh.x, neigh.w)]));
+	*/
+
+	float4 h = float4(TerrainHeightPrev[coord], TerrainHeightPrev[coord], TerrainHeightPrev[coord], TerrainHeightPrev[coord]);
+
+	float4 dhCardinal = terrainDim[1] * (h - hCardinal);
+	float4 dhDiagonal = terrainDim[1] * (h - hDiagonal);
+
+	float4 sCardinal = -1.0f * min(sign(dhCardinal), 0.0f);
+	float4 sDiagonal = -1.0f * min(sign(dhDiagonal), 0.0f);
+
+	/*
+	float4 cHardness = saturate(Hardness[coord]);
+	float4 hardness = lerp(cHardness, hardnessCardinal, sCardinal);
+
+	dhCardinal *= 1.0f - hardness;
+
+	hardness = lerp(cHardness, hardnessDiagonal, sDiagonal);
+	dhDiagonal *= 1.0f - hardness;
+	*/
+
+	//compute slopes
+	float4 mCardinal = abs(dhCardinal * float4(dxdy.z, dxdy.z, dxdy.w, dxdy.w));
+	float4 mDiagonal = abs(dhDiagonal * float4(InvDiagMag, InvDiagMag, InvDiagMag, InvDiagMag));
+
+	float tau = angleOfRepose.x;
+
+	float dv = 0.0f; //volume of sediment moved
+	
+	//could probably vectorize this and eliminate the ifs...
+	if (mCardinal.x > tau) { dv += dhCardinal.x; }
+	if (mCardinal.y > tau) { dv += dhCardinal.y; }
+	if (mCardinal.z > tau) { dv += dhCardinal.z; }
+	if (mCardinal.w > tau) { dv += dhCardinal.w; }
+
+	if (mDiagonal.x > tau) { dv += 0.707f * dhDiagonal.x; }
+	if (mDiagonal.y > tau) { dv += 0.707f * dhDiagonal.y; }
+	if (mDiagonal.z > tau) { dv += 0.707f * dhDiagonal.z; }
+	if (mDiagonal.w > tau) { dv += 0.707f * dhDiagonal.w; }
+
+	float halfHeight = 0.5f * TerrainHeightPrev[coord];
+	dv = clamp(0.0625f * dt * dv, -halfHeight, halfHeight);
+
+	TerrainHeight[coord] = TerrainHeightPrev[coord] - dv;
+	Sediment[coord] += dv;
+}
+
+
+#pragma kernel ThermalErosion
+
+[numthreads(8, 8, 1)]
+void ThermalErosion(uint3 id : SV_DispatchThreadID)
+{
+	simulateThermalErosion(id.xy);
+}
