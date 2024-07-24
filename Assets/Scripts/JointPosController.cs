@@ -1,18 +1,22 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
 
+/// <summary>
+/// å„é–¢ç¯€ã‚’ç‹¬ç«‹ã—ã¦åˆ¶å¾¡ã™ã‚‹
+/// </summary>
 public class JointPosController : MonoBehaviour
 {
     private ROSConnection ros;
 
-    [Tooltip("‚±‚ê‚ÍƒWƒ‡ƒCƒ“ƒgƒ|ƒWƒVƒ‡ƒ“‚ÌƒgƒsƒbƒN–¼‚Å‚·B")]
+    [Tooltip("è§’åº¦è¨­å®šã‚³ãƒãƒ³ãƒ‰ã®ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string setpointTopicName = "joint_name/setpoint";
 
-    [Tooltip("‚±‚ê‚ÍƒWƒ‡ƒCƒ“ƒgƒ|ƒWƒVƒ‡ƒ“‚Ì‰Šú’l‚Ì‰ñ“]Šp“x‚Å‚·B")]
+    [Tooltip("åˆæœŸã®ç›®æ¨™è§’åº¦")]
     public double initTargetPos;
+
     private ArticulationBody joint;
     private Float64Msg targetPos;
 

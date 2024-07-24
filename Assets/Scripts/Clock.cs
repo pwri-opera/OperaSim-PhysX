@@ -2,6 +2,9 @@
 using UnityEngine;
 // From: https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts
 
+/// <summary>
+/// 時刻管理を行うためのユーティリティクラス
+/// </summary>
 namespace Unity.Robotics.Core
 {
     public static class Clock
@@ -23,7 +26,6 @@ namespace Unity.Robotics.Core
             // ExternalClock
         }
 
-        [Tooltip("これは時計のナノセック定数です。")]
         public const double k_NanoSecondsInSeconds = 1e9;
 
         static readonly DateTime k_UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);

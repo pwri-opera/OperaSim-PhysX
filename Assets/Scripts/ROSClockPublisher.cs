@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.BuiltinInterfaces;
@@ -6,18 +6,20 @@ using RosMessageTypes.Rosgraph;
 using Unity.Robotics.Core;
 // From: https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts
 
+/// <summary>
+/// ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³æ™‚åˆ»ã‚’ROSã«é€ä¿¡ã™ã‚‹
+/// </summary>
 public class ROSClockPublisher : MonoBehaviour
 {
     [SerializeField]
-    [Tooltip("‚±‚ê‚ÍROSŒv‚Ìƒ‚[ƒh‚Å‚·B")]
+    [Tooltip("ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³æ™‚åˆ»ã‚’è¨ˆç®—ã™ã‚‹ãƒ¢ãƒ¼ãƒ‰è¨­å®š")]
     Clock.ClockMode m_ClockMode;
 
     [SerializeField, HideInInspector]
-    [Tooltip("‚±‚ê‚ÍROSŒv‚Ì‘O‰ñ‚Ìƒ‚[ƒh‚Å‚·B")]
     Clock.ClockMode m_LastSetClockMode;
     
     [SerializeField]
-    [Tooltip("‚±‚ê‚ÍROSŒv‚Ì‘—MƒŒ[ƒgHz‚Å‚·B")]
+    [Tooltip("æ™‚åˆ»ã®å‡ºåŠ›ãƒ¬ãƒ¼ãƒˆ(Hz)")]
     double m_PublishRateHz = 100f;
 
     double m_LastPublishTimeSeconds;

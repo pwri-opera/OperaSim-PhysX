@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -10,45 +10,62 @@ using Unity.Robotics.Core;
 using System;
 using PID_Controller;
 
+/// <summary>
+/// å·®å‹•é§†å‹•è»Šã®åˆ¶å¾¡ã‚’è¡Œã†
+/// </summary>
 public class DiffDriveController : MonoBehaviour
 {
     private ROSConnection ros;
 
+    [Tooltip("å·¦ã®è»Šè¼ªã®gameObjectã‚’ç™»éŒ²ã—ã¦ãã ã•ã„ï¼ˆè¤‡æ•°ç™»éŒ²å¯èƒ½ï¼‰")]
     public List<GameObject> leftWheels;
         
+    [Tooltip("å³ã®è»Šè¼ªã®gameObjectã‚’ç™»éŒ²ã—ã¦ãã ã•ã„ï¼ˆè¤‡æ•°ç™»éŒ²å¯èƒ½ï¼‰")]
     public List<GameObject> rightWheels;
 
     private OdometryMsg odomMessage;
 
-    [Tooltip("‚±‚ê‚ÍƒVƒ~ƒ…ƒŒ[ƒVƒ‡ƒ“ƒƒ{ƒbƒg‚Ìƒ‚ƒfƒ‹–¼‚Å‚·B")]
+    [Tooltip("ROSãƒˆãƒ”ãƒƒã‚¯åã®é ­ã«ä»˜ä¸ã•ã‚Œã‚‹ãƒ­ãƒœãƒƒãƒˆå")]
     public string robotName = "robot_name";
-    [Tooltip("‚±‚ê‚Í‚Ë‚¶‚êƒgƒsƒbƒN–¼‚Å‚·B")]
+
+    [Tooltip("cmd_velã‚³ãƒãƒ³ãƒ‰ã‚’å—ã‘å–ã‚‹ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string TwistTopicName = "robot_name/tracks/cmd_vel"; // Subscribe Messsage Topic Name
-    [Tooltip("‚±‚ê‚ÍGNSSƒgƒsƒbƒN–¼‚Å‚·B")]
+
+    [Tooltip("ã‚ªãƒ‰ãƒ¡ãƒˆãƒªæƒ…å ±ã‚’å‡ºåŠ›ã™ã‚‹ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
-    [Tooltip("‚±‚ê‚Íƒ`ƒƒƒCƒ‹ƒhƒtƒŒ[ƒ€–¼‚Å‚·B")]
+
+    [Tooltip("ã‚ªãƒ‰ãƒ¡ãƒˆãƒªæƒ…å ±ã‚’å‡ºåŠ›ã™ã‚‹éš›ã«ç”¨ã„ã‚‰ã‚Œã‚‹åŸºæº–ãƒ•ãƒ¬ãƒ¼ãƒ å")]
     public string childFrameName = "robot_name/base_link";
-    [Tooltip("‚±‚ê‚ÍƒgƒŒƒbƒhƒRƒŒƒNƒVƒ‡ƒ“ƒtƒ@ƒNƒ^[‚Å‚·B")]
+
+    [Tooltip("ã‚ªãƒ‰ãƒ¡ãƒˆãƒªã‚’è¨ˆç®—ã™ã‚‹éš›ã«ã¯ãƒˆãƒ¬ãƒƒãƒ‰å¹…ãŒç”¨ã„ã‚‰ã‚Œã¾ã™ã€‚ãƒˆãƒ¬ãƒƒãƒ‰å¹…ã«ä¿‚æ•°ã‚’ã‹ã‘ã‚‹ã“ã¨ã§è¨ˆç®—ã‚’è£œæ­£ã§ãã¾ã™ã€‚")]
     public double treadCollectionFactor = 2.0; // Factor Collecting Yaw angle of base_link. This Parameter is multiplied to tread to calculate angular velocity based on Vehicle's Kinematics.
+
     private List<WheelCollider> leftWheelColliders;
     private List<WheelCollider> rightWheelColliders;
     private WheelCollider leftMiddleWheel;
     private WheelCollider rightMiddleWheel;
 
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚Ì”ä—á“®ìƒQƒCƒ“‚Å‚·B")]
+    [Tooltip("PIDåˆ¶å¾¡ã‚’ç”¨ã„ã¦è»Šè¼ªã‚’åˆ¶å¾¡ã™ã‚‹éš›ã®æ¯”ä¾‹ã‚²ã‚¤ãƒ³")]
     public double pGain = 100.0;
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚ÌÏ•ª“®ìƒQƒCƒ“‚Å‚·B")]
+
+    [Tooltip("PIDåˆ¶å¾¡ã‚’ç”¨ã„ã¦è»Šè¼ªã‚’åˆ¶å¾¡ã™ã‚‹éš›ã®ç©åˆ†ã‚²ã‚¤ãƒ³")]
     public double iGain = 0.0;
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚Ì”÷•ª“®ìƒQƒCƒ“‚Å‚·B")]
+
+    [Tooltip("PIDåˆ¶å¾¡ã‚’ç”¨ã„ã¦è»Šè¼ªã‚’åˆ¶å¾¡ã™ã‚‹éš›ã®å¾®åˆ†ã‚²ã‚¤ãƒ³")]
     public double dGain = 0.0;
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚Ìƒgƒ‹ƒNãŒÀ‚Å‚·B")]
+
+    [Tooltip("PIDåˆ¶å¾¡ã‚’ç”¨ã„ã¦è»Šè¼ªã‚’åˆ¶å¾¡ã™ã‚‹éš›ã®æœ€å¤§ãƒˆãƒ«ã‚¯")]
     public double torqueLimit = 1000.0;
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚ÌƒuƒŒ[ƒLƒgƒ‹ƒN‚Å‚·B")]
+
+    [Tooltip("è»Šè¼ªã‚’é™æ­¢ã™ã‚‹éš›ã«ç”¨ã„ã‚‰ã‚Œã‚‹ãƒ–ãƒ¬ãƒ¼ã‚­ãƒˆãƒ«ã‚¯")]
     public float brakeTorque = 10000.0F;
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚ÌÅ‘å‘¬“x‚Å‚·B")]
+
+    [Tooltip("cmd_velã‚³ãƒãƒ³ãƒ‰ã§æŒ‡å®šå¯èƒ½ãªæœ€å¤§é€Ÿåº¦")]
     public double maxLinearVelocity = 3.00;  // unit is m/sec
-    [Tooltip("‚±‚ê‚ÍƒzƒC[ƒ‹‚ÌÅ‘åŠp‘¬“x‚Å‚·B")]
+
+    [Tooltip("cmd_velã‚³ãƒãƒ³ãƒ‰ã§æŒ‡å®šå¯èƒ½ãªæœ€å¤§è§’é€Ÿåº¦")]
     public double maxAngularVelocity = Math.PI * 2.0 * 5.0 / 360.0;  // unit is rad/sec
+
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
 
@@ -58,7 +75,7 @@ public class DiffDriveController : MonoBehaviour
     private double yaw = 0.0;
 
     // Publish the cube's position and rotation every N seconds
-    [Tooltip("‚±‚ê‚ÍƒpƒuƒŠƒbƒVƒƒ[ƒƒbƒZ[ƒWŠÔŠu‚Å‚·B")]
+    [Tooltip("ROSãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ›é–“éš”(ç§’)")]
     public float publishMessageInterval = 0.02f;//50Hz
 
     // Used to determine how much time has elapsed since the last message was published

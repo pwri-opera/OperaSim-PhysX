@@ -1,7 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// C30Rのシミュレーションモデルに対して細かな干渉検出設定を行う
+/// </summary>
 public class CustomCollisionC30R : MonoBehaviour
 {
     Transform base_link;

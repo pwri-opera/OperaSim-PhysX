@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -7,19 +7,23 @@ using RosMessageTypes.Geometry;
 using RosMessageTypes.BuiltinInterfaces;
 using Unity.Robotics.Core;
 
-
+/// <summary>
+/// ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ã‹ã‚‰å¾—ã‚‰ã‚Œã‚‹çœŸã®ä½ç½®ã‚’PoseStampedãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¨ã—ã¦é€ä¿¡ã™ã‚‹
+/// </summary>
 public class PoseStampedPublisher : MonoBehaviour
 {
     ROSConnection ros;
 
-    [Tooltip("‚±‚ê‚ÍƒVƒ~ƒ…ƒŒ[ƒVƒ‡ƒ“ƒƒ{ƒbƒg‚Ìƒ‚ƒfƒ‹–¼‚Å‚·B")]
+    [Tooltip("ROSãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æ¥é ­è¾ã¨ã—ã¦ç”¨ã„ã‚‰ã‚Œã‚‹ãƒ­ãƒœãƒƒãƒˆå")]
     public string robotName = "robot_name";
-    [Tooltip("‚±‚ê‚Íp¨ƒ|ƒWƒVƒ‡ƒ“‚ÌƒgƒsƒbƒN–¼‚Å‚·B")]
+
+    [Tooltip("å‡ºåŠ›ã™ã‚‹ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string topicName = "robot_name/unity/pose_stmp";
+
     private PoseStampedMsg message;
 
     // Publish the object's position and rotation every N seconds
-    [Tooltip("‚±‚ê‚ÍƒpƒuƒŠƒbƒVƒƒ[ƒƒbƒZ[ƒWŠÔŠu‚Å‚·B")]
+    [Tooltip("ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ›é–“éš”(ç§’)")]
     public float publishMessageInterval = 0.05f;//20Hz
 
     // Used to determine how much time has elapsed since the last message was published

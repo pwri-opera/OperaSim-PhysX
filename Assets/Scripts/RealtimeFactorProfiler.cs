@@ -1,8 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Profiling;
 
+/// <summary>
+/// リアルタイムファクターを計測するユーティリティ
+/// </summary>
 public class RealtimeFactorProfiler : MonoBehaviour
 {
     static readonly ProfilerCounterValue<double> k_RealtimeFactor = new(ProfilerCategory.Scripts, "Realtime Factor",

@@ -1,10 +1,13 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
 
+/// <summary>
+/// MoveIt!ãŒç”Ÿæˆã—ãŸè»Œè·¡ã‚’fake_controller_joint_statesãƒˆãƒ”ãƒƒã‚¯çµŒç”±ã§å®Ÿè¡Œã™ã‚‹
+/// </summary>
 public class FollowJointTrajectoryAction : MonoBehaviour
 {
     private ROSConnection ros;
@@ -12,11 +15,13 @@ public class FollowJointTrajectoryAction : MonoBehaviour
     private Dictionary<string, ArticulationBody> jointArticulationBodies;
     private JointStateMsg currentPose;
 
-    [Tooltip("‚±‚ê‚Í‰¼‘zƒRƒ“ƒgƒ[ƒ‰‚ÌƒgƒsƒbƒN–¼‚Å‚·B")]
+    [Tooltip("fake_controllerã®ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string fakeControllerTopicName = "move_group/fake_controller_joint_states";
-    [Tooltip("‚±‚ê‚Í‰Šúƒ|[ƒY‚ÌƒIƒuƒWƒFƒNƒg”‚Å‚·B")]
+
+    [Tooltip("åˆæœŸå§¿å‹¢ã‚’è¨­å®šã™ã‚‹gameObjectã®ãƒªã‚¹ãƒˆ")]
     public List<GameObject> initialPoseObjects;
-    [Tooltip("‚±‚ê‚Í‰Šúƒ|[ƒY‚Ì’l‚Å‚·B")]
+
+    [Tooltip("åˆæœŸå§¿å‹¢")]
     public List<float> initialPoseValues;
 
     // Start is called before the first frame update

@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -7,20 +7,26 @@ using RosMessageTypes.Std;
 using RosMessageTypes.Nav;
 using Unity.Robotics.Core;
 
+/// <summary>
+/// ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ã‹ã‚‰å¾—ã‚‰ã‚Œã‚‹çœŸã®ä½ç½®ã‚’ã‚ªãƒ‰ãƒ¡ãƒˆãƒªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¨ã—ã¦é€ä¿¡ã™ã‚‹
+/// </summary>
 public class OdomPublisher : MonoBehaviour
 {
     ROSConnection ros;
 
-    [Tooltip("‚±‚ê‚ÍƒVƒ~ƒ…ƒŒ[ƒVƒ‡ƒ“ƒƒ{ƒbƒg‚Ìƒ‚ƒfƒ‹–¼‚Å‚·B")]
+    [Tooltip("ROSãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æ¥é ­è¾ã¨ã—ã¦ç”¨ã„ã‚‰ã‚Œã‚‹ãƒ­ãƒœãƒƒãƒˆå")]
     public string robotName = "robot_name";
-    [Tooltip("‚±‚ê‚ÍGNSS@ODOM‚ÌƒgƒsƒbƒN–¼‚Å‚·B")]
+
+    [Tooltip("ã‚ªãƒ‰ãƒ¡ãƒˆãƒªæƒ…å ±ã‚’å‡ºåŠ›ã™ã‚‹ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string topicName = "robot_name/diff_drive_controller/odom";
-    [Tooltip("‚±‚ê‚Íƒ`ƒƒƒCƒ‹ƒhƒtƒŒ[ƒ€–¼‚Å‚·B")]
+ 
+    [Tooltip("åŸºæº–åº§æ¨™ã¨ã—ã¦è¨­å®šã™ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ å")]
     public string childFrameName = "robot_name/base_link";
+ 
     private OdometryMsg message;
 
     // Publish the cube's position and rotation every N seconds
-    [Tooltip("‚±‚ê‚ÍƒpƒuƒŠƒbƒVƒƒ[ƒƒbƒZ[ƒWŠÔŠu‚Å‚·B")]
+    [Tooltip("ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ›é–“éš”(ç§’)")]
     public float publishMessageInterval = 0.05f;//20Hz
 
     // Used to determine how much time has elapsed since the last message was published

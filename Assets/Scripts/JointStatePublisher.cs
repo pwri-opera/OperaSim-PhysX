@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -8,21 +8,25 @@ using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
 using Unity.Robotics.Core;
 
+/// <summary>
+/// å„é–¢ç¯€è§’åº¦ã®ç¾åœ¨å€¤ã‚’joint_statesãƒˆãƒ”ãƒƒã‚¯ã¨ã—ã¦å‡ºåŠ›ã™ã‚‹
+/// </summary>
 public class JointStatePublisher : MonoBehaviour
 {
     ROSConnection ros;
 
-    [Tooltip("‚±‚ê‚ÍƒWƒ‡ƒCƒ“ƒgó‘Ô‘—M‚ÌƒgƒsƒbƒN–¼‚Å‚·B")]
+    [Tooltip("joint_statesã‚’å‡ºåŠ›ã™ã‚‹ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string topicName = "joint_states";
+
     private JointStateMsg message;
     private List<ArticulationBody> joints;
     private List<string> jointNames;
 
-    [Tooltip("‚±‚ê‚Í—LŒø‚ÈƒWƒ‡ƒCƒ“ƒgó‘Ô‚ÌH‚Å‚·B")]
+    [Tooltip("ãƒˆãƒ«ã‚¯ã‚’å‡ºåŠ›ã™ã‚‹å ´åˆã¯trueã«ã—ã¦ããŸã‚™ã•ã„ã€‚")]
     public bool enableJointEffortSensor = false;
 
     // Publish the cube's position and rotation every N seconds
-    [Tooltip("‚±‚ê‚ÍƒWƒ‡ƒCƒ“ƒg‚ÌƒƒbƒZ[ƒWŠÔŠu‚Å‚·B")]
+    [Tooltip("ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ›é–“éš”(ç§’)")]
     public float publishMessageInterval = 0.5f;
 
     // Used to determine how much time has elapsed since the last message was published

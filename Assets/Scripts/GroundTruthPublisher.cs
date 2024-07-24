@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -7,17 +7,23 @@ using RosMessageTypes.Std;
 using RosMessageTypes.Nav;
 using Unity.Robotics.Core;
 
+/// <summary>
+/// シミュレータから得られる真の位置をROSメッセージとして送信する
+/// </summary>
 public class GroundTruthPublisher : MonoBehaviour
 {
     ROSConnection ros;
-    [Tooltip("これは掘削地形のトピック名です。")]
+
+    [Tooltip("真の位置を出力するROSトピック名")]
     public string topicName = "robot_name/groundtruth";
-    [Tooltip("これは掘削地形チャイルド名です。")]
+
+    [Tooltip("基準座標のフレーム名")]
     public string childFrameName = "robot_name/base_link";
+
     private OdometryMsg message;
 
     // Publish the cube's position and rotation every N seconds
-    [Tooltip("これは掘削地形のメッセージ間隔です。")]
+    [Tooltip("ROSメッセージの出力間隔(秒)")]
     public float publishMessageInterval = 0.5f;//2Hz
 
     // Used to determine how much time has elapsed since the last message was published

@@ -1,17 +1,21 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
 
+/// <summary>
+/// ãƒ€ãƒ³ãƒ—ãƒˆãƒ©ãƒƒã‚¯ã®ãƒ€ãƒ³ãƒ—è§’åº¦ã‚’åˆ¶å¾¡ã™ã‚‹
+/// </summary>
 public class VesselController : MonoBehaviour
 {
     private ROSConnection ros;
 
-    [Tooltip("‚±‚ê‚ÍDump‚ÌƒgƒsƒbƒN–¼‚Å‚·B")]
+    [Tooltip("ãƒ€ãƒ³ãƒ—è§’åº¦è¨­å®šã‚³ãƒãƒ³ãƒ‰ã®ROSãƒˆãƒ”ãƒƒã‚¯å")]
     public string DumpTopicName = "dump/cmd";
-    [Tooltip("‚±‚ê‚ÍDump‚ÌƒWƒ‡ƒCƒ“ƒgæ‚Å‚·B")]
-    public ArticulationBody dump_joint;
+
+    private ArticulationBody dump_joint;
+
     private Float64Msg target_pos;
 
     // Start is called before the first frame update
