@@ -25,11 +25,14 @@ public class Com3FrontController : MonoBehaviour
 
     public string com3FrontControllerTopicName = "robot_name/front_cmd";
 
+    private EmergencyStop emergencyStop;
+
     // Start is called before the first frame update
     void Start()
     {
         currentCmd = new JointCmdMsg();
         ros = ROSConnection.GetOrCreateInstance();
+        emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
 
         joints = new Dictionary<string, Com3JointInfo>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>()) {
@@ -60,6 +63,8 @@ public class Com3FrontController : MonoBehaviour
 
     void OnCommand(JointCmdMsg cmd)
     {
+        if (emergencyStop && emergencyStop.isEmergencyStop)
+            return;
         currentCmd = cmd;
         for (int i = 0; i < currentCmd.joint_name.Length; i++) {
             var joint = joints[currentCmd.joint_name[i]];

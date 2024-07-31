@@ -16,11 +16,14 @@ public class FollowJointTrajectoryAction : MonoBehaviour
     public List<GameObject> initialPoseObjects;
     public List<float> initialPoseValues;
 
+    private EmergencyStop emergencyStop;
+
     // Start is called before the first frame update
     void Start()
     {
         currentPose = new JointStateMsg();
         ros = ROSConnection.GetOrCreateInstance();
+        emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
         jointArticulationBodies = new Dictionary<string, ArticulationBody>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
         {
@@ -57,6 +60,8 @@ public class FollowJointTrajectoryAction : MonoBehaviour
 
     void ExecuteTrajectory(JointStateMsg trajectory)
     {
+        if (emergencyStop && emergencyStop.isEmergencyStop)
+            return;
         currentPose = trajectory;
         for (int i = 0; i < currentPose.name.Length; i++)
         {
