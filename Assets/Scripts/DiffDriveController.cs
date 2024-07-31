@@ -56,10 +56,13 @@ public class DiffDriveController : MonoBehaviour
     // Used to determine how much time has elapsed since the last message was published
     private double timeElapsed;
 
+    private EmergencyStop emergencyStop;
+
     // Start is called before the first frame update
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
+        emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
         leftWheelColliders = new List<WheelCollider>();
         rightWheelColliders = new List<WheelCollider>();
 
@@ -184,6 +187,11 @@ public class DiffDriveController : MonoBehaviour
 
             ros.Publish(OdomTopicName, odomMessage);
             timeElapsed = 0.0f;
+        }
+
+        if (emergencyStop && emergencyStop.isEmergencyStop) {
+            leftVelCmd = 0.0;
+            rightVelCmd = 0.0;
         }
 
         /* Set targetVelocity in xDrive in wheels */
