@@ -1,22 +1,18 @@
 {
-    "swing":
-    {
-        "joint_stiffness" : 200000,
-        "joint_dumping"   : 100000
-    },
-    "boom":
-    {
-        "joint_stiffness" : 200000,
-        "joint_dumping"   : 100000       
-    },
-    "arm":
-    {
-        "joint_stiffness" : 200000,
-        "joint_dumping"   : 100000        
-    },
-    "bucket":
-    {
-        "joint_stiffness" : 200000,
-        "joint_dumping"   : 100000        
+    "swing": {
+        "joint_stiffness": 5000000, 
+        "joint_damping": 2000000
+    }, 
+    "bucket": {
+        "joint_stiffness": 200000, 
+        "joint_damping": 100000
+    }, 
+    "arm": {
+        "joint_stiffness": 200000, 
+        "joint_damping": 100000
+    }, 
+    "boom": {
+        "joint_stiffness": 200000, 
+        "joint_damping": 100000
     }
 }

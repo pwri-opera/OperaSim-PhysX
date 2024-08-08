@@ -19,7 +19,7 @@ public class UpdateZX120Param : MonoBehaviour
     public class XDriveParam
     {
         public int joint_stiffness = 200000;
-        public int joint_dumping = 100000;
+        public int joint_damping = 100000;
     }
 
     [Serializable] // <- JsonUtility を介す際に必要
@@ -36,12 +36,13 @@ public class UpdateZX120Param : MonoBehaviour
     private List<string> jointNames;
 
 	//----------------------------------------------------------------------------
-	private void Awake()
+	private void Awake ()
 	{
 		m_FileSystemWatcher = new System.IO.FileSystemWatcher(); // FileSystemWatcher を作成
 		m_FileSystemWatcher.NotifyFilter = System.IO.NotifyFilters.LastWrite; // 更新日時が変更になったら知らせる設定
 		m_FileSystemWatcher.Path = "Assets/StreamConfig/"; // 監視するディレクトリ
 		m_FileSystemWatcher.Filter = "zx120_config.json"; // 監視するファイル 
+
         // 変更時に呼ばれるデリゲート
 		m_FileSystemWatcher.Changed += new System.IO.FileSystemEventHandler( ( source, e) =>
 		{
@@ -59,12 +60,11 @@ public class UpdateZX120Param : MonoBehaviour
 				}
 			}
 			var newConfig = UnityEngine.JsonUtility.FromJson<Param> ( json_text );
-            Debug.Log("raw_json? : " + newConfig.swing.joint_stiffness);
-            Debug.Log("raw_json? : " + json_text);
+            // Debug.Log("raw_json? : " + newConfig.swing.joint_stiffness);
+            // Debug.Log("raw_json? : " + json_text);
 			m_ConfigChangedList.Add( newConfig);
 		});
 		m_FileSystemWatcher.EnableRaisingEvents = true; // 監視開始
-
 
 
         joints = new List<ArticulationBody>();
@@ -77,45 +77,37 @@ public class UpdateZX120Param : MonoBehaviour
             
             if (joint.isActiveAndEnabled)
             {
-                Debug.Log("type? : " + type);
-                Debug.Log("fields? : " + fields);
+                // Debug.Log("type? : " + type);
+                // Debug.Log("fields? : " + fields);
 
                 var ujoint = joint.GetComponent<UrdfJoint>();
                 if (ujoint && !(ujoint is UrdfJointFixed))
                 {
                     joints.Add(joint);
                     jointNames.Add(ujoint.jointName);
-                    Debug.Log("Name? : " + ujoint.jointName);
+                    // Debug.Log("Name? : " + ujoint.jointName);
                 }
-
-                // var ujoint = joint.GetComponent<UrdfJoint>();
-                // Type utype = ujoint.GetType();
-                // FieldInfo[] ufields = utype.GetFields();
-
-                // Debug.Log("utype?" + utype);
-                // Debug.Log("ufields?" + ufields);
             }
-            
-            // foreach (FieldInfo field in fields)
-            // {
-            //     // メンバー名とその値を表示
-            //     object value = field.GetValue(joint);
-            //     Debug.Log($"{field.Name}: {value}");
-            // }
-
-            // if (joint.isActiveAndEnabled)
-            // {
-            //     var ujoint = joint.GetComponent<UrdfJoint>();
-            //     if (ujoint && !(ujoint is UrdfJointFixed))
-            //     {
-            //         joints.Add(joint);
-            //         jointNames.Add(ujoint.jointName);
-            //     }
-            // }
         }
+
+
+
+        // 初回 config file 読み込み
+        var pash = "Assets/StreamConfig/zx120_config.json";
+		string json_text = "";
+        using( var fileStream = new FileStream( pash, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            using( var reader = new StreamReader( fileStream, System.Text.Encoding.UTF8))
+            {
+                json_text = reader.ReadToEnd();
+            }
+        }
+        var newConfig = UnityEngine.JsonUtility.FromJson<Param> ( json_text );
+        UpdateJointParam (newConfig);
+
 	}
 	//----------------------------------------------------------------------------
-	public void OnDestroy()
+	public void OnDestroy ()
 	{
 		// 一応後始末
 		if( m_FileSystemWatcher != null)
@@ -126,28 +118,55 @@ public class UpdateZX120Param : MonoBehaviour
 		m_ConfigChangedList = null;
 	}
 	//----------------------------------------------------------------------------
-	private void Update()
+	private void Update ()
 	{
 		foreach( var config in m_ConfigChangedList)
 		{
             Debug.Log("is_changed? :" + config.swing.joint_stiffness);
-
-            joints
-            jointNames
-
-
-            // joint の stiffness 設定
-            // joint.swing.stiffness   = config.joint_stiffness.swing;
-            // joint.boom.stiffness    = config.joint_stiffness.boom;
-            // joint.arm.stiffness     = config.joint_stiffness.arm;
-            // joint.bucket.stiffness  = config.joint_stiffness.bucket;
-            
-            //joint の dumping 設定
-            // joint.swing.dumping   = config.joint_dumping.swing;
-            // joint.boom.dumping    = config.joint_dumping.boom;
-            // joint.arm.dumping     = config.joint_dumping.arm;
-            // joint.bucket.dumping  = config.joint_dumping.bucket;
+            UpdateJointParam (config);
 		}
 		m_ConfigChangedList.Clear();
 	}
+
+
+    private void UpdateJointParam (Param cfg)
+    {
+        for (int i = 0; i < joints.Count; i++)
+        {
+            var drive = joints[i].xDrive;
+            if (jointNames[i] == "swing_joint")
+            {
+               drive.stiffness = cfg.swing.joint_stiffness;
+                drive.damping = cfg.swing.joint_damping;
+                drive.forceLimit = 3200000;
+                Debug.Log("Swing params are changed to :: stiffness:" + cfg.swing.joint_stiffness + "damping:" + cfg.swing.joint_damping);
+            }
+            else if (jointNames[i] == "boom_joint")
+            {
+                drive.stiffness = cfg.boom.joint_stiffness;
+                drive.damping = cfg.boom.joint_damping;
+                drive.forceLimit = 400000;
+                Debug.Log("Swing params are changed to :: stiffness:" + cfg.boom.joint_stiffness + "damping:" + cfg.boom.joint_damping);
+            }
+            else if (jointNames[i] == "arm_joint")
+            {
+                drive.stiffness = cfg.arm.joint_stiffness;
+                drive.damping = cfg.arm.joint_damping;
+                drive.forceLimit = 236187;
+                Debug.Log("Swing params are changed to :: stiffness:" + cfg.arm.joint_stiffness + "damping:" + cfg.arm.joint_damping);
+            }
+            else if (jointNames[i] == "bucket_joint")
+            {
+                drive.stiffness = cfg.bucket.joint_stiffness;
+                drive.damping = cfg.bucket.joint_damping;
+                drive.forceLimit = 121770;
+                Debug.Log("Swing params are changed to :: stiffness:" + cfg.bucket.joint_stiffness + "damping:" + cfg.bucket.joint_damping);
+            }
+            else
+            {
+                Debug.LogWarning("A warning: joints do not exist");
+            }
+            joints[i].xDrive = drive;
+        }
+    }
 } 
