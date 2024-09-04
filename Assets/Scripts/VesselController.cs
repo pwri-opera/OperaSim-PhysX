@@ -1,14 +1,21 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
 
+/// <summary>
+/// ダンプトラックのダンプ角度を制御する
+/// </summary>
 public class VesselController : MonoBehaviour
 {
     private ROSConnection ros;
+
+    [Tooltip("ダンプ角度設定コマンドのROSトピック名")]
     public string DumpTopicName = "dump/cmd";
-    public ArticulationBody dump_joint;
+
+    private ArticulationBody dump_joint;
+
     private Float64Msg target_pos;
 
     // Start is called before the first frame update

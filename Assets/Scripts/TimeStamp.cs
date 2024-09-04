@@ -11,10 +11,14 @@ using RosSecsType = System.Int32;
 using RosSecsType = System.UInt32;
 #endif
 
+/// <summary>
+/// 時刻管理に用いるデータクラス
+/// </summary>
 namespace Unity.Robotics.Core
 {
     public readonly struct TimeStamp
     {
+
         public const double k_NanosecondsInSecond = 1e9f;
 
         // TODO: specify base time this stamp is measured against (Sim 0, time since application start, etc.)

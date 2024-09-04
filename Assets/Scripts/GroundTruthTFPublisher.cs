@@ -6,12 +6,21 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 
+/// <summary>
+/// シミュレータから得られる真の位置をTFメッセージとして送信する
+/// </summary>
 public class GroundTruthTFPublisher : MonoBehaviour
 {
+    [Tooltip("TFメッセージの出力レート(Hz)")]
     [SerializeField]
     float m_PublishRateHz = 20f;
+
+    [Tooltip("TFメッセージのフレーム名の接頭辞")]
     [SerializeField]
     string m_FramePrefix = "";
+
+
+    [Tooltip("TFメッセージのフレーム名の接尾辞")]
     [SerializeField]
     string m_FrameSuffix = "_groundtruth";
 

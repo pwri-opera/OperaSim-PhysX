@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.BuiltinInterfaces;
@@ -6,15 +6,20 @@ using RosMessageTypes.Rosgraph;
 using Unity.Robotics.Core;
 // From: https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts
 
+/// <summary>
+/// シミュレーション時刻をROSに送信する
+/// </summary>
 public class ROSClockPublisher : MonoBehaviour
 {
     [SerializeField]
+    [Tooltip("シミュレーション時刻を計算するモード設定")]
     Clock.ClockMode m_ClockMode;
 
     [SerializeField, HideInInspector]
     Clock.ClockMode m_LastSetClockMode;
     
-    [SerializeField] 
+    [SerializeField]
+    [Tooltip("時刻の出力レート(Hz)")]
     double m_PublishRateHz = 100f;
 
     double m_LastPublishTimeSeconds;
