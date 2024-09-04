@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -8,17 +8,25 @@ using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
 using Unity.Robotics.Core;
 
+/// <summary>
+/// 各関節角度の現在値をjoint_statesトピックとして出力する
+/// </summary>
 public class JointStatePublisher : MonoBehaviour
 {
     ROSConnection ros;
+
+    [Tooltip("joint_statesを出力するROSトピック名")]
     public string topicName = "joint_states";
+
     private JointStateMsg message;
     private List<ArticulationBody> joints;
     private List<string> jointNames;
 
+    [Tooltip("トルクを出力する場合はtrueにしてください。")]
     public bool enableJointEffortSensor = false;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("メッセージの出力間隔(秒)")]
     public float publishMessageInterval = 0.5f;
 
     // Used to determine how much time has elapsed since the last message was published

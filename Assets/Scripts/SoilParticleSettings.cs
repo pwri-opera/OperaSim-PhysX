@@ -1,22 +1,36 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// 掘削時の地形変形パラメータの設定
+/// </summary>
 public class SoilParticleSettings : MonoBehaviour
 {
     public static SoilParticleSettings instance = null;
 
+    [Tooltip("掘削時の地形変形を有効にする")]
     public bool enable = true;
+
+    [Tooltip("粒子の見た目の大きさ(m)")]
     public float particleVisualRadius = 0.2f;
+
+    [Tooltip("粒子間力を有効化する粒子間距離(m)")]
     public double partileStickDistance = 0.25;
+
+    [Tooltip("粒子間力の強さ")]
     public float stickForce = 30.0f;
 
     [SerializeField]
+    [Tooltip("地面の自然崩壊をシミュレートする際に用いる安息角の大きさ(x,y比)")]
     public Vector2 m_AngleOfRepose = new Vector2(30.0f, 45.0f);
+
     [SerializeField]
+    [Tooltip("地面の自然崩壊をシミュレートする際に用いるノイズの大きさ")]
     public int m_ReposeJitter = 0;
 
+    [Tooltip("heightmapを同期する間隔(秒)")]
     public float syncPeriod = 1.0f;
 
     private float timeElapsed = 0.0f;

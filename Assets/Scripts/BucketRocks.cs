@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GK;
@@ -9,9 +9,15 @@ using Unity.Mathematics;
 using Unity.Burst;
 using System.Runtime.InteropServices.WindowsRuntime;
 
+/// <summary>
+/// 各粒子にアタッチしてTerrainとの衝突イベントを通知するユーティリティスクリプト
+/// </summary>
 public class RockObjectDetector : MonoBehaviour
 {
+
+    [Tooltip("衝突イベントを通知する先のマネージャクラス")]
     public BucketRocks manager;
+    [Tooltip("衝突イベントを検出するTerrainオブジェクト")]
     public GameObject terrain;
     private double timecreated = 0.0;
     private Vector3 pos_last_collision = Vector3.zero;
@@ -55,9 +61,15 @@ public class RockObjectDetector : MonoBehaviour
     }
 }
 
+/// <summary>
+/// バケットにアタッチして、地面との接触時に粒子を生成する
+/// </summary>
 public class BucketRocks : MonoBehaviour
 {
+    [Tooltip("生成する粒子のPefabを設定してください")]
     public GameObject rockPrefab;
+
+    [Tooltip("接触を検知するTerrainオブジェクトを設定してください")]
     public GameObject terrain;
 
     private List<GameObject> rocks;
