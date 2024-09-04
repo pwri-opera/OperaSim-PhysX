@@ -59,6 +59,7 @@ sysinfo.txt
 *.apk
 *.aab
 *.unitypackage
+*.vscode
 
 # Crashlytics generated file
 crashlytics-build.properties

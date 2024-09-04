@@ -7,7 +7,7 @@ Simulator on Unity + PhysX communicating with ROS
 - Unityを利用するため、利用者が所属する組織に応じたUnityのライセンスが必要です。詳細は[Unityの公式サイト](https://store.unity.com/ja)をご確認の上、利用登録をしてください。
 
 
-![Videotogif](https://user-images.githubusercontent.com/24404939/159425467-c244de28-354e-4d2a-a615-5ccafc7b9709.gif)
+![OperaSim-PhysX-Drilling01](https://github.com/user-attachments/assets/fce94452-712f-4bd1-aeae-3e53920c1f50)
 
 ## インストール方法
 ### 1. Unity(ver:2022.3.4f1)のインストール
