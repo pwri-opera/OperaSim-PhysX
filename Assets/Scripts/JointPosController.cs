@@ -1,14 +1,22 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
 
+/// <summary>
+/// 各関節を独立して制御する
+/// </summary>
 public class JointPosController : MonoBehaviour
 {
     private ROSConnection ros;
+
+    [Tooltip("角度設定コマンドのROSトピック名")]
     public string setpointTopicName = "joint_name/setpoint";
+
+    [Tooltip("初期の目標角度")]
     public double initTargetPos;
+
     private ArticulationBody joint;
     private Float64Msg targetPos;
 

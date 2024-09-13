@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -7,15 +7,26 @@ using RosMessageTypes.Std;
 using RosMessageTypes.Nav;
 using Unity.Robotics.Core;
 
+/// <summary>
+/// シミュレータから得られる真の位置をオドメトリメッセージとして送信する
+/// </summary>
 public class OdomPublisher : MonoBehaviour
 {
     ROSConnection ros;
+
+    [Tooltip("ROSメッセージの接頭辞として用いられるロボット名")]
     public string robotName = "robot_name";
+
+    [Tooltip("オドメトリ情報を出力するROSトピック名")]
     public string topicName = "robot_name/diff_drive_controller/odom";
+ 
+    [Tooltip("基準座標として設定するフレーム名")]
     public string childFrameName = "robot_name/base_link";
+ 
     private OdometryMsg message;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("メッセージの出力間隔(秒)")]
     public float publishMessageInterval = 0.05f;//20Hz
 
     // Used to determine how much time has elapsed since the last message was published

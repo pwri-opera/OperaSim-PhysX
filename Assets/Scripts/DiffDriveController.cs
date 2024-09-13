@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -10,32 +10,62 @@ using Unity.Robotics.Core;
 using System;
 using PID_Controller;
 
+/// <summary>
+/// 差動駆動車の制御を行う
+/// </summary>
 public class DiffDriveController : MonoBehaviour
 {
     private ROSConnection ros;
 
+    [Tooltip("左の車輪のgameObjectを登録してください（複数登録可能）")]
     public List<GameObject> leftWheels;
+        
+    [Tooltip("右の車輪のgameObjectを登録してください（複数登録可能）")]
     public List<GameObject> rightWheels;
 
     private OdometryMsg odomMessage;
 
+    [Tooltip("ROSトピック名の頭に付与されるロボット名")]
     public string robotName = "robot_name";
+
+    [Tooltip("cmd_velコマンドを受け取るROSトピック名")]
     public string TwistTopicName = "robot_name/tracks/cmd_vel"; // Subscribe Messsage Topic Name
+
+    [Tooltip("オドメトリ情報を出力するROSトピック名")]
     public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
+
+    [Tooltip("オドメトリ情報を出力する際に用いられる基準フレーム名")]
     public string childFrameName = "robot_name/base_link";
+
+    [Tooltip("オドメトリを計算する際にはトレッド幅が用いられます。トレッド幅に係数をかけることで計算を補正できます。")]
     public double treadCollectionFactor = 2.0; // Factor Collecting Yaw angle of base_link. This Parameter is multiplied to tread to calculate angular velocity based on Vehicle's Kinematics.
+
     private List<WheelCollider> leftWheelColliders;
     private List<WheelCollider> rightWheelColliders;
     private WheelCollider leftMiddleWheel;
     private WheelCollider rightMiddleWheel;
 
+    [Tooltip("PID制御を用いて車輪を制御する際の比例ゲイン")]
     public double pGain = 100.0;
+
+    [Tooltip("PID制御を用いて車輪を制御する際の積分ゲイン")]
     public double iGain = 0.0;
+
+    [Tooltip("PID制御を用いて車輪を制御する際の微分ゲイン")]
     public double dGain = 0.0;
+
+    [Tooltip("PID制御を用いて車輪を制御する際の最大トルク")]
     public double torqueLimit = 1000.0;
+
+    [Tooltip("車輪を静止する際に用いられるブレーキトルク")]
     public float brakeTorque = 10000.0F;
+
+    [Tooltip("cmd_velコマンドで指定可能な最大速度")]
     public double maxLinearVelocity = 3.00;  // unit is m/sec
+
+    [Tooltip("cmd_velコマンドで指定可能な最大角速度")]
     public double maxAngularVelocity = Math.PI * 2.0 * 5.0 / 360.0;  // unit is rad/sec
+
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
 
@@ -45,6 +75,7 @@ public class DiffDriveController : MonoBehaviour
     private double yaw = 0.0;
 
     // Publish the cube's position and rotation every N seconds
+    [Tooltip("ROSメッセージの出力間隔(秒)")]
     public float publishMessageInterval = 0.02f;//50Hz
 
     // Used to determine how much time has elapsed since the last message was published
