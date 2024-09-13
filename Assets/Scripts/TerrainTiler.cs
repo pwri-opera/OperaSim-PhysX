@@ -52,6 +52,15 @@ public class TerrainTiler : MonoBehaviour
                 }
                 terrain.terrainData.terrainLayers = layers.ToArray();
 
+                terrains.Add(terrain);
+            }
+        }
+
+        for (int y = 0; y < divides; y++) {
+            for (int x = 0; x < divides; x++) {
+                int index = (y * divides) + x;
+                Terrain terrain = terrains[index];
+
                 // divide splatmap into tiles
                 int splatmapWidth = terrainData.alphamapWidth / divides;
                 int splatmapHeight = terrainData.alphamapHeight / divides;
@@ -75,8 +84,6 @@ public class TerrainTiler : MonoBehaviour
                     }
                 }
                 terrain.terrainData.SetHeights(0, 0, heightData);
-
-                terrains.Add(terrain);
             }
         }
 
@@ -102,7 +109,7 @@ public class TerrainTiler : MonoBehaviour
         var t = new TerrainData();
         t.heightmapResolution = masterTerrain.terrainData.heightmapResolution / divides;
         t.alphamapResolution = masterTerrain.terrainData.alphamapResolution / divides;
-        t.size = new Vector3(masterTerrain.terrainData.size.x / divides, masterTerrain.terrainData.size.y, masterTerrain.terrainData.size.z / divides);
+        t.size = new Vector3(masterTerrain.terrainData.size.x / divides + 1, masterTerrain.terrainData.size.y, masterTerrain.terrainData.size.z / divides + 1);
         var tile = Terrain.CreateTerrainGameObject(t);
         tile.tag = "terrain";
         return tile;
