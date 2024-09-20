@@ -39,7 +39,7 @@ public class TerrainTiler : MonoBehaviour
             for (int x = 0; x < divides; x++) {
                 var tile = CreateTile();
                 var terrain = tile.GetComponent<Terrain>();
-                tile.transform.position = new Vector3(gameObject.transform.position.x + terrainScale.x / divides * x, gameObject.transform.position.y, gameObject.transform.position.z + terrainScale.z / divides * y);
+                tile.transform.position = new Vector3(gameObject.transform.position.x + terrainScale.x / divides * x - 0.25f, gameObject.transform.position.y, gameObject.transform.position.z + terrainScale.z / divides * y - 0.25f);
 
                 // copy terrain layers to tile
                 var layers = new List<TerrainLayer>();
@@ -93,8 +93,7 @@ public class TerrainTiler : MonoBehaviour
         for (int y = 0; y < divides; y++) {
             for (int x = 0; x < divides; x++) {
                 int index = (y * divides) + x;
-                var tile = terrains[index];
-                var terrain = tile.GetComponent<Terrain>();
+                var terrain = terrains[index].GetComponent<Terrain>();
                 Terrain topTerrain = (x > 0) ? terrains[index - 1].GetComponent<Terrain>() : null;
                 Terrain bottomTerrain = (x < divides - 1) ? terrains[index + 1].GetComponent<Terrain>() : null;
                 Terrain leftTerrain = (y > 0) ? terrains[index - divides].GetComponent<Terrain>() : null;
@@ -113,15 +112,9 @@ public class TerrainTiler : MonoBehaviour
         var t = new TerrainData();
         t.heightmapResolution = masterTerrain.terrainData.heightmapResolution / divides;
         t.alphamapResolution = masterTerrain.terrainData.alphamapResolution / divides;
-        t.size = new Vector3(masterTerrain.terrainData.size.x / divides + 1, masterTerrain.terrainData.size.y, masterTerrain.terrainData.size.z / divides + 1);
+        t.size = new Vector3(masterTerrain.terrainData.size.x / divides + 0.5f, masterTerrain.terrainData.size.y, masterTerrain.terrainData.size.z / divides + 0.5f);
         var tile = Terrain.CreateTerrainGameObject(t);
         tile.tag = "terrain";
         return tile;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
