@@ -118,6 +118,8 @@ public class SoilParticleSettings : MonoBehaviour
 
     private float[,] originalHeights;
 
+    private TerrainTiler tiler = null;
+
     private void Awake()
     {
         if (instance == null)
@@ -130,6 +132,7 @@ public class SoilParticleSettings : MonoBehaviour
             Destroy(gameObject);
         }
 
+        tiler = GetComponent<TerrainTiler>();
 
         cs = Instantiate(Resources.Load<ComputeShader>("Thermal"));
         if (cs == null)
@@ -355,8 +358,8 @@ public class SoilParticleSettings : MonoBehaviour
 
         var terrainData = GetComponent<Terrain>().terrainData;
         Vector3 relpos = (point - transform.position);
-        var posXInTerrain = (int)(relpos.x / terrainData.size.x * instance.xRes);
-        var posYInTerrain = (int)(relpos.z / terrainData.size.z * instance.yRes);
+        var posXInTerrain = (int)(relpos.x / terrainData.size.x * xRes);
+        var posYInTerrain = (int)(relpos.z / terrainData.size.z * yRes);
 
         cs2.SetTexture(digKernelIdx, "heightmap", heightmapRT0);
         cs2.SetFloat("diff", diff);
@@ -368,7 +371,34 @@ public class SoilParticleSettings : MonoBehaviour
 
         // TODO: need to modifiy for tiled heightmap
         RectInt rect = new RectInt(posXInTerrain - 10, posYInTerrain - 10, 20, 20);
-        terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
+        if (!tiler) {
+            terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
+        } else {
+            RectInt tilesize = new RectInt(0, 0, instance.xRes / tiler.divides, instance.yRes / tiler.divides);
+            foreach (var t in tiler.terrains) {
+                var terrainData2 = t.GetComponent<Terrain>().terrainData;
+                Vector3 relpos2 = (point - t.transform.position);
+                var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
+                var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
+                RectInt rect2 = new RectInt(posXInTerrain2 - 10, posYInTerrain2 - 10, 20, 20);
+                if (rect2.Overlaps(tilesize)) {
+                    try {
+                        if (rect2.x < 0) rect2.x = 0;
+                        if (rect2.y < 0) rect2.y = 0;
+                        if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
+                            rect2.width = terrainData2.heightmapResolution - rect2.x;
+                        }
+                        if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
+                            rect2.height = terrainData2.heightmapResolution - rect2.y;
+                        }
+                        terrainData2.CopyActiveRenderTextureToHeightmap(rect, rect2.min, TerrainHeightmapSyncControl.None);
+                    } catch (Exception e) {
+                        //Debug.LogException(e);
+                        //Debug.Log(rect2 + " " + rect + " " + tilesize);
+                    }
+                }
+            }
+        }
 
         RenderTexture.active = prevRT;
     }
@@ -397,7 +427,7 @@ public class SoilParticleSettings : MonoBehaviour
         Vector2 m = new Vector2(Mathf.Tan(jitteredTau.x * Mathf.Deg2Rad), Mathf.Tan(jitteredTau.y * Mathf.Deg2Rad));
         cs.SetVector("angleOfRepose", new Vector4(m.x, m.y, 0.0f, 0.0f));
 
-        cs.Dispatch(thermalKernelIdx, xRes, yRes, 1);
+        cs.Dispatch(thermalKernelIdx, xRes / 8, yRes / 8, 1);
 
         if (timeElapsed >= syncPeriod)
         {
@@ -425,14 +455,47 @@ public class SoilParticleSettings : MonoBehaviour
                     var posXInTerrain = (int)(relpos.x / terrainData.size.x * xRes);
                     var posYInTerrain = (int)(relpos.z / terrainData.size.z * yRes);
                     RectInt rect = new RectInt(posXInTerrain - 30, posYInTerrain - 30, 60, 60);
-                    terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
+                    if (!tiler) {
+                        terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
+                    } else {
+                        RectInt tilesize = new RectInt(0, 0, instance.xRes / tiler.divides, instance.yRes / tiler.divides);
+                        foreach (var t in tiler.terrains) {
+                            var terrainData2 = t.GetComponent<Terrain>().terrainData;
+                            Vector3 relpos2 = (base_link.transform.position - t.transform.position);
+                            var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
+                            var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
+                            RectInt rect2 = new RectInt(posXInTerrain2 - 30, posYInTerrain2 - 30, 60, 60);
+                            if (rect2.Overlaps(tilesize)) {
+                                try {
+                                    if (rect2.x < 0) rect2.x = 0;
+                                    if (rect2.y < 0) rect2.y = 0;
+                                    if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
+                                        rect2.width = terrainData2.heightmapResolution - rect2.x;
+                                    }
+                                    if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
+                                        rect2.height = terrainData2.heightmapResolution - rect2.y;
+                                    }
+                                    terrainData2.CopyActiveRenderTextureToHeightmap(rect, rect2.min, TerrainHeightmapSyncControl.None);
+                                } catch (Exception e) {
+                                    //Debug.LogException(e);
+                                    //Debug.Log(rect2 + " " + rect + " " + tilesize);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             timeElapsed = 0.0f;
         }
-        // TODO: need to modify for tiled heightmap
-        terrainData.SyncHeightmap();
+
+        if (!tiler) {
+            terrainData.SyncHeightmap();
+        } else {
+            foreach (var t in tiler.terrains) {
+                t.GetComponent<Terrain>().terrainData.SyncHeightmap();
+            }
+        }
 
         // swap
         var temp = heightmapRT0;

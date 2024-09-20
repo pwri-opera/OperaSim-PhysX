@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class TerrainTiler : MonoBehaviour
 {
-    int divides = 4;
+    public int divides = 4;
 
     private Terrain masterTerrain;
 
     private float[,] originalHeights;
     private float[,,] originalSplat;
 
-    private List<Terrain> terrains;
+    [HideInInspector]
+    public List<GameObject> terrains;
 
     private static TerrainTiler instance = null;
     public void Awake()
@@ -32,7 +33,7 @@ public class TerrainTiler : MonoBehaviour
         originalHeights = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
         originalSplat = terrainData.GetAlphamaps(0, 0, terrainData.alphamapResolution, terrainData.alphamapResolution);
 
-        terrains = new List<Terrain>();
+        terrains = new List<GameObject>();
 
         for (int y = 0; y < divides; y++) {
             for (int x = 0; x < divides; x++) {
@@ -52,14 +53,15 @@ public class TerrainTiler : MonoBehaviour
                 }
                 terrain.terrainData.terrainLayers = layers.ToArray();
 
-                terrains.Add(terrain);
+                terrains.Add(tile);
             }
         }
 
         for (int y = 0; y < divides; y++) {
             for (int x = 0; x < divides; x++) {
                 int index = (y * divides) + x;
-                Terrain terrain = terrains[index];
+                var tile = terrains[index];
+                var terrain = tile.GetComponent<Terrain>();
 
                 // divide splatmap into tiles
                 int splatmapWidth = terrainData.alphamapWidth / divides;
@@ -91,17 +93,19 @@ public class TerrainTiler : MonoBehaviour
         for (int y = 0; y < divides; y++) {
             for (int x = 0; x < divides; x++) {
                 int index = (y * divides) + x;
-                Terrain terrain = terrains[index];
-                Terrain topTerrain = (x > 0) ? terrains[index - 1] : null;
-                Terrain bottomTerrain = (x < divides - 1) ? terrains[index + 1] : null;
-                Terrain leftTerrain = (y > 0) ? terrains[index - divides] : null;
-                Terrain rightTerrain = (y < divides - 1) ? terrains[index + divides] : null;
+                var tile = terrains[index];
+                var terrain = tile.GetComponent<Terrain>();
+                Terrain topTerrain = (x > 0) ? terrains[index - 1].GetComponent<Terrain>() : null;
+                Terrain bottomTerrain = (x < divides - 1) ? terrains[index + 1].GetComponent<Terrain>() : null;
+                Terrain leftTerrain = (y > 0) ? terrains[index - divides].GetComponent<Terrain>() : null;
+                Terrain rightTerrain = (y < divides - 1) ? terrains[index + divides].GetComponent<Terrain>() : null;
                 terrain.SetNeighbors(leftTerrain, bottomTerrain, rightTerrain, topTerrain);
             }
         }
 
         // hide the original terrain
-        gameObject.SetActive(false);
+        gameObject.GetComponent<Terrain>().enabled = false;
+        gameObject.GetComponent<TerrainCollider>().enabled = false;
     }
 
     private GameObject CreateTile()
