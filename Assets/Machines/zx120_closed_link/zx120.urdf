@@ -4,55 +4,6 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="zx120">
-  <!-- ros_control plugin -->
-  <gazebo>
-    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-      <robotNamespace>/zx120</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-    </plugin>
-  </gazebo>
-  <gazebo reference="link1">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link2">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link3">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link4">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link5">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link5">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link6">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link7">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link8">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link9">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link10">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link11">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link12">
-    <material>zx120texture</material>
-  </gazebo>
-  <gazebo reference="link13">
-    <material>zx120texture</material>
-  </gazebo>
   <!--material name="black">
 		<color rgba="0.0 0.0 0.0 1.0"/>
 	</material>
@@ -180,7 +131,7 @@
     </plugin>
   </gazebo>
   <joint name="joint7" type="fixed">
-    <origin xyz="2.053030 0 1.991444"/>
+    <origin xyz="2.053030 0 1.991444"  rpy="0 -0.156207 0"/>
     <axis xyz="0 1 0"/>
     <parent link="link3"/>
     <child link="link8"/>
