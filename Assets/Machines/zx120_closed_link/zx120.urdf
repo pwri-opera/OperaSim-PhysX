@@ -159,6 +159,7 @@
     <parent link="link4"/>
     <child link="link10"/>
   </joint>
+  
   <joint name="joint10" type="prismatic">
     <origin xyz="0 0 0"/>
     <axis xyz="-0.021529 0 -2.207579"/>

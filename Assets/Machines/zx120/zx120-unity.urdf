@@ -342,6 +342,7 @@
   <!-- boom axis -->
   <joint name="boom_joint" type="revolute">
     <origin rpy="0 1.57079632675 0" xyz="0.14 -0.16 0.781"/>
+    <!-- <origin rpy="0 0 0" xyz="0.14 -0.16 0.781"/> -->
     <axis xyz="0 1 0"/>
     <parent link="body_link"/>
     <child link="boom_link"/>
@@ -350,12 +351,14 @@
   <link name="boom_link">
     <visual>
       <origin rpy="0 -1.18079632675 0" xyz="0 0 0"/>
+      <!-- <origin rpy="0 0 0" xyz="0 0 0"/> -->
       <geometry>
         <mesh filename="package://zx120_description/meshes/zx120-boom.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 -1.18079632675 0" xyz="0 0 0"/>
+      <!-- <origin rpy="0 0 0" xyz="0 0 0"/> -->
       <geometry>
         <mesh filename="package://zx120_description/meshes/zx120-boom.dae"/>
       </geometry>
