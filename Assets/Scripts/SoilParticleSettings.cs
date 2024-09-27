@@ -450,37 +450,49 @@ public class SoilParticleSettings : MonoBehaviour
                         base_link = robot.GetComponent(typeof(Component));
                     }
 
-                    // TODO: need to modify for tiled heightmap
-                    Vector3 relpos = (base_link.transform.position - gameObject.transform.position);
+                    Vector3 relpos = base_link.transform.position - gameObject.transform.position;
                     var posXInTerrain = (int)(relpos.x / terrainData.size.x * xRes);
                     var posYInTerrain = (int)(relpos.z / terrainData.size.z * yRes);
                     RectInt rect = new RectInt(posXInTerrain - 30, posYInTerrain - 30, 60, 60);
                     if (!tiler) {
                         terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
                     } else {
+                        // in case if the terrain is tiled
                         RectInt tilesize = new RectInt(0, 0, instance.xRes / tiler.divides, instance.yRes / tiler.divides);
                         foreach (var t in tiler.terrains) {
                             var terrainData2 = t.GetComponent<Terrain>().terrainData;
-                            Vector3 relpos2 = (base_link.transform.position - t.transform.position);
+                            Vector3 relpos2 = base_link.transform.position - t.transform.position;
                             var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
                             var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
                             RectInt rect2 = new RectInt(posXInTerrain2 - 30, posYInTerrain2 - 30, 60, 60);
+                            if (tilesize.Contains(rect2.min) && tilesize.Contains(rect2.max)) {
+                                terrainData2.CopyActiveRenderTextureToHeightmap(rect, rect2.min, TerrainHeightmapSyncControl.None);
+                            }
+                            /* TODO: following code is better but not working
                             if (rect2.Overlaps(tilesize)) {
                                 try {
-                                    if (rect2.x < 0) rect2.x = 0;
-                                    if (rect2.y < 0) rect2.y = 0;
+                                    var rect1 = rect;
                                     if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
-                                        rect2.width = terrainData2.heightmapResolution - rect2.x;
+                                        rect1.width = terrainData2.heightmapResolution - rect2.x;
                                     }
                                     if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
-                                        rect2.height = terrainData2.heightmapResolution - rect2.y;
+                                        rect1.height = terrainData2.heightmapResolution - rect2.y;
                                     }
-                                    terrainData2.CopyActiveRenderTextureToHeightmap(rect, rect2.min, TerrainHeightmapSyncControl.None);
+                                    if (rect2.x < 0) {
+                                        rect1.x -= rect2.x;
+                                        rect2.x = 0;
+                                    }
+                                    if (rect2.y < 0) {
+                                        rect1.y -= rect2.y;
+                                        rect2.y = 0;
+                                    }
+                                    terrainData2.CopyActiveRenderTextureToHeightmap(rect1, rect2.min, TerrainHeightmapSyncControl.None);
                                 } catch (Exception e) {
                                     //Debug.LogException(e);
                                     //Debug.Log(rect2 + " " + rect + " " + tilesize);
                                 }
                             }
+                            */
                         }
                     }
                 }
