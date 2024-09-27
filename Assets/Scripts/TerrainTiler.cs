@@ -33,13 +33,17 @@ public class TerrainTiler : MonoBehaviour
         originalHeights = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
         originalSplat = terrainData.GetAlphamaps(0, 0, terrainData.alphamapResolution, terrainData.alphamapResolution);
 
+        // hide the original terrain
+        gameObject.GetComponent<Terrain>().enabled = false;
+        gameObject.GetComponent<TerrainCollider>().enabled = false;
+
         terrains = new List<GameObject>();
 
         for (int y = 0; y < divides; y++) {
             for (int x = 0; x < divides; x++) {
                 var tile = CreateTile();
                 var terrain = tile.GetComponent<Terrain>();
-                tile.transform.position = new Vector3(gameObject.transform.position.x + terrainScale.x / divides * x - 0.25f, gameObject.transform.position.y, gameObject.transform.position.z + terrainScale.z / divides * y - 0.25f);
+                tile.transform.position = new Vector3(gameObject.transform.position.x + terrainScale.x / divides * x, gameObject.transform.position.y, gameObject.transform.position.z + terrainScale.z / divides * y);
 
                 // copy terrain layers to tile
                 var layers = new List<TerrainLayer>();
@@ -57,38 +61,6 @@ public class TerrainTiler : MonoBehaviour
             }
         }
 
-        for (int y = 0; y < divides; y++) {
-            for (int x = 0; x < divides; x++) {
-                int index = (y * divides) + x;
-                var tile = terrains[index];
-                var terrain = tile.GetComponent<Terrain>();
-
-                // divide splatmap into tiles
-                int splatmapWidth = terrainData.alphamapWidth / divides;
-                int splatmapHeight = terrainData.alphamapHeight / divides;
-                float[,,] splatmapData = new float[splatmapHeight, splatmapWidth, terrainData.alphamapLayers];
-                for (int sx = 0; sx < splatmapWidth; sx++) {
-                    for (int sy = 0; sy < splatmapHeight; sy++) {
-                        for (int splat = 0; splat < terrainData.alphamapLayers; splat++) {
-                            splatmapData[sy, sx, splat] = originalSplat[y * splatmapHeight + sy, x * splatmapWidth + sx, splat];
-                        }
-                    }
-                }
-                terrain.terrainData.SetAlphamaps(0, 0, splatmapData);
-
-                // divide heightmap into tiles
-                int heightmapWidth = terrainData.heightmapResolution / divides;
-                int heightmapHeight = terrainData.heightmapResolution / divides;
-                float[,] heightData = new float[heightmapHeight, heightmapWidth];
-                for (int hx = 0; hx < heightmapWidth; hx++) {
-                    for (int hy = 0; hy < heightmapHeight; hy++) {
-                        heightData[hy, hx] = originalHeights[y * heightmapHeight + hy, x * heightmapWidth + hx];
-                    }
-                }
-                terrain.terrainData.SetHeights(0, 0, heightData);
-            }
-        }
-
         // set neighbor terrains
         for (int y = 0; y < divides; y++) {
             for (int x = 0; x < divides; x++) {
@@ -102,19 +74,50 @@ public class TerrainTiler : MonoBehaviour
             }
         }
 
-        // hide the original terrain
-        gameObject.GetComponent<Terrain>().enabled = false;
-        gameObject.GetComponent<TerrainCollider>().enabled = false;
+        for (int y = 0; y < divides; y++) {
+            for (int x = 0; x < divides; x++) {
+                int index = (y * divides) + x;
+                var tile = terrains[index];
+                var terrain = tile.GetComponent<Terrain>();
+
+                // divide splatmap into tiles
+                int splatmapWidth = terrainData.alphamapWidth / divides;
+                int splatmapHeight = terrainData.alphamapHeight / divides;
+                float[,,] splatmapData = new float[splatmapHeight + 1, splatmapWidth + 1, terrainData.alphamapLayers];
+                for (int sx = 0; sx < splatmapWidth + 1; sx++) {
+                    for (int sy = 0; sy < splatmapHeight + 1; sy++) {
+                        int isx = sx > splatmapWidth - 1 ? splatmapWidth - 1 : sx;
+                        int isy = sy > splatmapHeight - 1 ? splatmapHeight - 1 : sy;
+                        for (int splat = 0; splat < terrainData.alphamapLayers; splat++) {
+                            splatmapData[sy, sx, splat] = originalSplat[y * splatmapHeight + isy, x * splatmapWidth + isx, splat];
+                        }
+                    }
+                }
+                terrain.terrainData.SetAlphamaps(0, 0, splatmapData);
+
+                // divide heightmap into tiles
+                int heightmapWidth = terrainData.heightmapResolution / divides;
+                int heightmapHeight = terrainData.heightmapResolution / divides;
+                float[,] heightData = new float[heightmapHeight + 1, heightmapWidth + 1];
+                for (int hx = 0; hx < heightmapWidth + 1; hx++) {
+                    for (int hy = 0; hy < heightmapHeight + 1; hy++) {
+                        int ihx = hx > heightmapWidth - 1 ? heightmapWidth - 1 : hx;
+                        int ihy = hy > heightmapHeight - 1 ? heightmapHeight - 1 : hy;
+                        heightData[hy, hx] = originalHeights[y * heightmapHeight + ihy, x * heightmapWidth + ihx];
+                    }
+                }
+                terrain.terrainData.SetHeights(0, 0, heightData);
+            }
+        }
     }
 
     private GameObject CreateTile()
     {
         var t = new TerrainData();
-        t.heightmapResolution = masterTerrain.terrainData.heightmapResolution / divides;
-        t.alphamapResolution = masterTerrain.terrainData.alphamapResolution / divides;
-        t.size = new Vector3(masterTerrain.terrainData.size.x / divides + 0.5f, masterTerrain.terrainData.size.y, masterTerrain.terrainData.size.z / divides + 0.5f);
+        t.heightmapResolution = masterTerrain.terrainData.heightmapResolution / divides + 1;
+        t.alphamapResolution = masterTerrain.terrainData.alphamapResolution / divides + 1;
+        t.size = new Vector3(masterTerrain.terrainData.size.x / divides, masterTerrain.terrainData.size.y, masterTerrain.terrainData.size.z / divides);
         var tile = Terrain.CreateTerrainGameObject(t);
-        tile.tag = "terrain";
         return tile;
     }
 }
