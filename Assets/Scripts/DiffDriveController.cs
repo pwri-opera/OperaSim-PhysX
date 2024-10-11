@@ -60,10 +60,10 @@ public class DiffDriveController : MonoBehaviour
     [Tooltip("車輪を静止する際に用いられるブレーキトルク")]
     public float brakeTorque = 10000.0F;
 
-    [Tooltip("cmd_velコマンドで指定可能な最大速度")]
+    [Tooltip("cmd_velコマンドで指定可能な最大速度(m/s)")]
     public double maxLinearVelocity = 3.00;  // unit is m/sec
 
-    [Tooltip("cmd_velコマンドで指定可能な最大角速度")]
+    [Tooltip("cmd_velコマンドで指定可能な最大角速度(度/s)")]
     public double maxAngularVelocity = Math.PI * 2.0 * 5.0 / 360.0;  // unit is rad/sec
 
     private List<PID> leftWheelControllers;
