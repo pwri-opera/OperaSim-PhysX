@@ -1,0 +1,1 @@
+* use "%programs%\Perforce\p4merge.exe" "%b" "%l" "%r" "%d"
