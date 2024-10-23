@@ -14,20 +14,21 @@ public class JointPosController : MonoBehaviour
     [Tooltip("角度設定コマンドのROSトピック名")]
     public string setpointTopicName = "joint_name/setpoint";
 
-    [Tooltip("初期の目標角度")]
+    [Tooltip("初期の目標角度(degree)")]
     public double initTargetPos;
 
     private ArticulationBody joint;
     private Float64Msg targetPos;
 
     // Start is called before the first frame update
-    void Start()
+   IEnumerator Start()
     {
-        ros = ROSConnection.GetOrCreateInstance();
+        yield return new WaitForSeconds(0.1f); // 少し待機してから設定
+       ros = ROSConnection.GetOrCreateInstance();
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();
 
-        if (joint)
+       if(joint)
         {
             var drive = joint.xDrive;
             if (drive.stiffness == 0)
@@ -36,14 +37,15 @@ public class JointPosController : MonoBehaviour
                 drive.damping = 100000;
             if (drive.forceLimit == 0)
                 drive.forceLimit = 100000;
-            joint.xDrive = drive;
+
+            drive.target = (float)initTargetPos;
+           joint.xDrive = drive;
         }
         else
         {
             Debug.Log("No ArticulationBody are found");
         }
 
-        targetPos.data = initTargetPos;
         ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
     }
 
