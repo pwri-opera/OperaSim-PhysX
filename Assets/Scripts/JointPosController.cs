@@ -21,14 +21,14 @@ public class JointPosController : MonoBehaviour
     private Float64Msg targetPos;
 
     // Start is called before the first frame update
-    IEnumerator Start()
+   IEnumerator Start()
     {
         yield return new WaitForSeconds(0.1f); // 少し待機してから設定
-        ros = ROSConnection.GetOrCreateInstance();
+       ros = ROSConnection.GetOrCreateInstance();
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();
 
-        if(joint)
+       if(joint)
         {
             var drive = joint.xDrive;
             if (drive.stiffness == 0)
@@ -39,7 +39,7 @@ public class JointPosController : MonoBehaviour
                 drive.forceLimit = 100000;
 
             drive.target = (float)initTargetPos;
-            joint.xDrive = drive;
+           joint.xDrive = drive;
         }
         else
         {
