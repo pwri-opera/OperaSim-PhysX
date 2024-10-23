@@ -37,12 +37,12 @@ public class FollowJointTrajectoryAction : MonoBehaviour
             {
                 jointArticulationBodies.Add(ujoint.jointName, joint);
                 ArticulationDrive drive = joint.xDrive;
-                if (drive.stiffness == 0)
-                    drive.stiffness = 200000;
-                if (drive.damping == 0)
-                    drive.damping = 100000;
-                if (drive.forceLimit == 0)
-                    drive.forceLimit = 100000;
+                // if (drive.stiffness == 0)
+                //     drive.stiffness = 200000;
+                // if (drive.damping == 0)
+                //     drive.damping = 100000;
+                // if (drive.forceLimit == 0)
+                //     drive.forceLimit = 100000;
                 joint.xDrive = drive;
             }
         }
