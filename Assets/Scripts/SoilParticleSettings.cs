@@ -442,7 +442,7 @@ public class SoilParticleSettings : MonoBehaviour
         Vector2 m = new Vector2(Mathf.Tan(jitteredTau.x * Mathf.Deg2Rad), Mathf.Tan(jitteredTau.y * Mathf.Deg2Rad));
         cs.SetVector("angleOfRepose", new Vector4(m.x, m.y, 0.0f, 0.0f));
 
-        cs.Dispatch(thermalKernelIdx, xRes / 8, yRes / 8, 1);
+        cs.Dispatch(thermalKernelIdx, xRes / 32, yRes / 32, 1);
 
         if (timeElapsed >= syncPeriod)
         {
