@@ -369,35 +369,11 @@ public class SoilParticleSettings : MonoBehaviour
 
         RenderTexture.active = heightmapRT0;
 
-        // TODO: need to modifiy for tiled heightmap
         RectInt rect = new RectInt(posXInTerrain - 10, posYInTerrain - 10, 20, 20);
         if (!tiler) {
             terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
         } else {
-            RectInt tilesize = new RectInt(0, 0, instance.xRes / tiler.divides, instance.yRes / tiler.divides);
-            foreach (var t in tiler.terrains) {
-                var terrainData2 = t.GetComponent<Terrain>().terrainData;
-                Vector3 relpos2 = (point - t.transform.position);
-                var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
-                var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
-                RectInt rect2 = new RectInt(posXInTerrain2 - 10, posYInTerrain2 - 10, 20, 20);
-                if (rect2.Overlaps(tilesize)) {
-                    try {
-                        if (rect2.x < 0) rect2.x = 0;
-                        if (rect2.y < 0) rect2.y = 0;
-                        if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
-                            rect2.width = terrainData2.heightmapResolution - rect2.x;
-                        }
-                        if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
-                            rect2.height = terrainData2.heightmapResolution - rect2.y;
-                        }
-                        terrainData2.CopyActiveRenderTextureToHeightmap(rect, rect2.min, TerrainHeightmapSyncControl.None);
-                    } catch (Exception e) {
-                        //Debug.LogException(e);
-                        //Debug.Log(rect2 + " " + rect + " " + tilesize);
-                    }
-                }
-            }
+            CopyActiveRenderTextureToHeightmapTiled(rect, point, 10);
         }
 
         RenderTexture.active = prevRT;
@@ -418,6 +394,52 @@ public class SoilParticleSettings : MonoBehaviour
         Debug.DrawLine(pt4, pt1, color, duration, false);
     }
 
+    void CopyActiveRenderTextureToHeightmapTiled(RectInt rect, Vector3 point, int margin) {
+        var tilesize = new RectInt(0, 0, xRes / tiler.divides, yRes / tiler.divides);
+        var terrainData = gameObject.GetComponent<Terrain>().terrainData;
+        foreach (var t in tiler.terrains) {
+            var terrainData2 = t.GetComponent<Terrain>().terrainData;
+            Vector3 relpos2 = point - t.transform.position;
+            var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
+            var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
+            RectInt rect2 = new RectInt(posXInTerrain2 - margin, posYInTerrain2 - margin, margin * 2, margin * 2);
+            if (rect2.Overlaps(tilesize)) {
+                //DrawDebugRect(rect2, t.transform, terrainData.size, UnityEngine.Color.green, syncPeriod);
+                try {
+                    var rect1 = new RectInt();
+                    rect1.x = rect.x;
+                    rect1.y = rect.y;
+                    rect1.width = rect.width;
+                    rect1.height = rect.height;
+                    if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
+                        rect1.width = terrainData2.heightmapResolution - rect2.x;
+                    }
+                    if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
+                        rect1.height = terrainData2.heightmapResolution - rect2.y;
+                    }
+                    if (rect2.x < 0) {
+                        rect1.x -= rect2.x;
+                        rect2.x = 0;
+                    }
+                    if (rect2.y < 0) {
+                        rect1.y -= rect2.y;
+                        rect2.y = 0;
+                    }
+                    terrainData2.CopyActiveRenderTextureToHeightmap(rect1, rect2.min, TerrainHeightmapSyncControl.None);
+                    //var rect3 = new RectInt();
+                    //rect3.x = rect2.x;
+                    //rect3.y = rect2.y;
+                    //rect3.width = rect1.width;
+                    //rect3.height = rect1.height;
+                    //DrawDebugRect(rect3, t.transform, terrainData.size, UnityEngine.Color.red, syncPeriod);
+                } catch (Exception e) {
+                    //Debug.LogException(e);
+                    //Debug.Log(rect2 + " " + rect + " " + tilesize);
+                }
+            }
+        }
+    }
+
     // Part of this code is from:
     //  com.unity.terrain-tools/Editor/TerrainTools/Erosion/ThermalEroder.cs
     void FixedUpdate()
@@ -429,9 +451,9 @@ public class SoilParticleSettings : MonoBehaviour
 
         UpdateStickForce();
 
-        RenderTexture prevRT = RenderTexture.active;
-
         var terrainData = gameObject.GetComponent<Terrain>().terrainData;
+
+        RenderTexture prevRT = RenderTexture.active;
 
         cs.SetTexture(thermalKernelIdx, "TerrainHeightPrev", heightmapRT0);
         cs.SetTexture(thermalKernelIdx, "TerrainHeight", heightmapRT1);
@@ -473,48 +495,7 @@ public class SoilParticleSettings : MonoBehaviour
                         terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
                     } else {
                         // in case if the terrain is tiled
-                        RectInt tilesize = new RectInt(0, 0, xRes / tiler.divides, yRes / tiler.divides);
-                        foreach (var t in tiler.terrains) {
-                            var terrainData2 = t.GetComponent<Terrain>().terrainData;
-                            Vector3 relpos2 = base_link.transform.position - t.transform.position;
-                            var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
-                            var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
-                            RectInt rect2 = new RectInt(posXInTerrain2 - 30, posYInTerrain2 - 30, 60, 60);
-                            if (rect2.Overlaps(tilesize)) {
-                                //DrawDebugRect(rect2, t.transform, terrainData.size, UnityEngine.Color.green, syncPeriod);
-                                try {
-                                    var rect1 = new RectInt();
-                                    rect1.x = rect.x;
-                                    rect1.y = rect.y;
-                                    rect1.width = rect.width;
-                                    rect1.height = rect.height;
-                                    if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
-                                        rect1.width = terrainData2.heightmapResolution - rect2.x;
-                                    }
-                                    if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
-                                        rect1.height = terrainData2.heightmapResolution - rect2.y;
-                                    }
-                                    if (rect2.x < 0) {
-                                        rect1.x -= rect2.x;
-                                        rect2.x = 0;
-                                    }
-                                    if (rect2.y < 0) {
-                                        rect1.y -= rect2.y;
-                                        rect2.y = 0;
-                                    }
-                                    terrainData2.CopyActiveRenderTextureToHeightmap(rect1, rect2.min, TerrainHeightmapSyncControl.None);
-                                    //var rect3 = new RectInt();
-                                    //rect3.x = rect2.x;
-                                    //rect3.y = rect2.y;
-                                    //rect3.width = rect1.width;
-                                    //rect3.height = rect1.height;
-                                    //DrawDebugRect(rect3, t.transform, terrainData.size, UnityEngine.Color.red, syncPeriod);
-                                } catch (Exception e) {
-                                    //Debug.LogException(e);
-                                    //Debug.Log(rect2 + " " + rect + " " + tilesize);
-                                }
-                            }
-                        }
+                        CopyActiveRenderTextureToHeightmapTiled(rect, base_link.transform.position, 30);
                     }
                 }
             }
