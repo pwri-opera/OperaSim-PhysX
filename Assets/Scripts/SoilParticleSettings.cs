@@ -323,9 +323,9 @@ public class SoilParticleSettings : MonoBehaviour
         sedimentRT.enableRandomWrite = true;
         sedimentRT.filterMode = FilterMode.Point;
 
-        Graphics.Blit(terrainTexture, heightmapRT0);
-        Graphics.Blit(terrainTexture, heightmapRT1);
-        Graphics.Blit(Texture2D.blackTexture, sedimentRT);
+        UnityEngine.Graphics.Blit(terrainTexture, heightmapRT0);
+        UnityEngine.Graphics.Blit(terrainTexture, heightmapRT1);
+        UnityEngine.Graphics.Blit(Texture2D.blackTexture, sedimentRT);
 
         float dx = (float)texelSize.x;
         float dy = (float)texelSize.y;
@@ -403,6 +403,21 @@ public class SoilParticleSettings : MonoBehaviour
         RenderTexture.active = prevRT;
     }
 
+    void DrawDebugRect(RectInt rect, Transform t, Vector3 terrainDatasize, float duration) {
+        var x = rect.x * terrainDatasize.x / xRes + t.position.x;
+        var y = rect.y * terrainDatasize.z / yRes + t.position.z;
+        var width = rect.width * terrainDatasize.x / xRes;
+        var height = rect.height * terrainDatasize.z / yRes;
+        var pt1 = new Vector3(x, 0, y);
+        var pt2 = new Vector3(x + width, 0, y);
+        var pt3 = new Vector3(x + width, 0, y + height);
+        var pt4 = new Vector3(x, 0, y + height);
+        Debug.DrawLine(pt1, pt2, UnityEngine.Color.red, duration, false);
+        Debug.DrawLine(pt2, pt3, UnityEngine.Color.red, duration, false);
+        Debug.DrawLine(pt3, pt4, UnityEngine.Color.red, duration, false);
+        Debug.DrawLine(pt4, pt1, UnityEngine.Color.red, duration, false);
+    }
+
     // Part of this code is from:
     //  com.unity.terrain-tools/Editor/TerrainTools/Erosion/ThermalEroder.cs
     void FixedUpdate()
@@ -458,7 +473,7 @@ public class SoilParticleSettings : MonoBehaviour
                         terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
                     } else {
                         // in case if the terrain is tiled
-                        RectInt tilesize = new RectInt(0, 0, instance.xRes / tiler.divides, instance.yRes / tiler.divides);
+                        RectInt tilesize = new RectInt(0, 0, xRes / tiler.divides, yRes / tiler.divides);
                         foreach (var t in tiler.terrains) {
                             var terrainData2 = t.GetComponent<Terrain>().terrainData;
                             Vector3 relpos2 = base_link.transform.position - t.transform.position;
@@ -468,6 +483,7 @@ public class SoilParticleSettings : MonoBehaviour
                             if (tilesize.Contains(rect2.min) && tilesize.Contains(rect2.max)) {
                                 terrainData2.CopyActiveRenderTextureToHeightmap(rect, rect2.min, TerrainHeightmapSyncControl.None);
                             }
+                            //DrawDebugRect(rect2, t.transform, terrainData.size, syncPeriod);
                             /* TODO: following code is better but not working
                             if (rect2.Overlaps(tilesize)) {
                                 try {
