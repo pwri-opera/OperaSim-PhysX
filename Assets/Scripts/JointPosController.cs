@@ -34,16 +34,18 @@ public class JointPosController : MonoBehaviour
 
        if(joint)
         {
-            var drive = joint.xDrive;
-            if (drive.stiffness == 0)
-                drive.stiffness = 200000;
-            if (drive.damping == 0)
-                drive.damping = 100000;
-            if (drive.forceLimit == 0)
-                drive.forceLimit = 100000;
+            if (joint.GetComponent<Com3.ControlTypeAnnotation>() == null) {
+                var drive = joint.xDrive;
+                if (drive.stiffness == 0)
+                    drive.stiffness = 200000;
+                if (drive.damping == 0)
+                    drive.damping = 100000;
+                if (drive.forceLimit == 0)
+                    drive.forceLimit = 100000;
 
-            drive.target = (float)initTargetPos;
-           joint.xDrive = drive;
+                drive.target = (float)initTargetPos;
+                joint.xDrive = drive;
+            }
         }
         else
         {
