@@ -2,6 +2,9 @@
 using UnityEngine;
 // From: https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts
 
+/// <summary>
+/// 時刻管理を行うためのユーティリティクラス
+/// </summary>
 namespace Unity.Robotics.Core
 {
     public static class Clock

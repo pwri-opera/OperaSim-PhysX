@@ -5,6 +5,9 @@ using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
 
+/// <summary>
+/// MoveIt!が生成した軌跡をfake_controller_joint_statesトピック経由で実行する
+/// </summary>
 public class FollowJointTrajectoryAction : MonoBehaviour
 {
     private ROSConnection ros;
@@ -12,8 +15,13 @@ public class FollowJointTrajectoryAction : MonoBehaviour
     private Dictionary<string, ArticulationBody> jointArticulationBodies;
     private JointStateMsg currentPose;
 
+    [Tooltip("fake_controllerのROSトピック名")]
     public string fakeControllerTopicName = "move_group/fake_controller_joint_states";
+
+    [Tooltip("初期姿勢を設定するgameObjectのリスト")]
     public List<GameObject> initialPoseObjects;
+
+    [Tooltip("初期姿勢")]
     public List<float> initialPoseValues;
 
     private EmergencyStop emergencyStop;

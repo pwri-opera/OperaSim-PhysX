@@ -1,7 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// ZX120のシミュレーションモデルに対して細かな干渉検出設定を行う
+/// </summary>
 public class CustomCollisionZX120 : MonoBehaviour
 {
     Transform arm_link;

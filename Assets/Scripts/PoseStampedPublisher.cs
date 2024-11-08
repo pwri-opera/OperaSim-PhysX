@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -7,15 +7,23 @@ using RosMessageTypes.Geometry;
 using RosMessageTypes.BuiltinInterfaces;
 using Unity.Robotics.Core;
 
-
+/// <summary>
+/// シミュレータから得られる真の位置をPoseStampedメッセージとして送信する
+/// </summary>
 public class PoseStampedPublisher : MonoBehaviour
 {
     ROSConnection ros;
+
+    [Tooltip("ROSメッセージの接頭辞として用いられるロボット名")]
     public string robotName = "robot_name";
+
+    [Tooltip("出力するROSトピック名")]
     public string topicName = "robot_name/unity/pose_stmp";
+
     private PoseStampedMsg message;
 
     // Publish the object's position and rotation every N seconds
+    [Tooltip("メッセージの出力間隔(秒)")]
     public float publishMessageInterval = 0.05f;//20Hz
 
     // Used to determine how much time has elapsed since the last message was published
