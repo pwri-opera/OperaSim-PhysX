@@ -45,8 +45,12 @@ public class Com3FrontController : MonoBehaviour
                     Debug.LogWarning("Effort control not supported yet!");
                 }
                 if (jointtype.GetControlType() == Com3.ControlType.Velocity) {
+                    Debug.Log("Set joint " + ujoint.jointName + " to velocity control.");
                     drive.stiffness = 0;
+                    if (drive.damping == 0)
+                        drive.damping = 1e+25f;
                 } else {
+                    Debug.Log("Set joint " + ujoint.jointName + " to position control.");
                     if (drive.stiffness == 0)
                         drive.stiffness = 200000;
                 }
@@ -67,17 +71,21 @@ public class Com3FrontController : MonoBehaviour
             return;
         currentCmd = cmd;
         for (int i = 0; i < currentCmd.joint_name.Length; i++) {
-            var joint = joints[currentCmd.joint_name[i]];
-            ArticulationDrive drive = joint.joint.xDrive;
-            switch (joint.jointtype.GetControlType()) {
-                case Com3.ControlType.Velocity:
-                    drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
-                    break;
-                default:
-                    drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
-                    break;
+            try {
+                var joint = joints[currentCmd.joint_name[i]];
+                ArticulationDrive drive = joint.joint.xDrive;
+                switch (joint.jointtype.GetControlType()) {
+                    case Com3.ControlType.Velocity:
+                        drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
+                        break;
+                    default:
+                        drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
+                        break;
+                }
+                joint.joint.xDrive = drive;                
+            } catch (KeyNotFoundException) {
+                //Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
             }
-            joint.joint.xDrive = drive;
         }
     }
 }
