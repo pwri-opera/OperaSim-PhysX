@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -14,17 +15,23 @@ public class JointPosController : MonoBehaviour
     [Tooltip("角度設定コマンドのROSトピック名")]
     public string setpointTopicName = "joint_name/setpoint";
 
-    [Tooltip("初期の目標角度(degree)")]
+    [Tooltip("初期の目標角度 (degree)")]
     public double initTargetPos;
+
+    [Tooltip("入力に対するむだ時間 (msec)")]
+    public double deadTime;
 
     private ArticulationBody joint;
     private Float64Msg targetPos;
 
+    private Queue<(DateTime timestamp, Float64Msg data)> InputQueue = new Queue<(DateTime, Float64Msg)>();
+    // private Queue<(DateTime timestamp, string data)> dataQueue = new Queue<(DateTime, string)>();
+
     // Start is called before the first frame update
-   IEnumerator Start()
+    IEnumerator Start()
     {
         yield return new WaitForSeconds(0.1f); // 少し待機してから設定
-       ros = ROSConnection.GetOrCreateInstance();
+        ros = ROSConnection.GetOrCreateInstance();
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();
 
@@ -46,7 +53,17 @@ public class JointPosController : MonoBehaviour
             Debug.Log("No ArticulationBody are found");
         }
 
-        ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
+        if (deadTime == 0.0)
+        {
+            Debug.Log("Normal Mode");
+            ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
+        }
+        else
+        {
+            Debug.Log("Dead Time Mode");
+            Debug.Log("deadTime" + deadTime);
+            ros.Subscribe<Float64Msg>(setpointTopicName, AddInputData);
+        }
     }
 
     void ExecuteJointPosControl(Float64Msg msg)
@@ -55,6 +72,44 @@ public class JointPosController : MonoBehaviour
         var drive = joint.xDrive;
         drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
         joint.xDrive = drive;
-        //Debug.Log("Joint Target Position:" + targetPos.data);
     }
+
+    void Update()
+    {
+        if (deadTime != 0.0)
+        {
+            // Debug.Log("Get Delay Data");
+            GetDelayedData();
+            Debug.Log("InputQueue.Count: " + InputQueue.Count);
+            // InputQueue.Count
+        }
+    }
+
+    // ----- Functions of Dead Time ----- //
+    void AddInputData(Float64Msg msg)
+    {
+        DateTime currentTime = DateTime.Now;
+        InputQueue.Enqueue((currentTime, msg));
+    }
+
+    void GetDelayedData()
+    {
+        while (InputQueue.Count > 0)
+        { 
+            var (timestamp, data) = InputQueue.Peek();
+            if ((DateTime.Now - timestamp).TotalMilliseconds >= deadTime)
+            {
+                ExecuteJointPosControl(data);
+                Debug.Log("Data: " + data);
+                InputQueue.Dequeue();
+            }
+            else if (InputQueue.Count <= 0 || (DateTime.Now - timestamp).TotalMilliseconds < deadTime)
+            {
+                // Debug.Log("Processed !!");
+                break;
+            }
+        }
+    }
+    // ---------------------------------- //
 }
+
