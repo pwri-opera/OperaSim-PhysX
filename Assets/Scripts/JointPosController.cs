@@ -74,7 +74,9 @@ public class JointPosController : MonoBehaviour
         joint.xDrive = drive;
     }
 
-    void Update()
+    void Update() 
+    // fiXupdate の方 が良い　（必須）
+    　// Unity でスレッドを実装できるライブラリ有，検討推奨（内部に update があるのか？）
     {
         if (deadTime != 0.0)
         {
@@ -86,7 +88,7 @@ public class JointPosController : MonoBehaviour
     }
 
     // ----- Functions of Dead Time ----- //
-    void AddInputData(Float64Msg msg)
+    void AddInputData(Float64Msg msg) // DateTime.Now は使うべきでない (Unity 内の時間を使用する（※必須）)
     {
         DateTime currentTime = DateTime.Now;
         InputQueue.Enqueue((currentTime, msg));
@@ -94,6 +96,7 @@ public class JointPosController : MonoBehaviour
 
     void GetDelayedData()
     {
+        // 疑似的なスレッドを使えると while を入れずに済む？
         while (InputQueue.Count > 0)
         { 
             var (timestamp, data) = InputQueue.Peek();
@@ -108,6 +111,7 @@ public class JointPosController : MonoBehaviour
                 // Debug.Log("Processed !!");
                 break;
             }
+            // else break を入れる
         }
     }
     // ---------------------------------- //
