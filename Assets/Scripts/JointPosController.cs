@@ -24,8 +24,8 @@ public class JointPosController : MonoBehaviour
     private ArticulationBody joint;
     private Float64Msg targetPos;
 
-    private Queue<(DateTime timestamp, Float64Msg data)> InputQueue = new Queue<(DateTime, Float64Msg)>();
-    // private Queue<(DateTime timestamp, string data)> dataQueue = new Queue<(DateTime, string)>();
+    private Queue<(float timestamp, Float64Msg data)> InputQueue = new Queue<(float, Float64Msg)>();
+    // private Queue<(float timestamp, string data)> dataQueue = new Queue<(float, string)>();
 
     // Start is called before the first frame update
     IEnumerator Start()
@@ -74,7 +74,7 @@ public class JointPosController : MonoBehaviour
         joint.xDrive = drive;
     }
 
-    void Update() 
+    void FixedUpdate() 
     // fiXupdate の方 が良い　（必須）
     　// Unity でスレッドを実装できるライブラリ有，検討推奨（内部に update があるのか？）
     {
@@ -82,15 +82,14 @@ public class JointPosController : MonoBehaviour
         {
             // Debug.Log("Get Delay Data");
             GetDelayedData();
-            Debug.Log("InputQueue.Count: " + InputQueue.Count);
-            // InputQueue.Count
+            // Debug.Log("InputQueue.Count: " + InputQueue.Count);
         }
     }
 
     // ----- Functions of Dead Time ----- //
     void AddInputData(Float64Msg msg) // DateTime.Now は使うべきでない (Unity 内の時間を使用する（※必須）)
     {
-        DateTime currentTime = DateTime.Now;
+        float currentTime = Time.time * 1000; // sec -> msec
         InputQueue.Enqueue((currentTime, msg));
     }
 
@@ -100,18 +99,20 @@ public class JointPosController : MonoBehaviour
         while (InputQueue.Count > 0)
         { 
             var (timestamp, data) = InputQueue.Peek();
-            if ((DateTime.Now - timestamp).TotalMilliseconds >= deadTime)
+            if ((Time.time - timestamp) >= deadTime)
             {
                 ExecuteJointPosControl(data);
                 Debug.Log("Data: " + data);
                 InputQueue.Dequeue();
             }
-            else if (InputQueue.Count <= 0 || (DateTime.Now - timestamp).TotalMilliseconds < deadTime)
+            else if (InputQueue.Count <= 0 || (Time.time - timestamp) < deadTime)
             {
-                // Debug.Log("Processed !!");
                 break;
             }
-            // else break を入れる
+            else
+            {
+                break;
+            }
         }
     }
     // ---------------------------------- //
