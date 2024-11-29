@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -6,6 +6,7 @@ using RosMessageTypes.BuiltinInterfaces;
 using RosMessageTypes.Std;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Nav;
+using RosMessageTypes.Com3;
 using Unity.Robotics.Core;
 using System;
 using PID_Controller;
@@ -33,6 +34,8 @@ public class DiffDriveController : MonoBehaviour
 
     [Tooltip("オドメトリ情報を出力するROSトピック名")]
     public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
+
+    public string Com3TopicName = "robot_name/tracks_cmd"; // Subscribe Messsage Topic Name
 
     [Tooltip("オドメトリ情報を出力する際に用いられる基準フレーム名")]
     public string childFrameName = "robot_name/base_link";
@@ -69,7 +72,9 @@ public class DiffDriveController : MonoBehaviour
     private List<PID> leftWheelControllers;
     private List<PID> rightWheelControllers;
 
-    private TwistMsg twist;
+    private double leftVelCmd = 0.0f; // Velocity Command for Left Track
+    private double rightVelCmd = 0.0f; // Velocity Command for Right Track
+
     private double tread_half = 2.0;
     private double previousTime = 0.0;
     private double yaw = 0.0;
@@ -79,15 +84,20 @@ public class DiffDriveController : MonoBehaviour
     public float publishMessageInterval = 0.02f;//50Hz
 
     // Used to determine how much time has elapsed since the last message was published
-    private float timeElapsed;
+    private double timeElapsed;
+
+    private EmergencyStop emergencyStop;
 
     // Start is called before the first frame update
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
+        emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
         leftWheelColliders = new List<WheelCollider>();
         rightWheelColliders = new List<WheelCollider>();
-        twist = new TwistMsg();
+
+        leftVelCmd = 0.0; // Velocity Command for Left Track
+        rightVelCmd = 0.0; // Velocity Command for Right Track
 
         leftWheelControllers = new List<PID>();
         rightWheelControllers = new List<PID>();
@@ -128,19 +138,14 @@ public class DiffDriveController : MonoBehaviour
 
         Debug.Log("DiffDriveController starts!!");
         ros.Subscribe<TwistMsg>(TwistTopicName, ExecuteTwist); //Register Subscriber
+        ros.Subscribe<JointCmdMsg>(Com3TopicName, ExecuteJointCmd); //Register Subscriber
         ros.RegisterPublisher<OdometryMsg>(OdomTopicName); //Register Publisher
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        //const float speed = 100.0f;
-        float leftVelCmd = 0.0f; // Velocity Command for Left Track
-        float rightVelCmd = 0.0f; // Velocity Command for Right Track
-        double leftVelMes = 0.0; // Measured Velocity from Left Track
-        double rightVelMes = 0.0; // Measured Velocity from Right Track
-
-        timeElapsed += Time.deltaTime;
+        timeElapsed += Time.fixedDeltaTime;
 
         double time = Time.fixedTimeAsDouble;
         double deltaTime = time - previousTime;
@@ -159,17 +164,14 @@ public class DiffDriveController : MonoBehaviour
         // Debug.Log("RightTrackRadius:"+rightTrackRadius);
 
         /* velocity =  angular velocity[rad/s] * radius[m] */
-        leftVelMes = leftTrackVel * leftTrackRadius; // Unit is [m/s]
-        rightVelMes = rightTrackVel * rightTrackRadius; // Unit is [m/s]
+        double leftVelMes = leftTrackVel * leftTrackRadius; // Measured Velocity from Left Track. Unit is [m/s]
+        double rightVelMes = rightTrackVel * rightTrackRadius; // Measured Velocity from Right Track. Unit is [m/s]
         // Debug.Log("LeftJointVelocity:"+leftVelMes);
         // Debug.Log("RightJointVelocity:"+rightVelMes);
 
-        double linearVel = 0.0;
-        double angularVel = 0.0;
-
         /* Calculate linear and angular velocity based on kinematics */
-        linearVel = (rightVelMes + leftVelMes)/2.0;
-        angularVel = (rightVelMes - leftVelMes)/(2.0*tread_half*treadCollectionFactor);   
+        double linearVel = (rightVelMes + leftVelMes)/2.0;
+        double angularVel = (rightVelMes - leftVelMes)/(2.0*tread_half*treadCollectionFactor);   
         // Debug.Log("LinearVelocity:"+linearVel);
         // Debug.Log("AngularVelocity:"+angularVel);
         // Debug.Log("tread_half:"+tread_half);
@@ -217,17 +219,10 @@ public class DiffDriveController : MonoBehaviour
             timeElapsed = 0.0f;
         }
 
-        /* Calculate velocity command value based on inverse kinematics */
-        var cmdLinearVel = twist.linear.x;
-        cmdLinearVel = Math.Min(cmdLinearVel, maxLinearVelocity);
-        cmdLinearVel = Math.Max(cmdLinearVel, -maxLinearVelocity);
-        var cmdAngularVel = twist.angular.z;
-        cmdAngularVel = Math.Min(cmdAngularVel, maxAngularVelocity);
-        cmdAngularVel = Math.Max(cmdAngularVel, -maxAngularVelocity);
-        leftVelCmd = (float)(cmdLinearVel - tread_half * cmdAngularVel); // Unit is [m/s]
-        rightVelCmd = (float)(cmdLinearVel + tread_half * cmdAngularVel); // Unit is [m/s]
-        // Debug.Log("LeftJointVelocityCommand:" + leftVelCmd);
-        // Debug.Log("RightJointVelocityCommand:" + rightVelCmd);
+        if (emergencyStop && emergencyStop.isEmergencyStop) {
+            leftVelCmd = 0.0;
+            rightVelCmd = 0.0;
+        }
 
         /* Set targetVelocity in xDrive in wheels */
         var ts = TimeSpan.FromSeconds(deltaTime);
@@ -271,10 +266,42 @@ public class DiffDriveController : MonoBehaviour
         previousTime = time;
     }
 
-    void ExecuteTwist(TwistMsg msg)
+    void CommandLinearAngularVelocity(double cmdLinearVel, double cmdAngularVel)
     {
-        twist = msg;
+        /* Calculate velocity command value based on inverse kinematics */
+        cmdLinearVel = Math.Min(cmdLinearVel, maxLinearVelocity);
+        cmdLinearVel = Math.Max(cmdLinearVel, -maxLinearVelocity);
+        cmdAngularVel = Math.Min(cmdAngularVel, maxAngularVelocity);
+        cmdAngularVel = Math.Max(cmdAngularVel, -maxAngularVelocity);
+        leftVelCmd = (cmdLinearVel - tread_half * cmdAngularVel); // Unit is [m/s]
+        rightVelCmd = (cmdLinearVel + tread_half * cmdAngularVel); // Unit is [m/s]
+        // Debug.Log("LeftJointVelocityCommand:" + leftVelCmd);
+        // Debug.Log("RightJointVelocityCommand:" + rightVelCmd);
+    }
+
+    void ExecuteTwist(TwistMsg twist)
+    {
         //Debug.Log("Linear Velocity:"+twist.linear.x);
         //Debug.Log("Angular Velocity:"+twist.angular.z);
+        CommandLinearAngularVelocity(twist.linear.x, twist.angular.z);
+    }
+
+    void ExecuteJointCmd(JointCmdMsg cmd)
+    {
+        double linearVelCmd = Double.NaN, angularVelCmd = Double.NaN;
+        for (int i = 0; i < cmd.joint_name.Length; i++) {
+            if (cmd.joint_name[i] == "left_track") {
+                leftVelCmd = cmd.velocity[i];
+            } else if (cmd.joint_name[i] == "right_track") {
+                rightVelCmd = cmd.velocity[i];
+            } else if (cmd.joint_name[i] == "forward_volume") {
+                linearVelCmd = cmd.velocity[i];
+            } else if (cmd.joint_name[i] == "turn_volume") {
+                angularVelCmd = cmd.velocity[i];
+            }
+        }
+        if (!double.IsNaN(linearVelCmd) && !double.IsNaN(angularVelCmd)) {
+            CommandLinearAngularVelocity(linearVelCmd, angularVelCmd);
+        }
     }
 }
