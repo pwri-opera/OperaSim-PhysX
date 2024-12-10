@@ -91,6 +91,7 @@ public class JointPosController : MonoBehaviour
     {
         float currentTime = Time.time * 1000; // sec -> msec
         InputQueue.Enqueue((currentTime, msg));
+        // Debug.Log("Time: " + Time.time);
     }
 
     void GetDelayedData()
@@ -99,7 +100,7 @@ public class JointPosController : MonoBehaviour
         while (InputQueue.Count > 0)
         { 
             var (timestamp, data) = InputQueue.Peek();
-            if ((Time.time - timestamp) >= deadTime)
+            if ((Time.time*1000 - timestamp) >= deadTime)
             {
                 ExecuteJointPosControl(data);
                 Debug.Log("Data: " + data);
