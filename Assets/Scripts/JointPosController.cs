@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,20 +18,29 @@ public class JointPosController : MonoBehaviour
     [Tooltip("初期の目標角度 (degree)")]
     public double initTargetPos;
 
-    [Tooltip("入力に対するむだ時間 (msec)")]
-    public double deadTime;
+    [Tooltip("むだ時間機能の 有効/無効 切替え")]
+    public bool enableDeadTime;
+
+    [Tooltip("入力に対するむだ時間 (msec) \n40 msec 以上に設定") ]
+    [Min(40)] public double deadTime;
 
     private ArticulationBody joint;
     private Float64Msg targetPos;
+    private EmergencyStop emergencyStop;
+    private bool currentEmergencyStop = false;
+    private float emergencyStopPosition = 0.0f;
 
     private Queue<(float timestamp, Float64Msg data)> InputQueue = new Queue<(float, Float64Msg)>();
-    // private Queue<(float timestamp, string data)> dataQueue = new Queue<(float, string)>();
 
+    private double unityDeadTime = 40.0f; // msec
+    private double internalDeadTime; // msec
+    
     // Start is called before the first frame update
     IEnumerator Start()
     {
         yield return new WaitForSeconds(0.1f); // 少し待機してから設定
         ros = ROSConnection.GetOrCreateInstance();
+        emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();
 
@@ -53,7 +62,10 @@ public class JointPosController : MonoBehaviour
             Debug.Log("No ArticulationBody are found");
         }
 
-        if (deadTime == 0.0)
+        internalDeadTime = deadTime - unityDeadTime;
+        
+
+        if (enableDeadTime == false)
         {
             Debug.Log("Normal Mode");
             ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
@@ -61,7 +73,7 @@ public class JointPosController : MonoBehaviour
         else
         {
             Debug.Log("Dead Time Mode");
-            Debug.Log("deadTime" + deadTime);
+            // Debug.Log("deadTime" + deadTime);
             ros.Subscribe<Float64Msg>(setpointTopicName, AddInputData);
         }
     }
@@ -75,15 +87,11 @@ public class JointPosController : MonoBehaviour
     }
 
     void FixedUpdate() 
-    // fiXupdate の方 が良い　（必須）
-    　// Unity でスレッドを実装できるライブラリ有，検討推奨（内部に update があるのか？）
     {
         // Dead Time 
-        if (deadTime != 0.0)
+        if (internalDeadTime != 0.0)
         {
-            // Debug.Log("Get Delay Data");
             GetDelayedData();
-            // Debug.Log("InputQueue.Count: " + InputQueue.Count);
         }
  
         // Emergency Stop
@@ -101,11 +109,10 @@ public class JointPosController : MonoBehaviour
     }
 
     // ----- Functions of Dead Time ----- //
-    void AddInputData(Float64Msg msg) // DateTime.Now は使うべきでない (Unity 内の時間を使用する（※必須）)
-    {
+    void AddInputData(Float64Msg msg)
+    { 
         float currentTime = Time.time * 1000; // sec -> msec
         InputQueue.Enqueue((currentTime, msg));
-        // Debug.Log("Time: " + Time.time);
     }
 
     void GetDelayedData()
@@ -114,13 +121,13 @@ public class JointPosController : MonoBehaviour
         while (InputQueue.Count > 0)
         { 
             var (timestamp, data) = InputQueue.Peek();
-            if ((Time.time*1000 - timestamp) >= deadTime)
+            if ((Time.time*1000 - timestamp) >= internalDeadTime)
             {
                 ExecuteJointPosControl(data);
-                Debug.Log("Data: " + data);
+                // Debug.Log("Data: " + data);
                 InputQueue.Dequeue();
             }
-            else if (InputQueue.Count <= 0 || (Time.time - timestamp) < deadTime)
+            else if (InputQueue.Count <= 0 || (Time.time - timestamp) < internalDeadTime)
             {
                 break;
             }
@@ -132,4 +139,3 @@ public class JointPosController : MonoBehaviour
     }
     // ---------------------------------- //
 }
-
