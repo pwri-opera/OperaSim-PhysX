@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -78,11 +78,25 @@ public class JointPosController : MonoBehaviour
     // fiXupdate の方 が良い　（必須）
     　// Unity でスレッドを実装できるライブラリ有，検討推奨（内部に update があるのか？）
     {
+        // Dead Time 
         if (deadTime != 0.0)
         {
             // Debug.Log("Get Delay Data");
             GetDelayedData();
             // Debug.Log("InputQueue.Count: " + InputQueue.Count);
+        }
+ 
+        // Emergency Stop
+        if (emergencyStop && emergencyStop.isEmergencyStop) {
+            if (currentEmergencyStop == false) {
+                emergencyStopPosition = joint.jointPosition[0] * Mathf.Rad2Deg;
+                currentEmergencyStop = true;
+            }
+            var drive = joint.xDrive;
+            drive.target = emergencyStopPosition;
+            joint.xDrive = drive;
+        } else {
+            currentEmergencyStop = false;
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -24,11 +24,14 @@ public class FollowJointTrajectoryAction : MonoBehaviour
     [Tooltip("初期姿勢")]
     public List<float> initialPoseValues;
 
+    private EmergencyStop emergencyStop;
+
     // Start is called before the first frame update
     void Start()
     {
         currentPose = new JointStateMsg();
         ros = ROSConnection.GetOrCreateInstance();
+        emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
         jointArticulationBodies = new Dictionary<string, ArticulationBody>();
         foreach (var joint in this.GetComponentsInChildren<ArticulationBody>())
         {
@@ -36,14 +39,16 @@ public class FollowJointTrajectoryAction : MonoBehaviour
             if (ujoint)
             {
                 jointArticulationBodies.Add(ujoint.jointName, joint);
-                ArticulationDrive drive = joint.xDrive;
-                if (drive.stiffness == 0)
-                    drive.stiffness = 200000;
-                if (drive.damping == 0)
-                    drive.damping = 100000;
-                if (drive.forceLimit == 0)
-                    drive.forceLimit = 100000;
-                joint.xDrive = drive;
+                    if (joint.GetComponent<Com3.ControlTypeAnnotation>() == null) {
+                    ArticulationDrive drive = joint.xDrive;
+                    if (drive.stiffness == 0)
+                        drive.stiffness = 200000;
+                    if (drive.damping == 0)
+                        drive.damping = 100000;
+                    if (drive.forceLimit == 0)
+                        drive.forceLimit = 100000;
+                    joint.xDrive = drive;
+                }
             }
         }
         if (initialPoseObjects.Count == initialPoseValues.Count)
@@ -65,6 +70,8 @@ public class FollowJointTrajectoryAction : MonoBehaviour
 
     void ExecuteTrajectory(JointStateMsg trajectory)
     {
+        if (emergencyStop && emergencyStop.isEmergencyStop)
+            return;
         currentPose = trajectory;
         for (int i = 0; i < currentPose.name.Length; i++)
         {
