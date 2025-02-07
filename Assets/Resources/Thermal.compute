@@ -123,8 +123,9 @@ void simulateThermalErosion(uint2 coord) {
 
 #pragma kernel ThermalErosion
 
-[numthreads(8, 8, 1)]
+[numthreads(32, 32, 1)]
 void ThermalErosion(uint3 id : SV_DispatchThreadID)
 {
+	if (id.x < 0 || id.x >= texDim[0] || id.y < 0 || id.y >= texDim[1]) { return; }
 	simulateThermalErosion(id.xy);
 }

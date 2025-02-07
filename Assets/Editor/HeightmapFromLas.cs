@@ -11,6 +11,9 @@ public class HeightmapFromLas : EditorWindow
     private string[] resolutionOptions;
     private int selectedResolution;
 
+    private string[] divisionOptions;
+    private int selectedDivision;
+
     [MenuItem("OPERA/Import/Heightmap from LAS")]
     static void OpenFilePanel()
     {
@@ -33,9 +36,18 @@ public class HeightmapFromLas : EditorWindow
             "4096",
         };
         selectedResolution = 3;
+
+        divisionOptions = new[]
+        {
+            "1",
+            "2",
+            "4",
+            "8",
+        };
+        selectedDivision = 2;
     }
 
-    public void Process(int resolution)
+    public void Process(int resolution, int divide)
     {
     	Undo.RegisterCompleteObjectUndo(Terrain.activeTerrain.terrainData, "Heightmap from LAS");
 
@@ -112,6 +124,14 @@ public class HeightmapFromLas : EditorWindow
 
         lazReader.laszip_close_reader();
 
+        if (divide > 1) {
+            var terrainTiler = Terrain.activeTerrain.gameObject.GetComponent<TerrainTiler>();
+            if (terrainTiler == null) {
+                terrainTiler = Terrain.activeTerrain.gameObject.AddComponent<TerrainTiler>();
+            }
+            terrainTiler.divides = divide;
+        }
+
         EditorUtility.ClearProgressBar();
     }
 
@@ -134,10 +154,15 @@ public class HeightmapFromLas : EditorWindow
             selectedIndex: selectedResolution,
             displayedOptions: resolutionOptions
         );
+        selectedDivision = EditorGUILayout.Popup(
+            label: new GUIContent("Divide"),
+            selectedIndex: selectedDivision,
+            displayedOptions: divisionOptions
+        );
         GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
         // create button to process the data
         if (GUILayout.Button("Import")) {
-            Process(int.Parse(resolutionOptions[selectedResolution]));
+            Process(int.Parse(resolutionOptions[selectedResolution]), int.Parse(divisionOptions[selectedDivision]));
         }
         if (GUILayout.Button("Close")) {
             Close();
