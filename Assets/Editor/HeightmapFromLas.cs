@@ -5,6 +5,12 @@ using laszip.net;
 
 public class HeightmapFromLas : EditorWindow
 {
+    public string lasFilePath;
+    private laszip_dll lazReader;
+
+    private string[] resolutionOptions;
+    private int selectedResolution;
+
     [MenuItem("OPERA/Import/Heightmap from LAS")]
     static void OpenFilePanel()
     {
@@ -12,19 +18,33 @@ public class HeightmapFromLas : EditorWindow
         if (string.IsNullOrEmpty(path))
             return;
 
-        var lazReader = new laszip_dll();
-        var compressed = true;
-        lazReader.laszip_open_reader(path, ref compressed);
-        var numberOfPoints = lazReader.header.number_of_point_records;
+        HeightmapFromLas window = (HeightmapFromLas)EditorWindow.GetWindow(typeof(HeightmapFromLas));
+        window.lasFilePath = path;
+        window.Show();
+    }
 
+    HeightmapFromLas() {
+        resolutionOptions = new[]
+        {
+            "256",
+            "512",
+            "1024",
+            "2048",
+            "4096",
+        };
+        selectedResolution = 3;
+    }
+
+    public void Process(int resolution)
+    {
     	Undo.RegisterCompleteObjectUndo(Terrain.activeTerrain.terrainData, "Heightmap from LAS");
+
+        var numberOfPoints = lazReader.header.number_of_point_records;
 
     	TerrainData terrain = Terrain.activeTerrain.terrainData;
 
-    	int w = 2048; // terrain.heightmapResolution;
-        int alphaw = w;
-        terrain.heightmapResolution = w;
-        terrain.alphamapResolution = alphaw;
+    	int w = terrain.heightmapResolution = resolution;
+        int alphaw = terrain.alphamapResolution = resolution;
 
         float sizeX = (float)(lazReader.header.max_x - lazReader.header.min_x);
         float sizeY = (float)(lazReader.header.max_y - lazReader.header.min_y);
@@ -33,6 +53,8 @@ public class HeightmapFromLas : EditorWindow
         float scaleXAlpha = (float)(lazReader.header.max_x - lazReader.header.min_x) / alphaw;
         float scaleYAlpha = (float)(lazReader.header.max_y - lazReader.header.min_y) / alphaw;
         float scaleZ = 100.0f;
+
+        Terrain.activeTerrain.gameObject.transform.position = new Vector3(-sizeX / 2.0f, -(float)lazReader.header.z_offset, -sizeY / 2.0f);
 
     	float[,] heightmapData = new float[w, w];
     	Color[] colorData = new Color[alphaw * alphaw];
@@ -66,7 +88,7 @@ public class HeightmapFromLas : EditorWindow
         terrain.size = new Vector3(sizeX, scaleZ, sizeY);
         terrain.SetHeights(0, 0, heightmapData);
 
-        var originalFname = Path.GetFileNameWithoutExtension(path);
+        var originalFname = Path.GetFileNameWithoutExtension(lasFilePath);
         var layerName = AssetDatabase.GenerateUniqueAssetPath(
                         Path.Combine("Assets", "Terrains", originalFname + ".terrainlayer"));
         var textureName = AssetDatabase.GenerateUniqueAssetPath(
@@ -91,5 +113,34 @@ public class HeightmapFromLas : EditorWindow
         lazReader.laszip_close_reader();
 
         EditorUtility.ClearProgressBar();
+    }
+
+    void OnGUI()
+    {
+        lazReader = new laszip_dll();
+        var compressed = true;
+        lazReader.laszip_open_reader(lasFilePath, ref compressed);
+        // create area to display the las header info
+        GUILayout.Label("LAS Header Info", EditorStyles.boldLabel);
+        GUILayout.Label("Number of point records: " + lazReader.header.number_of_point_records);
+        GUILayout.Label("X size: " + (lazReader.header.max_x - lazReader.header.min_x) + " [m]");
+        GUILayout.Label("Y size: " + (lazReader.header.max_y - lazReader.header.min_y) + " [m]");
+        GUILayout.Label("Z size: " + (lazReader.header.max_z - lazReader.header.min_z) + " [m]");
+        GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+        // create dropdown box to select the resolution
+        GUILayout.Label("Import Setting", EditorStyles.boldLabel);
+        selectedResolution = EditorGUILayout.Popup(
+            label: new GUIContent("Resolution"),
+            selectedIndex: selectedResolution,
+            displayedOptions: resolutionOptions
+        );
+        GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+        // create button to process the data
+        if (GUILayout.Button("Import")) {
+            Process(int.Parse(resolutionOptions[selectedResolution]));
+        }
+        if (GUILayout.Button("Close")) {
+            Close();
+        }
     }
 }
