@@ -52,7 +52,7 @@ public class HeightmapFromLas : EditorWindow
             if (x < 0 || x >= w) continue;
             int y = (int)((point_y - lazReader.header.min_y) / scaleY);
             if (y < 0 || y >= w) continue;
-            heightmapData[x, y] = (float)point_z / scaleZ;
+            heightmapData[y, x] = (float)point_z / scaleZ;
 
             int ax = (int)((point_x - lazReader.header.min_x) / scaleXAlpha);
             if (ax < 0 || ax >= alphaw) continue;
@@ -61,9 +61,9 @@ public class HeightmapFromLas : EditorWindow
             float r = lazReader.point.rgb[0] / 65535.0f;
             float g = lazReader.point.rgb[1] / 65535.0f;
             float b = lazReader.point.rgb[2] / 65535.0f;
-            colorData[ay + ax * alphaw] = new Color(r, g, b);
+            colorData[ax + ay * alphaw] = new Color(r, g, b);
         }
-        terrain.size = new Vector3(sizeX, 100.0f, sizeY);
+        terrain.size = new Vector3(sizeX, scaleZ, sizeY);
         terrain.SetHeights(0, 0, heightmapData);
 
         var originalFname = Path.GetFileNameWithoutExtension(path);
