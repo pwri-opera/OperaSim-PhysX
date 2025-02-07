@@ -26,8 +26,8 @@ public class HeightmapFromLas : EditorWindow
         terrain.heightmapResolution = w;
         terrain.alphamapResolution = alphaw;
 
-        int sizeX = ((int)(lazReader.header.max_x - lazReader.header.min_x)) / 16 * 16;
-        int sizeY = ((int)(lazReader.header.max_y - lazReader.header.min_y)) / 16 * 16;
+        float sizeX = (float)(lazReader.header.max_x - lazReader.header.min_x);
+        float sizeY = (float)(lazReader.header.max_y - lazReader.header.min_y);
         float scaleX = (float)(lazReader.header.max_x - lazReader.header.min_x) / w;
         float scaleY = (float)(lazReader.header.max_y - lazReader.header.min_y) / w;
         float scaleXAlpha = (float)(lazReader.header.max_x - lazReader.header.min_x) / alphaw;
