@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using laszip.net;
@@ -10,7 +11,7 @@ public class HeightmapFromLas : EditorWindow
         var path = EditorUtility.OpenFilePanel("Select Asset",  Application.dataPath, "las,laz");
         if (string.IsNullOrEmpty(path))
             return;
-        
+
         var lazReader = new laszip_dll();
         var compressed = true;
         lazReader.laszip_open_reader(path, ref compressed);
@@ -21,17 +22,20 @@ public class HeightmapFromLas : EditorWindow
     	TerrainData terrain = Terrain.activeTerrain.terrainData;
 
     	int w = 2048; // terrain.heightmapResolution;
+        int alphaw = w;
         terrain.heightmapResolution = w;
-        terrain.alphamapResolution = w;
+        terrain.alphamapResolution = alphaw;
 
         int sizeX = ((int)(lazReader.header.max_x - lazReader.header.min_x)) / 16 * 16;
         int sizeY = ((int)(lazReader.header.max_y - lazReader.header.min_y)) / 16 * 16;
         float scaleX = (float)(lazReader.header.max_x - lazReader.header.min_x) / w;
         float scaleY = (float)(lazReader.header.max_y - lazReader.header.min_y) / w;
+        float scaleXAlpha = (float)(lazReader.header.max_x - lazReader.header.min_x) / alphaw;
+        float scaleYAlpha = (float)(lazReader.header.max_y - lazReader.header.min_y) / alphaw;
         float scaleZ = 100.0f;
 
     	float[,] heightmapData = new float[w, w];
-    	Color[] colorData = new Color[w * w];
+    	Color[] colorData = new Color[alphaw * alphaw];
 
         for (int pointIndex = 0; pointIndex < numberOfPoints; pointIndex++)
         {
@@ -50,24 +54,35 @@ public class HeightmapFromLas : EditorWindow
             if (y < 0 || y >= w) continue;
             heightmapData[x, y] = (float)point_z / scaleZ;
 
+            int ax = (int)((point_x - lazReader.header.min_x) / scaleXAlpha);
+            if (ax < 0 || ax >= alphaw) continue;
+            int ay = (int)((point_y - lazReader.header.min_y) / scaleYAlpha);
+            if (ay < 0 || ay >= alphaw) continue;
             float r = lazReader.point.rgb[0] / 65535.0f;
             float g = lazReader.point.rgb[1] / 65535.0f;
             float b = lazReader.point.rgb[2] / 65535.0f;
-            colorData[y + x * w] = new Color(r, g, b);
+            colorData[ay + ax * alphaw] = new Color(r, g, b);
         }
         terrain.size = new Vector3(sizeX, 100.0f, sizeY);
         terrain.SetHeights(0, 0, heightmapData);
 
+        var originalFname = Path.GetFileNameWithoutExtension(path);
+        var layerName = AssetDatabase.GenerateUniqueAssetPath(
+                        Path.Combine("Assets", "Terrains", originalFname + ".terrainlayer"));
+        var textureName = AssetDatabase.GenerateUniqueAssetPath(
+                        Path.Combine("Assets", "Terrains", originalFname + ".asset"));
         var layer = new TerrainLayer();
         layer.tileSize = new Vector2(sizeX, sizeY);
-        layer.diffuseTexture = new Texture2D(w, w);
+        layer.diffuseTexture = new Texture2D(alphaw, alphaw);
         layer.diffuseTexture.SetPixels(colorData);
         layer.diffuseTexture.Apply();
+        AssetDatabase.CreateAsset(layer.diffuseTexture, textureName);
+        AssetDatabase.CreateAsset(layer, layerName);
         terrain.terrainLayers = new TerrainLayer[] { layer };
 
-        float[,,] splatmapData = new float[w, w, 1];
-        for (int sx = 0; sx < w; sx++) {
-            for (int sy = 0; sy < w; sy++) {
+        float[,,] splatmapData = new float[alphaw, alphaw, 1];
+        for (int sx = 0; sx < alphaw; sx++) {
+            for (int sy = 0; sy < alphaw; sy++) {
                 splatmapData[sy, sx, 0] = 1.0f;
             }
         }
