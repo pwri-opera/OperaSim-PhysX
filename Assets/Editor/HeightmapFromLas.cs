@@ -104,7 +104,7 @@ public class HeightmapFromLas : EditorWindow
 
         var textureName = AssetDatabase.GenerateUniqueAssetPath(
                         Path.Combine("Assets", "Terrains", originalFname + ".png"));
-        var diffuseTexture = new Texture2D(alphaw, alphaw, TextureFormat.ARGB32, false, false);
+        var diffuseTexture = new Texture2D(alphaw, alphaw, TextureFormat.RGB24, false, false);
         diffuseTexture.SetPixels(colorData);
         diffuseTexture.Apply(true, false);
         File.WriteAllBytes(textureName, diffuseTexture.EncodeToPNG());
