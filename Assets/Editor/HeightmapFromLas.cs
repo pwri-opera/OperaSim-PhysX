@@ -101,16 +101,20 @@ public class HeightmapFromLas : EditorWindow
         terrain.SetHeights(0, 0, heightmapData);
 
         var originalFname = Path.GetFileNameWithoutExtension(lasFilePath);
+
+        var textureName = AssetDatabase.GenerateUniqueAssetPath(
+                        Path.Combine("Assets", "Terrains", originalFname + ".png"));
+        var diffuseTexture = new Texture2D(alphaw, alphaw, TextureFormat.RGB24, false, false);
+        diffuseTexture.SetPixels(colorData);
+        diffuseTexture.Apply(true, false);
+        File.WriteAllBytes(textureName, diffuseTexture.EncodeToPNG());
+        AssetDatabase.ImportAsset(textureName);
+
         var layerName = AssetDatabase.GenerateUniqueAssetPath(
                         Path.Combine("Assets", "Terrains", originalFname + ".terrainlayer"));
-        var textureName = AssetDatabase.GenerateUniqueAssetPath(
-                        Path.Combine("Assets", "Terrains", originalFname + ".asset"));
         var layer = new TerrainLayer();
         layer.tileSize = new Vector2(sizeX, sizeY);
-        layer.diffuseTexture = new Texture2D(alphaw, alphaw);
-        layer.diffuseTexture.SetPixels(colorData);
-        layer.diffuseTexture.Apply();
-        AssetDatabase.CreateAsset(layer.diffuseTexture, textureName);
+        layer.diffuseTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureName);
         AssetDatabase.CreateAsset(layer, layerName);
         terrain.terrainLayers = new TerrainLayer[] { layer };
 
