@@ -1,6 +1,9 @@
 # OperaSim-PhysX
 Simulator on Unity + PhysX communicating with ROS
 
+## 詳細マニュアル
+[OperaSim-PhysXマニュアル](https://operasim-physx.readthedocs.io/ja/latest/)
+
 ## 概説
 - 本シミュレータは自律施工技術開発基盤OPERA（Open Platform for Earth work with Robotics and Autonomy）の一部であり、どなたでも利用可能です
 - シミュレータプラットフォームに[Unity](https://unity.com/)、物理エンジンに[Nvidia PhysX](https://www.nvidia.com/ja-jp/drivers/physx/physx-9-19-0218-driver/)を利用しています
