@@ -15,10 +15,12 @@ public class GroundTruthPublisher : MonoBehaviour
     ROSConnection ros;
 
     [Tooltip("真の位置を出力するROSトピック名")]
-    public string topicName = "robot_name/groundtruth";
+    public string topicName = "[robot_name]/groundtruth";
+    private string preprocessedTopicName;
 
     [Tooltip("基準座標のフレーム名")]
-    public string childFrameName = "robot_name/base_link";
+    public string childFrameName = "[robot_name]/base_link";
+    private string preprocessedChildFrameName;
 
     private OdometryMsg message;
 
@@ -36,8 +38,11 @@ public class GroundTruthPublisher : MonoBehaviour
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();
 
+        preprocessedTopicName = Utils.PreprocessNamespace(this.gameObject, topicName);
+        preprocessedChildFrameName = Utils.PreprocessNamespace(this.gameObject, childFrameName);
+
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<OdometryMsg>(topicName);
+        ros.RegisterPublisher<OdometryMsg>(preprocessedTopicName);
     }
 
     // Update is called once per constant rate
@@ -48,7 +53,7 @@ public class GroundTruthPublisher : MonoBehaviour
         if (timeElapsed >= publishMessageInterval){
             message.header.frame_id = "map";
             message.header.stamp = new TimeStamp(Clock.time);
-            message.child_frame_id = childFrameName;
+            message.child_frame_id = preprocessedChildFrameName;
 
             // Unity -> ROSへの変換方法
             //Position: Unity(x,y,z) -> ROS(z,-x,y)
@@ -65,7 +70,7 @@ public class GroundTruthPublisher : MonoBehaviour
 
             message.pose.covariance = new double[] {0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1};
 
-            ros.Publish(topicName, message);
+            ros.Publish(preprocessedTopicName, message);
             timeElapsed = 0.0f;
         }
     }

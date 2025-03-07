@@ -12,7 +12,11 @@ public class QuaternionStampedPublisher : MonoBehaviour
 {
     ROSConnection ros;
     public string frameID = "frame_id";
-    public string topicName = "robot_name/unity/quat_stmp";
+    private string preprocessdFrameID;
+
+    public string topicName = "[robot_name]/unity/quat_stmp";
+    private string preprocessdTopicName;
+
     private QuaternionStampedMsg message;
 
     // Publish the object's position and rotation every N seconds
@@ -28,8 +32,11 @@ public class QuaternionStampedPublisher : MonoBehaviour
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();
 
+        preprocessdFrameID = Utils.PreprocessNamespace(this.gameObject, frameID);
+        preprocessdTopicName = Utils.PreprocessNamespace(this.gameObject, topicName);
+
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<QuaternionStampedMsg>(topicName);
+        ros.RegisterPublisher<QuaternionStampedMsg>(preprocessdTopicName);
     }
 
     // Update is called once per constant rate
@@ -41,7 +48,7 @@ public class QuaternionStampedPublisher : MonoBehaviour
     
         if (timeElapsed >= publishMessageInterval)
         {
-            message.header.frame_id = frameID;
+            message.header.frame_id = preprocessdFrameID;
             message.header.stamp = new TimeStamp(Clock.time);
 
             // Unity -> ROS transformation
@@ -52,7 +59,7 @@ public class QuaternionStampedPublisher : MonoBehaviour
             message.quaternion.z = - this.transform.rotation.y;
             message.quaternion.w = this.transform.rotation.w;
 
-            ros.Publish(topicName, message);
+            ros.Publish(preprocessdTopicName, message);
             timeElapsed = 0.0f;
         }
     }

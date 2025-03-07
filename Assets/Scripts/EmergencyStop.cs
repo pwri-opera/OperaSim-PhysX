@@ -7,7 +7,7 @@ using RosMessageTypes.Std;
 public class EmergencyStop : MonoBehaviour
 {
     private ROSConnection ros;
-    public string emergencyStopTopicName = "robot_name/emg_stop";
+    public string emergencyStopTopicName = "[robot_name]/emg_stop";
 
     public bool isEmergencyStop { get; private set; }
 
@@ -16,7 +16,7 @@ public class EmergencyStop : MonoBehaviour
     {
         isEmergencyStop = false;
         ros = ROSConnection.GetOrCreateInstance();
-        ros.Subscribe<BoolMsg>(emergencyStopTopicName, OnCommand);
+        ros.Subscribe<BoolMsg>(Utils.PreprocessNamespace(this.gameObject,emergencyStopTopicName), OnCommand);
     }
     void OnCommand(BoolMsg cmd)
     {

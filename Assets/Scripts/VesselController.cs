@@ -41,7 +41,7 @@ public class VesselController : MonoBehaviour
         }
 
         target_pos.data = 0.0;
-        ros.Subscribe<Float64Msg>(DumpTopicName, ExecuteVesselControl);
+        ros.Subscribe<Float64Msg>(Utils.PreprocessNamespace(this.gameObject, DumpTopicName), ExecuteVesselControl);
     }
 
     // Update is called once per frame

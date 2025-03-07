@@ -52,7 +52,7 @@ public class JointPosController : MonoBehaviour
             Debug.Log("No ArticulationBody are found");
         }
 
-        ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
+        ros.Subscribe<Float64Msg>(Utils.PreprocessNamespace(this.gameObject, setpointTopicName), ExecuteJointPosControl);
     }
 
     void FixedUpdate()
