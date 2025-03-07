@@ -28,7 +28,7 @@ public class DiffDriveController : MonoBehaviour
 
     [Tooltip("ROSトピック名の頭に付与されるロボット名")]
     public string robotName = "[robot_name]";
-    public string preprocessedRobotName;
+    private string preprocessedRobotName;
 
     [Tooltip("cmd_velコマンドを受け取るROSトピック名")]
     public string TwistTopicName = "[robot_name]/tracks/cmd_vel"; // Subscribe Messsage Topic Name
