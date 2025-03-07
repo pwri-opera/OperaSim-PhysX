@@ -17,6 +17,7 @@ public class JointStatePublisher : MonoBehaviour
 
     [Tooltip("joint_statesを出力するROSトピック名")]
     public string topicName = "joint_states";
+    private string preprocessedTopicName;
 
     private JointStateMsg message;
     private List<ArticulationBody> joints;
@@ -54,7 +55,10 @@ public class JointStatePublisher : MonoBehaviour
         message.header.stamp = new TimeMsg();
         message.name = jointNames.ToArray();
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<JointStateMsg>(topicName);
+
+        preprocessedTopicName = Utils.PreprocessNamespace(this.gameObject, topicName);
+
+        ros.RegisterPublisher<JointStateMsg>(preprocessedTopicName);
     }
 
     // Update is called once per constant rate
@@ -75,7 +79,7 @@ public class JointStatePublisher : MonoBehaviour
                 message.velocity[i] = joints[i].jointVelocity[0];
                 message.effort[i] = enableJointEffortSensor ? joints[i].driveForce[0] : 0.0;
             }
-            ros.Publish(topicName, message);
+            ros.Publish(preprocessedTopicName, message);
             timeElapsed = 0.0f;
         }
     }

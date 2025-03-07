@@ -65,7 +65,7 @@ public class FollowJointTrajectoryAction : MonoBehaviour
         {
             Debug.Log("size of InitialPoseObject and InitialPoseValues does not match");
         }
-        ros.Subscribe<JointStateMsg>(fakeControllerTopicName, ExecuteTrajectory);
+        ros.Subscribe<JointStateMsg>(Utils.PreprocessNamespace(this.gameObject, fakeControllerTopicName), ExecuteTrajectory);
     }
 
     void ExecuteTrajectory(JointStateMsg trajectory)

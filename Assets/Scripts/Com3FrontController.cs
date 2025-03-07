@@ -23,7 +23,7 @@ public class Com3FrontController : MonoBehaviour
     private Dictionary<string, Com3JointInfo> joints;
     private JointCmdMsg currentCmd;
 
-    public string com3FrontControllerTopicName = "robot_name/front_cmd";
+    public string com3FrontControllerTopicName = "[robot_name]/front_cmd";
 
     private EmergencyStop emergencyStop;
 
@@ -62,7 +62,7 @@ public class Com3FrontController : MonoBehaviour
             }
         }
 
-        ros.Subscribe<JointCmdMsg>(com3FrontControllerTopicName, OnCommand);
+        ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), OnCommand);
     }
 
     void OnCommand(JointCmdMsg cmd)

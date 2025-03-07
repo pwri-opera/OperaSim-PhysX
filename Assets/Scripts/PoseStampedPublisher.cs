@@ -14,11 +14,9 @@ public class PoseStampedPublisher : MonoBehaviour
 {
     ROSConnection ros;
 
-    [Tooltip("ROSメッセージの接頭辞として用いられるロボット名")]
-    public string robotName = "robot_name";
-
     [Tooltip("出力するROSトピック名")]
-    public string topicName = "robot_name/unity/pose_stmp";
+    public string topicName = "[robot_name]/unity/pose_stmp";
+    private string preprocessedTopicName;
 
     private PoseStampedMsg message;
 
@@ -36,8 +34,10 @@ public class PoseStampedPublisher : MonoBehaviour
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();
 
+        preprocessedTopicName = Utils.PreprocessNamespace(this.gameObject, topicName);
+
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<PoseStampedMsg>(topicName);
+        ros.RegisterPublisher<PoseStampedMsg>(preprocessedTopicName);
     }
 
     // Update is called once per constant rate
@@ -65,7 +65,7 @@ public class PoseStampedPublisher : MonoBehaviour
             message.pose.orientation.z = - this.transform.rotation.y;
             message.pose.orientation.w = this.transform.rotation.w;
 
-            ros.Publish(topicName, message);
+            ros.Publish(preprocessedTopicName, message);
             timeElapsed = 0.0f;
         }
     }
