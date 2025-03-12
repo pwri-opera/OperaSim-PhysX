@@ -27,18 +27,21 @@ public class DiffDriveController : MonoBehaviour
     private OdometryMsg odomMessage;
 
     [Tooltip("ROSトピック名の頭に付与されるロボット名")]
-    public string robotName = "robot_name";
+    public string robotName = "[robot_name]";
+    private string preprocessedRobotName;
 
     [Tooltip("cmd_velコマンドを受け取るROSトピック名")]
-    public string TwistTopicName = "robot_name/tracks/cmd_vel"; // Subscribe Messsage Topic Name
+    public string TwistTopicName = "[robot_name]/tracks/cmd_vel"; // Subscribe Messsage Topic Name
 
     [Tooltip("オドメトリ情報を出力するROSトピック名")]
-    public string OdomTopicName = "robot_name/odom"; // Publish Message Topic Name
+    public string OdomTopicName = "[robot_name]/odom"; // Publish Message Topic Name
+    private string preprocessedOdomTopicName;
 
-    public string Com3TopicName = "robot_name/tracks_cmd"; // Subscribe Messsage Topic Name
+    public string Com3TopicName = "[robot_name]/tracks_cmd"; // Subscribe Messsage Topic Name
 
     [Tooltip("オドメトリ情報を出力する際に用いられる基準フレーム名")]
-    public string childFrameName = "robot_name/base_link";
+    public string childFrameName = "[robot_name]/base_link";
+    private string preprocessedChildFrameName;
 
     [Tooltip("オドメトリを計算する際にはトレッド幅が用いられます。トレッド幅に係数をかけることで計算を補正できます。")]
     public double treadCollectionFactor = 2.0; // Factor Collecting Yaw angle of base_link. This Parameter is multiplied to tread to calculate angular velocity based on Vehicle's Kinematics.
@@ -136,10 +139,14 @@ public class DiffDriveController : MonoBehaviour
         }
         tread_half = Mathf.Abs(leftWheels[0].transform.localPosition.x - rightWheels[0].transform.localPosition.x)/2;
 
+        preprocessedRobotName = Utils.PreprocessNamespace(this.gameObject, robotName);
+        preprocessedChildFrameName = Utils.PreprocessNamespace(this.gameObject, childFrameName);
+        preprocessedOdomTopicName = Utils.PreprocessNamespace(this.gameObject, OdomTopicName);
+
         Debug.Log("DiffDriveController starts!!");
-        ros.Subscribe<TwistMsg>(TwistTopicName, ExecuteTwist); //Register Subscriber
-        ros.Subscribe<JointCmdMsg>(Com3TopicName, ExecuteJointCmd); //Register Subscriber
-        ros.RegisterPublisher<OdometryMsg>(OdomTopicName); //Register Publisher
+        ros.Subscribe<TwistMsg>(Utils.PreprocessNamespace(this.gameObject, TwistTopicName), ExecuteTwist); //Register Subscriber
+        ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, Com3TopicName), ExecuteJointCmd); //Register Subscriber
+        ros.RegisterPublisher<OdometryMsg>(preprocessedOdomTopicName); //Register Publisher
     }
 
     // Update is called once per frame
@@ -211,11 +218,11 @@ public class DiffDriveController : MonoBehaviour
         
         if (timeElapsed >= publishMessageInterval)
         {
-            odomMessage.header.frame_id = robotName + "_tf/odom";
+            odomMessage.header.frame_id = preprocessedRobotName + "_tf/odom";
             odomMessage.header.stamp = new TimeStamp(Clock.time);
-            odomMessage.child_frame_id = childFrameName;
+            odomMessage.child_frame_id = preprocessedChildFrameName;
 
-            ros.Publish(OdomTopicName, odomMessage);
+            ros.Publish(preprocessedOdomTopicName, odomMessage);
             timeElapsed = 0.0f;
         }
 

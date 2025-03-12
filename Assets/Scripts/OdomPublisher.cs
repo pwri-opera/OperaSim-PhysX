@@ -15,13 +15,16 @@ public class OdomPublisher : MonoBehaviour
     ROSConnection ros;
 
     [Tooltip("ROSメッセージの接頭辞として用いられるロボット名")]
-    public string robotName = "robot_name";
+    public string robotName = "[robot_name]";
+    private string preprocessedRobotName;
 
     [Tooltip("オドメトリ情報を出力するROSトピック名")]
-    public string topicName = "robot_name/diff_drive_controller/odom";
+    public string topicName = "[robot_name]/diff_drive_controller/odom";
+    private string preprocessedTopicName;
  
     [Tooltip("基準座標として設定するフレーム名")]
-    public string childFrameName = "robot_name/base_link";
+    public string childFrameName = "[robot_name]/base_link";
+    private string preprocessedChildFrameName;
  
     private OdometryMsg message;
 
@@ -39,8 +42,12 @@ public class OdomPublisher : MonoBehaviour
         message.header = new HeaderMsg();
         message.header.stamp = new TimeMsg();
 
+        preprocessedRobotName = Utils.PreprocessNamespace(this.gameObject, robotName);
+        preprocessedChildFrameName = Utils.PreprocessNamespace(this.gameObject, childFrameName);
+        preprocessedTopicName = Utils.PreprocessNamespace(this.gameObject, topicName);
+
         ros = ROSConnection.GetOrCreateInstance();
-        ros.RegisterPublisher<OdometryMsg>(topicName);
+        ros.RegisterPublisher<OdometryMsg>(preprocessedTopicName);
     }
 
     // Update is called once per constant rate
@@ -52,9 +59,9 @@ public class OdomPublisher : MonoBehaviour
 
         if (timeElapsed >= publishMessageInterval)
         {
-            message.header.frame_id = robotName + "_tf/odom";
+            message.header.frame_id = preprocessedRobotName + "_tf/odom";
             message.header.stamp = new TimeStamp(Clock.time);
-            message.child_frame_id = childFrameName;
+            message.child_frame_id = preprocessedChildFrameName;
 
             // Unity -> ROS transformation
             //Position: Unity(x,y,z) -> ROS(z,-x,y)
@@ -85,7 +92,7 @@ public class OdomPublisher : MonoBehaviour
 
             message.twist.covariance = new double[] {0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1000.0};
 
-            ros.Publish(topicName, message);
+            ros.Publish(preprocessedTopicName, message);
             timeElapsed = 0.0f;
         }
     }
