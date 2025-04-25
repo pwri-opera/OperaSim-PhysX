@@ -67,24 +67,42 @@ public class Com3FrontController : MonoBehaviour
 
     void OnCommand(JointCmdMsg cmd)
     {
+    
+        float kp = 100f;
+        float kd = 10f;
+
         if (emergencyStop && emergencyStop.isEmergencyStop)
             return;
         currentCmd = cmd;
         for (int i = 0; i < currentCmd.joint_name.Length; i++) {
+            Debug.Log("target");
             try {
                 var joint = joints[currentCmd.joint_name[i]];
                 ArticulationDrive drive = joint.joint.xDrive;
+                Debug.Log(joint.jointtype.GetControlType());
+                
                 switch (joint.jointtype.GetControlType()) {
                     case Com3.ControlType.Velocity:
+
+                        // float q  = (float)joint.joint.jointVelocity[i] * Mathf.Rad2Deg;             
+                        // float dq = (float)joint.joint.jointAcceleration[i] * Mathf.Rad2Deg;             
+                        // float qd = (float)currentCmd.velocity[i] * Mathf.Deg2Rad;   
+
+                        // float torque = kp * (qd - q) - kd * dq;        // PD
+                        // joint.joint.AddTorque(new Vector3(torque, 0, 0));
+
                         drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
+                        Debug.Log("targetVel : " + i + ":" + currentCmd.velocity[i]);
+
                         break;
                     default:
                         drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
+                        Debug.Log("target");
                         break;
                 }
                 joint.joint.xDrive = drive;                
             } catch (KeyNotFoundException) {
-                //Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
+                Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
             }
         }
     }
