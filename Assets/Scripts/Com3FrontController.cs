@@ -47,8 +47,10 @@ public class Com3FrontController : MonoBehaviour
                 if (jointtype.GetControlType() == Com3.ControlType.Velocity) {
                     Debug.Log("Set joint " + ujoint.jointName + " to velocity control.");
                     drive.stiffness = 0;
-                    if (drive.damping == 0)
+                    if (drive.damping == 0) {
                         drive.damping = 1e+25f;
+                        // drive.damping = 0;
+                    }
                 } else {
                     Debug.Log("Set joint " + ujoint.jointName + " to position control.");
                     if (drive.stiffness == 0)
@@ -68,8 +70,8 @@ public class Com3FrontController : MonoBehaviour
     void OnCommand(JointCmdMsg cmd)
     {
     
-        float kp = 100f;
-        float kd = 10f;
+        float kp = 1000000f;
+        float kd = 0f;
 
         if (emergencyStop && emergencyStop.isEmergencyStop)
             return;
@@ -84,23 +86,27 @@ public class Com3FrontController : MonoBehaviour
                 switch (joint.jointtype.GetControlType()) {
                     case Com3.ControlType.Velocity:
 
-                        // float q  = (float)joint.joint.jointVelocity[i] * Mathf.Rad2Deg;             
-                        // float dq = (float)joint.joint.jointAcceleration[i] * Mathf.Rad2Deg;             
-                        // float qd = (float)currentCmd.velocity[i] * Mathf.Deg2Rad;   
+                        float q  = (float)joint.joint.jointVelocity[0];             
+                        float dq = (float)joint.joint.jointAcceleration[0];             
+                        float qd = (float)currentCmd.velocity[i];   
 
-                        // float torque = kp * (qd - q) - kd * dq;        // PD
-                        // joint.joint.AddTorque(new Vector3(torque, 0, 0));
+                        float torque = kp * (qd - q) - kd * dq;        // PD
+                        // torque = 300;        // PD
+                        joint.joint.AddRelativeTorque(new Vector3(0, -torque, 0));
 
-                        drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
-                        Debug.Log("targetVel : " + i + ":" + currentCmd.velocity[i]);
+                        // drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
+                        // Debug.Log("targetVel : " + i + ":" + currentCmd.velocity[i]);
+                        // Debug.Log("currentVel : " + i + ":" + (float)joint.joint.jointVelocity[0]);
+                        // Debug.Log("currentAccVel : " + i + ":" + (float)joint.joint.jointAcceleration[0]);
+                        Debug.Log("InputTorque : " + i + ":" + torque);
 
                         break;
                     default:
                         drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
                         Debug.Log("target");
+                        joint.joint.xDrive = drive;  
                         break;
                 }
-                joint.joint.xDrive = drive;                
             } catch (KeyNotFoundException) {
                 Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
             }
