@@ -49,7 +49,7 @@ uint4 getSafeNeighbors(uint2 coord) {
 float4 angleOfRepose; //actually tan(theta), which is slope (m)
 float4 dxdy; //<dx, dy, 1.0f / dx, 1.0f / dy>
 float InvDiagMag;
-
+#define MAX_ANGLE 10.0
 
 void simulateThermalErosion(uint2 coord) {
 	uint4 neigh = getSafeNeighbors(coord);
@@ -101,17 +101,17 @@ void simulateThermalErosion(uint2 coord) {
 	float tau = angleOfRepose.x;
 
 	float dv = 0.0f; //volume of sediment moved
-	
-	//could probably vectorize this and eliminate the ifs...
-	if (mCardinal.x > tau) { dv += dhCardinal.x; }
-	if (mCardinal.y > tau) { dv += dhCardinal.y; }
-	if (mCardinal.z > tau) { dv += dhCardinal.z; }
-	if (mCardinal.w > tau) { dv += dhCardinal.w; }
 
-	if (mDiagonal.x > tau) { dv += 0.707f * dhDiagonal.x; }
-	if (mDiagonal.y > tau) { dv += 0.707f * dhDiagonal.y; }
-	if (mDiagonal.z > tau) { dv += 0.707f * dhDiagonal.z; }
-	if (mDiagonal.w > tau) { dv += 0.707f * dhDiagonal.w; }
+	//could probably vectorize this and eliminate the ifs...
+	if (mCardinal.x > tau && mCardinal.x < MAX_ANGLE) { dv += dhCardinal.x; }
+	if (mCardinal.y > tau && mCardinal.y < MAX_ANGLE) { dv += dhCardinal.y; }
+	if (mCardinal.z > tau && mCardinal.z < MAX_ANGLE) { dv += dhCardinal.z; }
+	if (mCardinal.w > tau && mCardinal.w < MAX_ANGLE) { dv += dhCardinal.w; }
+
+	if (mDiagonal.x > tau && mDiagonal.x < MAX_ANGLE) { dv += 0.707f * dhDiagonal.x; }
+	if (mDiagonal.y > tau && mDiagonal.y < MAX_ANGLE) { dv += 0.707f * dhDiagonal.y; }
+	if (mDiagonal.z > tau && mDiagonal.z < MAX_ANGLE) { dv += 0.707f * dhDiagonal.z; }
+	if (mDiagonal.w > tau && mDiagonal.w < MAX_ANGLE) { dv += 0.707f * dhDiagonal.w; }
 
 	float halfHeight = 0.5f * TerrainHeightPrev[coord];
 	dv = clamp(0.0625f * dt * dv, -halfHeight, halfHeight);
