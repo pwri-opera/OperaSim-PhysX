@@ -7,7 +7,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: zx120-body_85
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -154,6 +154,7 @@ Mesh:
     m_Center: {x: 0.34765887, y: 0.9161362, z: 2.2392495}
     m_Extent: {x: 0.0072018504, y: 0.005199611, z: 0.0039277077}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
