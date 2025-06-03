@@ -37,7 +37,7 @@ public class DiffDriveController : MonoBehaviour
     public string OdomTopicName = "[robot_name]/odom"; // Publish Message Topic Name
     private string preprocessedOdomTopicName;
 
-    public string Com3TopicName = "[robot_name]/tracks_cmd"; // Subscribe Messsage Topic Name
+    public string Com3TopicName = "[robot_name]/track_cmd"; // Subscribe Messsage Topic Name
 
     [Tooltip("オドメトリ情報を出力する際に用いられる基準フレーム名")]
     public string childFrameName = "[robot_name]/base_link";
