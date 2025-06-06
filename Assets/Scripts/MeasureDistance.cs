@@ -1,5 +1,7 @@
 using UnityEngine;
-
+/// <summary>
+/// 二つのオブジェクト間の距離（x方向, y方向, z方向及びそれらのノルム）を取得する
+/// </summary>
 public class DistanceCalculator : MonoBehaviour
 {
     public GameObject object1;
