@@ -31,18 +31,20 @@ public class Com3FrontController : MonoBehaviour
 
     private EmergencyStop emergencyStop;
 
-
     // 型エイリアス
-
     // 各ジョイントごとのバッファ
     private Dictionary<string, Queue<DataSample>> inputJointsQueue = new Dictionary<string, Queue<DataSample>>();
 
     private double unityDeadTime = 40.0f; // msec
-    private double internalDeadTime; // msec
+    // private double internalDeadTime; // msec
 
     private Dictionary<string, double> joints_dt;
 
-    static readonly ProfilerCounterValue<double> k_JointAngleBoom = new(ProfilerCategory.Scripts, "Joint Angle Boom",
+    // Unity Profiler 用
+    static readonly ProfilerCounterValue<double> k_JointAngleBoom = new(ProfilerCategory.Scripts, "Joint Angle Arm",
+        ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
+
+    static readonly ProfilerCounterValue<double> k_JointAngleBoom_2 = new(ProfilerCategory.Scripts, "Joint Angle Arm (after dead time)",
         ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
 
     // Start is called before the first frame update
@@ -96,44 +98,71 @@ public class Com3FrontController : MonoBehaviour
             }
         }
 
-        if (enableDeadTime == false)
-        {
-            Debug.Log("Normal Mode");
-            ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), OnCommand);
-        }
-        else
-        {
-            Debug.Log("Dead Time Mode");
-            ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), AddInputData);
-        }        
+        // if (enableDeadTime == false)
+        // {
+        //     Debug.Log("Normal Mode");
+        ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), OnCommand);
+        // }
+        // else
+        // {
+        //     Debug.Log("Dead Time Mode");
+        //     ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), AddInputData);
+        // }        
     }
 
     void OnCommand(JointCmdMsg cmd)
     {
         if (emergencyStop && emergencyStop.isEmergencyStop)
             return;
+
         currentCmd = cmd;
+        float currentTime = Time.time * 1000; // sec -> msec
+
+        k_JointAngleBoom.Value = currentCmd.position[2] * Mathf.Rad2Deg;
+        Debug.Log("arm_joint Angle: " + currentCmd.position[1] * Mathf.Rad2Deg);
+
         for (int i = 0; i < currentCmd.joint_name.Length; i++)
         {
             try
             {
-                var joint = joints[currentCmd.joint_name[i]];
-                ArticulationDrive drive = joint.joint.xDrive;
-                switch (joint.jointtype.GetControlType())
+                if (joints_dt[currentCmd.joint_name[i]] != 0.0)
                 {
-                    case Com3.ControlType.Velocity:
-                        drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
-                        break;
-                    default:
-                        if (currentCmd.joint_name[i] == "boom_joint")
-                        {
-                            k_JointAngleBoom.Value = drive.target;
-                            Debug.Log("Angle: " + currentCmd.position[i] * Mathf.Rad2Deg);
-                        }
-                        drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
-                        break;
+                    var joint = joints[currentCmd.joint_name[i]];
+                    ArticulationDrive drive = joint.joint.xDrive;
+                    switch (joint.jointtype.GetControlType())
+                    {
+                        case Com3.ControlType.Velocity:
+                            // Queue にデータを push (velocity)
+                            inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.velocity[i]));
+                            break;
+                        default:
+                            // Queue にデータを push (position)
+                            // if (currentCmd.joint_name[i] == "boom_joint")
+                            // {
+                            //     k_JointAngleBoom.Value = -currentCmd.position[i];
+                            //     Debug.Log("is_call_error: " + currentCmd.position[i]);
+                            // }
+                            inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.position[i]));
+                            break;
+                    }
+                    joint.joint.xDrive = drive;
                 }
-                joint.joint.xDrive = drive;
+                else
+                {
+                    var joint = joints[currentCmd.joint_name[i]];
+                    ArticulationDrive drive = joint.joint.xDrive;
+                    switch (joint.jointtype.GetControlType())
+                    {
+                        case Com3.ControlType.Velocity:
+                            drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
+                            break;
+                        default:
+                            drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
+                            break;
+                    }
+                    joint.joint.xDrive = drive;
+
+                }
             }
             catch (KeyNotFoundException)
             {
@@ -145,40 +174,49 @@ public class Com3FrontController : MonoBehaviour
 
     // ----- Functions for controlling with dead time ----- //
 
-    void AddInputData(JointCmdMsg cmd)
-    {
-        currentCmd = cmd;
-        float currentTime = Time.time * 1000; // sec -> msec
+    // void AddInputData(JointCmdMsg cmd)
+    // {
+    //     currentCmd = cmd;
+    //     float currentTime = Time.time * 1000; // sec -> msec
 
-        for (int i = 0; i < currentCmd.joint_name.Length; i++)
-        {
-            try
-            {
-                var joint = joints[currentCmd.joint_name[i]];
-                ArticulationDrive drive = joint.joint.xDrive;
-                switch (joint.jointtype.GetControlType())
-                {
-                    case Com3.ControlType.Velocity:
-                        // Queue にデータを push (velocity)
-                        inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.velocity[i]));
-                        break;
-                    default:
-                        // Queue にデータを push (position)
-                        inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.position[i]));
-                        break;
-                }
-                joint.joint.xDrive = drive;
-            }
-            catch (KeyNotFoundException)
-            {
-                //Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
-            }
-        }
+    //     for (int i = 0; i < currentCmd.joint_name.Length; i++)
+    //     {
+    //         try
+    //         {
+    //             var joint = joints[currentCmd.joint_name[i]];
+    //             ArticulationDrive drive = joint.joint.xDrive;
+    //             switch (joint.jointtype.GetControlType())
+    //             {
+    //                 case Com3.ControlType.Velocity:
+    //                     // Queue にデータを push (velocity)
+    //                     inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.velocity[i]));
+    //                     break;
+    //                 default:
+    //                     // Queue にデータを push (position)
+    //                     if (currentCmd.joint_name[i] == "boom_joint")
+    //                     {
+    //                         k_JointAngleBoom.Value = currentCmd.position[i];
+    //                         // Debug.Log("Angle: " + currentCmd.position[i]);
+    //                     }
+    //                     inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.position[i]));
+    //                     Debug.Log("is_call_3?: " + inputJointsQueue[currentCmd.joint_name[i]].Count);
+    //                     break;
+    //             }
+    //             joint.joint.xDrive = drive;
+    //         }
+    //         catch (KeyNotFoundException)
+    //         {
+    //             //Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
+    //         }
+    //     }
 
-    }
+    // }
 
     void FixedUpdate()
     {
+        k_JointAngleBoom_2.Value = joints["arm_joint"].joint.xDrive.target;
+        Debug.Log("arm_joint Angle: " + joints["arm_joint"].joint.xDrive.target);
+
         double data_sample = 0.0f;
 
         if (emergencyStop && emergencyStop.isEmergencyStop)
@@ -191,21 +229,26 @@ public class Com3FrontController : MonoBehaviour
             {
                 if (joints_dt[currentCmd.joint_name[i]] == 0)
                 {
+                    // Debug.Log("is_call_name: " + currentCmd.joint_name[i]);
                     return;
                 }
                 var joint = joints[currentCmd.joint_name[i]];
                 var queue = inputJointsQueue[currentCmd.joint_name[i]];
+                // Debug.Log("is_call_2?: " + queue.Count);
+
                 // データ取り出し
-                // 疑似的なスレッドを使えると while を入れずに済む？            
+                // 疑似的なスレッドを使えると while を入れずに済む？ 
+                // Debug.Log("internalDeadTime: " + joints_dt[currentCmd.joint_name[i]]);
                 while (queue.Count > 0)
                 {
                     var (timestamp, data) = queue.Peek();
-                    if ((Time.time * 1000 - timestamp) >= internalDeadTime)
+                    if ((Time.time * 1000 - timestamp) >= joints_dt[currentCmd.joint_name[i]])
                     {
                         data_sample = data;
                         inputJointsQueue[currentCmd.joint_name[i]].Dequeue();
+                        // Debug.Log("is_call?");
                     }
-                    else if (queue.Count <= 0 || (Time.time - timestamp) < internalDeadTime)
+                    else if (queue.Count <= 0 || (Time.time - timestamp) < joints_dt[currentCmd.joint_name[i]])
                     {
                         break;
                     }
@@ -213,20 +256,24 @@ public class Com3FrontController : MonoBehaviour
                     {
                         break;
                     }
-                }
 
-                // 関節を駆動
+                    // 関節を駆動
                     ArticulationDrive drive = joint.joint.xDrive;
-                switch (joint.jointtype.GetControlType())
-                {
-                    case Com3.ControlType.Velocity:
-                        drive.targetVelocity = (float)data_sample * Mathf.Rad2Deg;
-                        break;
-                    default:
-                        drive.target = (float)data_sample * Mathf.Rad2Deg;
-                        break;
+                    switch (joint.jointtype.GetControlType())
+                    {
+                        case Com3.ControlType.Velocity:
+                            drive.targetVelocity = (float)data_sample * Mathf.Rad2Deg;
+                            break;
+                        default:
+                            // if (currentCmd.joint_name[i] == "boom_joint")
+                            // {
+                            //     Debug.Log("Angle: " + data_sample);
+                            // }
+                            drive.target = (float)data_sample * Mathf.Rad2Deg;
+                            break;
+                    }
+                    joint.joint.xDrive = drive;
                 }
-                joint.joint.xDrive = drive;
             }
             catch (KeyNotFoundException)
             {
