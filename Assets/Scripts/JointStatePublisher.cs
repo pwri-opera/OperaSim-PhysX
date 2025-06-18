@@ -7,6 +7,7 @@ using RosMessageTypes.Std;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.UrdfImporter;
 using Unity.Robotics.Core;
+using Unity.Profiling;
 
 /// <summary>
 /// 各関節角度の現在値をjoint_statesトピックとして出力する
@@ -32,6 +33,9 @@ public class JointStatePublisher : MonoBehaviour
 
     // Used to determine how much time has elapsed since the last message was published
     private float timeElapsed;
+
+    static readonly ProfilerCounterValue<double> k_RealtimeFactor = new(ProfilerCategory.Scripts, "Joint State (Arm)",
+        ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
 
     // Start is called before the first frame update
     void Start()
@@ -78,7 +82,10 @@ public class JointStatePublisher : MonoBehaviour
                 message.position[i] = joints[i].jointPosition[0];
                 message.velocity[i] = joints[i].jointVelocity[0];
                 message.effort[i] = enableJointEffortSensor ? joints[i].driveForce[0] : 0.0;
+                // Debug.Log("i: " + i);
             }
+            k_RealtimeFactor.Value = message.position[2] * Mathf.Rad2Deg;
+            // k_RealtimeFactor.Value = message.position[2] * Mathf.Rad2Deg;
             ros.Publish(preprocessedTopicName, message);
             timeElapsed = 0.0f;
         }
