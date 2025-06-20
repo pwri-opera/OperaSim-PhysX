@@ -1514,6 +1514,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.x
       value: -0.501621
       objectReference: {fileID: 0}
+    - target: {fileID: 6014845831407721769, guid: c12a7b61b5050d61bbdc6698f0017fae, type: 3}
+      propertyPath: _coordinateSystem
+      value: 
+      objectReference: {fileID: 1700391021}
     - target: {fileID: 6108721830143676322, guid: c12a7b61b5050d61bbdc6698f0017fae, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -1599,6 +1603,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c12a7b61b5050d61bbdc6698f0017fae, type: 3}
+--- !u!114 &1700391021 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6658069106543365611, guid: bfbdcabf0c3de544d92e2b824ec5a3a6, type: 3}
+  m_PrefabInstance: {fileID: 463301759}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f2116b7f84275c4d877f9ac14990716, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1796672308
 PrefabInstance:
   m_ObjectHideFlags: 0
