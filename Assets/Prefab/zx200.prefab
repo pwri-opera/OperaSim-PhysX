@@ -43,7 +43,7 @@ Transform:
   - {fileID: 6412660796302326879}
   - {fileID: 5366237281312768854}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: -89.589, z: 0}
 --- !u!114 &1725495770091932613
 MonoBehaviour:
@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00f7ba05af3df4dff8b17f595405ef28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: zx200/joint_state
+  topicName: zx200/front/joint_states
   enableJointEffortSensor: 0
   publishMessageInterval: 0.04
 --- !u!114 &3686397559774379334
