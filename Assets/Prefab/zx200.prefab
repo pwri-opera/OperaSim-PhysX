@@ -43,7 +43,7 @@ Transform:
   - {fileID: 6412660796302326879}
   - {fileID: 5366237281312768854}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -89.589, z: 0}
 --- !u!114 &1725495770091932613
 MonoBehaviour:
@@ -17956,7 +17956,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7660156099892221445}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 678c269cf858a4c23a7fcf6214780542, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
