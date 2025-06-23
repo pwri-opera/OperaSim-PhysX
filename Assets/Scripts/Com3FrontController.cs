@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Com3;
 using Unity.Robotics.UrdfImporter;
+using Unity.Profiling;  // Profile 用
 
 public class Com3JointInfo
 {
@@ -26,6 +27,10 @@ public class Com3FrontController : MonoBehaviour
     public string com3FrontControllerTopicName = "[robot_name]/front_cmd";
 
     private EmergencyStop emergencyStop;
+
+    // Unity Profiler 用
+    static readonly ProfilerCounterValue<double> k_JointAngleArm = new(ProfilerCategory.Scripts, "Joint Angle Arm",
+        ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
 
     // Start is called before the first frame update
     void Start()
@@ -70,11 +75,16 @@ public class Com3FrontController : MonoBehaviour
         if (emergencyStop && emergencyStop.isEmergencyStop)
             return;
         currentCmd = cmd;
-        for (int i = 0; i < currentCmd.joint_name.Length; i++) {
-            try {
+        
+        k_JointAngleArm.Value = currentCmd.position[2] * Mathf.Rad2Deg;
+        for (int i = 0; i < currentCmd.joint_name.Length; i++)
+        {
+            try
+            {
                 var joint = joints[currentCmd.joint_name[i]];
                 ArticulationDrive drive = joint.joint.xDrive;
-                switch (joint.jointtype.GetControlType()) {
+                switch (joint.jointtype.GetControlType())
+                {
                     case Com3.ControlType.Velocity:
                         drive.targetVelocity = (float)currentCmd.velocity[i] * Mathf.Rad2Deg;
                         break;
@@ -82,8 +92,10 @@ public class Com3FrontController : MonoBehaviour
                         drive.target = (float)currentCmd.position[i] * Mathf.Rad2Deg;
                         break;
                 }
-                joint.joint.xDrive = drive;                
-            } catch (KeyNotFoundException) {
+                joint.joint.xDrive = drive;
+            }
+            catch (KeyNotFoundException)
+            {
                 //Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
             }
         }
