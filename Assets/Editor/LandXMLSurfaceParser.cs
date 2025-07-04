@@ -1,3 +1,5 @@
+using UnityEditor;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -48,6 +50,8 @@ public class Surface
 
 public class LandXMLSurfaceParser
 {
+    public static LandXMLUnits Units { get; private set; }
+
     public static List<Surface> ParseSurfaces(string xmlFilePath)
     {
         var surfaces = new List<Surface>();
@@ -55,6 +59,14 @@ public class LandXMLSurfaceParser
         // Load the XML file
         XDocument doc = XDocument.Load(xmlFilePath);
         XNamespace ns = "http://www.landxml.org/schema/LandXML-1.1";
+
+        // Parse Units first
+        var unitsElement = doc.Root?.Element(ns + "Units");
+        Units = LandXMLUnits.Parse(unitsElement);
+        if (Units == null)
+        {
+            Debug.LogWarning("No units information found in LandXML file. Using raw values.");
+        }
 
         // Find all Surface elements
         var surfaceElements = doc.Descendants(ns + "Surface");
@@ -88,12 +100,24 @@ public class LandXMLSurfaceParser
 
                         if (coordinates.Count >= 3)
                         {
+                            float x = (float)coordinates[0];
+                            float y = (float)coordinates[1];
+                            float z = (float)coordinates[2];
+
+                            // Convert to meters if units are available
+                            if (Units != null)
+                            {
+                                x = Units.ConvertLinearValue(x);
+                                y = Units.ConvertLinearValue(y);
+                                z = Units.ConvertLinearValue(z);
+                            }
+
                             surface.Points.Add(new Point3D
                             {
                                 Id = p.Attribute("id")?.Value ?? "",
-                                X = coordinates[0],
-                                Y = coordinates[1],
-                                Z = coordinates[2]
+                                X = x,
+                                Y = y,
+                                Z = z
                             });
                         }
                     }
