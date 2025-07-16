@@ -6,10 +6,10 @@ using UnityEngine;
 public class DeadTime : MonoBehaviour
 {
     [Tooltip("入力に対するむだ時間 (msec) \n40 msec 以上に設定")]
-    [Min(40)] public double deadtime;
+    [Min(0)] public double deadtime;
 
     private double internalDeadTime;
-    private double unityDeadTime = 40.0f; // msec
+    private double unityDeadTime = 0.0f; // msec
 
     public double GetDeadTime()
     {
