@@ -172,46 +172,8 @@ public class Com3FrontController : MonoBehaviour
     }
 
 
+
     // ----- Functions for controlling with dead time ----- //
-
-    // void AddInputData(JointCmdMsg cmd)
-    // {
-    //     currentCmd = cmd;
-    //     float currentTime = Time.time * 1000; // sec -> msec
-
-    //     for (int i = 0; i < currentCmd.joint_name.Length; i++)
-    //     {
-    //         try
-    //         {
-    //             var joint = joints[currentCmd.joint_name[i]];
-    //             ArticulationDrive drive = joint.joint.xDrive;
-    //             switch (joint.jointtype.GetControlType())
-    //             {
-    //                 case Com3.ControlType.Velocity:
-    //                     // Queue にデータを push (velocity)
-    //                     inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.velocity[i]));
-    //                     break;
-    //                 default:
-    //                     // Queue にデータを push (position)
-    //                     if (currentCmd.joint_name[i] == "boom_joint")
-    //                     {
-    //                         k_JointAngleBoom.Value = currentCmd.position[i];
-    //                         // Debug.Log("Angle: " + currentCmd.position[i]);
-    //                     }
-    //                     inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.position[i]));
-    //                     Debug.Log("is_call_3?: " + inputJointsQueue[currentCmd.joint_name[i]].Count);
-    //                     break;
-    //             }
-    //             joint.joint.xDrive = drive;
-    //         }
-    //         catch (KeyNotFoundException)
-    //         {
-    //             //Debug.LogWarning("Joint " + currentCmd.joint_name[i] + " not found.");
-    //         }
-    //     }
-
-    // }
-
     void FixedUpdate()
     {
         k_JointAngleBoom_2.Value = joints["arm_joint"].joint.xDrive.target;
