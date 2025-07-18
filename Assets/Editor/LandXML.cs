@@ -1,10 +1,14 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 public class LandXML : EditorWindow
 {
     public string landXMLFilePath;
+    public List<Surface> landXMLSurfaces;
+    private Dictionary<string, Color> surfaceColors;
 
     [MenuItem("OPERA/Import/LandXML")]
     static void OpenFilePanel()
@@ -13,23 +17,41 @@ public class LandXML : EditorWindow
         if (string.IsNullOrEmpty(path))
             return;
 
-        LandXML window = (LandXML)EditorWindow.GetWindow(typeof(LandXML));
-        window.landXMLFilePath = path;
-        window.Show();
+        try {
+            var landXMLSurfaces = LandXMLSurfaceParser.ParseSurfaces(path);
+            LandXML window = (LandXML)EditorWindow.GetWindow(typeof(LandXML));
+            window.landXMLFilePath = path;
+            window.landXMLSurfaces = landXMLSurfaces;
+            window.Show();
+        } catch (Exception e) {
+            Debug.LogError(e.Message);
+            EditorUtility.DisplayDialog("Error", "Failed to parse LandXML file:\n" + e.Message, "OK");
+            return;
+        }
     }
 
     LandXML() {
+        surfaceColors = new Dictionary<string, Color>();
     }
 
     void OnGUI()
     {
         GUILayout.Label("LandXML Path: " + landXMLFilePath);
+        GUILayout.Label("Number of Surfaces: " + landXMLSurfaces.Count);
         GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
-        GUILayout.Label("Import Setting", EditorStyles.boldLabel);
-        GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+
+        for (int i = 0; i < landXMLSurfaces.Count; i++) {
+            GUILayout.Label("Surface " + i + ": " + landXMLSurfaces[i].Name);
+            // color picker for each surface
+            if (!surfaceColors.ContainsKey(landXMLSurfaces[i].Name)) {
+                surfaceColors[landXMLSurfaces[i].Name] = Color.blue;
+            }
+            surfaceColors[landXMLSurfaces[i].Name] = EditorGUILayout.ColorField("Color", surfaceColors[landXMLSurfaces[i].Name]);
+            GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+        }
         // create button to process the data
         if (GUILayout.Button("Import")) {
-            var landXMLData = LandXMLSurfaceParser.ParseSurfaces(landXMLFilePath);
+            var landXMLData = landXMLSurfaces;
 
             // calculate max and min of each xyz axes
             double minX = double.MaxValue;
@@ -62,6 +84,9 @@ public class LandXML : EditorWindow
                 // Create mesh for each surface
                 GameObject surfaceObject = LandXMLMeshConverter.CreateMeshFromSurface(surface, new Vector3((float)center_x, (float)center_y, (float)center_z));
                 surfaceObject.transform.SetParent(parentObject.transform, false);
+                
+                // set color
+                surfaceObject.GetComponent<MeshRenderer>().material.color = surfaceColors[surface.Name];
                 
                 Debug.Log($"Created mesh for surface: {surface.Name}");
                 Debug.Log($"Points: {surface.Points.Count}, Faces: {surface.Faces.Count}");
