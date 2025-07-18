@@ -118,6 +118,8 @@ public class Object2Terrain : EditorWindow
 
         terrain.SetHeights(0, 0, heights);
 
+        terrainObject.transform.position = bounds.min;
+
         EditorUtility.ClearProgressBar();
 
         if (cleanUp != null)
