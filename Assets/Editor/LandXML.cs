@@ -44,7 +44,7 @@ public class LandXML : EditorWindow
             GUILayout.Label("Surface " + i + ": " + landXMLSurfaces[i].Name);
             // color picker for each surface
             if (!surfaceColors.ContainsKey(landXMLSurfaces[i].Name)) {
-                surfaceColors[landXMLSurfaces[i].Name] = Color.blue;
+                surfaceColors[landXMLSurfaces[i].Name] = new Color(0, 0, 1, 0.5f);  // default color is transparent blue
             }
             surfaceColors[landXMLSurfaces[i].Name] = EditorGUILayout.ColorField("Color", surfaceColors[landXMLSurfaces[i].Name]);
             GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
@@ -83,20 +83,36 @@ public class LandXML : EditorWindow
             {
                 // Create mesh for each surface
                 GameObject surfaceObject = LandXMLMeshConverter.CreateMeshFromSurface(surface, new Vector3((float)center_x, (float)center_y, (float)center_z));
-                surfaceObject.transform.SetParent(parentObject.transform, false);
                 
+                var renderer = surfaceObject.GetComponent<MeshRenderer>();
+                var color = surfaceColors[surface.Name];
+
+                // make transparent
+                renderer.sharedMaterial.SetFloat("_Mode", 2);
+                if (color.a < 1)
+                {
+                    renderer.sharedMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    renderer.sharedMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                }
+                renderer.sharedMaterial.SetInt("_ZWrite", 1);
+                renderer.sharedMaterial.DisableKeyword("_ALPHATEST_ON");
+                renderer.sharedMaterial.EnableKeyword("_ALPHABLEND_ON");
+                renderer.sharedMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+
                 // set color
-                surfaceObject.GetComponent<MeshRenderer>().material.color = surfaceColors[surface.Name];
-                
+                renderer.sharedMaterial.SetColor("_Color", color);
+
+                renderer.sharedMaterial.renderQueue = -1;
+
+                surfaceObject.transform.SetParent(parentObject.transform, false);
+
                 Debug.Log($"Created mesh for surface: {surface.Name}");
                 Debug.Log($"Points: {surface.Points.Count}, Faces: {surface.Faces.Count}");
             }
 
             // Select the parent object in the hierarchy
             Selection.activeGameObject = parentObject;
-        }
 
-        if (GUILayout.Button("Close")) {
             Close();
         }
     }
