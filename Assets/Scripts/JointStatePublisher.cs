@@ -82,10 +82,7 @@ public class JointStatePublisher : MonoBehaviour
                 message.position[i] = joints[i].jointPosition[0];
                 message.velocity[i] = joints[i].jointVelocity[0];
                 message.effort[i] = enableJointEffortSensor ? joints[i].driveForce[0] : 0.0;
-                // Debug.Log("i: " + i);
             }
-            k_RealtimeFactor.Value = message.position[2] * Mathf.Rad2Deg;
-            // k_RealtimeFactor.Value = message.position[2] * Mathf.Rad2Deg;
             ros.Publish(preprocessedTopicName, message);
             timeElapsed = 0.0f;
         }
