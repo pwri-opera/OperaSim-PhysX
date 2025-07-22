@@ -70,8 +70,6 @@ public class Com3FrontController : MonoBehaviour
                 // むだ時間制御用データバッファインスタンス作成（各関節）
                 inputJointsQueue.Add(ujoint.jointName, new Queue<DataSample>());
 
-                // Debug.Log("Set joint dead time " + ujoint.jointName +  jointdt.GetDeadTime() + ".");
-
                 ArticulationDrive drive = joint.xDrive;
                 if (jointtype.GetControlType() == Com3.ControlType.Effort)
                 {
@@ -97,17 +95,7 @@ public class Com3FrontController : MonoBehaviour
                 joint.xDrive = drive;
             }
         }
-
-        // if (enableDeadTime == false)
-        // {
-        //     Debug.Log("Normal Mode");
-        ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), OnCommand);
-        // }
-        // else
-        // {
-        //     Debug.Log("Dead Time Mode");
-        //     ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), AddInputData);
-        // }        
+        ros.Subscribe<JointCmdMsg>(Utils.PreprocessNamespace(this.gameObject, com3FrontControllerTopicName), OnCommand); 
     }
 
     void OnCommand(JointCmdMsg cmd)
@@ -132,16 +120,9 @@ public class Com3FrontController : MonoBehaviour
                     switch (joint.jointtype.GetControlType())
                     {
                         case Com3.ControlType.Velocity:
-                            // Queue にデータを push (velocity)
                             inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.velocity[i]));
                             break;
                         default:
-                            // Queue にデータを push (position)
-                            // if (currentCmd.joint_name[i] == "boom_joint")
-                            // {
-                            //     k_JointAngleBoom.Value = -currentCmd.position[i];
-                            //     Debug.Log("is_call_error: " + currentCmd.position[i]);
-                            // }
                             inputJointsQueue[currentCmd.joint_name[i]].Enqueue((currentTime, currentCmd.position[i]));
                             break;
                     }
@@ -191,12 +172,10 @@ public class Com3FrontController : MonoBehaviour
             {
                 if (joints_dt[currentCmd.joint_name[i]] == 0)
                 {
-                    // Debug.Log("is_call_name: " + currentCmd.joint_name[i]);
                     return;
                 }
                 var joint = joints[currentCmd.joint_name[i]];
                 var queue = inputJointsQueue[currentCmd.joint_name[i]];
-                // Debug.Log("is_call_2?: " + queue.Count);
 
                 // データ取り出し
                 // 疑似的なスレッドを使えると while を入れずに済む？ 
@@ -208,7 +187,6 @@ public class Com3FrontController : MonoBehaviour
                     {
                         data_sample = data;
                         inputJointsQueue[currentCmd.joint_name[i]].Dequeue();
-                        // Debug.Log("is_call?");
                     }
                     else if (queue.Count <= 0 || (Time.time - timestamp) < joints_dt[currentCmd.joint_name[i]])
                     {
@@ -227,10 +205,6 @@ public class Com3FrontController : MonoBehaviour
                             drive.targetVelocity = (float)data_sample * Mathf.Rad2Deg;
                             break;
                         default:
-                            // if (currentCmd.joint_name[i] == "boom_joint")
-                            // {
-                            //     Debug.Log("Angle: " + data_sample);
-                            // }
                             drive.target = (float)data_sample * Mathf.Rad2Deg;
                             break;
                     }
