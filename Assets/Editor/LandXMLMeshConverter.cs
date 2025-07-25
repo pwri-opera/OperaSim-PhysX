@@ -32,9 +32,23 @@ public class LandXMLMeshConverter
             {
                 // Subtract 1 from indices because LandXML uses 1-based indexing
                 // while Unity uses 0-based indexing
-                triangles.Add(face.VertexIndices[0] - 1);
-                triangles.Add(face.VertexIndices[1] - 1);
-                triangles.Add(face.VertexIndices[2] - 1);
+                int idx0 = face.VertexIndices[0] - 1;
+                int idx1 = face.VertexIndices[1] - 1;
+                int idx2 = face.VertexIndices[2] - 1;
+
+                // Validate indices are within bounds
+                if (idx0 >= 0 && idx0 < vertices.Length &&
+                    idx1 >= 0 && idx1 < vertices.Length &&
+                    idx2 >= 0 && idx2 < vertices.Length)
+                {
+                    triangles.Add(idx0);
+                    triangles.Add(idx1);
+                    triangles.Add(idx2);
+                }
+                else
+                {
+                    Debug.LogWarning($"Skipping invalid face with indices: {idx0}, {idx1}, {idx2} (vertex count: {vertices.Length})");
+                }
             }
         }
         
