@@ -58,7 +58,10 @@ public class LandXMLSurfaceParser
         
         // Load the XML file
         XDocument doc = XDocument.Load(xmlFilePath);
-        XNamespace ns = "http://www.landxml.org/schema/LandXML-1.1";
+
+        // Read namespace from the XML file (assumes xmlns="http://www.landxml.org/schema/LandXML/1.2")
+        var ns_string = doc.Root?.Attribute("xmlns")?.Value;
+        XNamespace ns = ns_string != null ? XNamespace.Get(ns_string) : XNamespace.None;
 
         // Parse Units first
         var unitsElement = doc.Root?.Element(ns + "Units");
