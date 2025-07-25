@@ -2,16 +2,17 @@ using UnityEditor;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using System.Xml;
 using System.Linq;
 using System.Globalization;
+using System.IO;
 
 public class Point3D
 {
     public double X { get; set; }
     public double Y { get; set; }
     public double Z { get; set; }
-    public string Id { get; set; }
+    public int Id { get; set; }
 
     public override string ToString()
     {
@@ -52,100 +53,120 @@ public class LandXMLSurfaceParser
 {
     public static LandXMLUnits Units { get; private set; }
 
-    public static List<Surface> ParseSurfaces(string xmlFilePath)
+    public static List<Surface> ParseSurfaces(string xmlFilePath, Action<float> progressCallback)
     {
         var surfaces = new List<Surface>();
-        
-        // Load the XML file
-        XDocument doc = XDocument.Load(xmlFilePath);
+        Surface currentSurface = null;
 
-        // Read namespace from the XML file (assumes xmlns="http://www.landxml.org/schema/LandXML/1.2")
-        var ns_string = doc.Root?.Attribute("xmlns")?.Value;
-        XNamespace ns = ns_string != null ? XNamespace.Get(ns_string) : XNamespace.None;
-
-        // Parse Units first
-        var unitsElement = doc.Root?.Element(ns + "Units");
-        Units = LandXMLUnits.Parse(unitsElement);
-        if (Units == null)
+        using (var reader = XmlReader.Create(xmlFilePath))
         {
-            Debug.LogWarning("No units information found in LandXML file. Using raw values.");
-        }
+            string xmlns = null;
 
-        // Find all Surface elements
-        var surfaceElements = doc.Descendants(ns + "Surface");
-
-        foreach (var surfaceElement in surfaceElements)
-        {
-            var surface = new Surface
+            // Find the root element and get the namespace
+            while (reader.Read())
             {
-                Name = surfaceElement.Attribute("name")?.Value ?? "",
-                Description = surfaceElement.Attribute("desc")?.Value ?? ""
-            };
-
-            // Get the Definition element
-            var definition = surfaceElement.Element(ns + "Definition");
-            if (definition != null)
-            {
-                surface.Area2D = double.Parse(definition.Attribute("area2DSurf")?.Value ?? "0", CultureInfo.InvariantCulture);
-                surface.Area3D = double.Parse(definition.Attribute("area3DSurf")?.Value ?? "0", CultureInfo.InvariantCulture);
-                surface.MaxElevation = double.Parse(definition.Attribute("elevMax")?.Value ?? "0", CultureInfo.InvariantCulture);
-                surface.MinElevation = double.Parse(definition.Attribute("elevMin")?.Value ?? "0", CultureInfo.InvariantCulture);
-
-                // Parse Points
-                var pointsElement = definition.Element(ns + "Pnts");
-                if (pointsElement != null)
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "LandXML")
                 {
-                    foreach (var p in pointsElement.Elements(ns + "P"))
-                    {
-                        var coordinates = p.Value.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                                         .Select(c => double.Parse(c, CultureInfo.InvariantCulture))
-                                         .ToList();
-
-                        if (coordinates.Count >= 3)
-                        {
-                            float x = (float)coordinates[0];
-                            float y = (float)coordinates[1];
-                            float z = (float)coordinates[2];
-
-                            // Convert to meters if units are available
-                            if (Units != null)
-                            {
-                                x = Units.ConvertLinearValue(x);
-                                y = Units.ConvertLinearValue(y);
-                                z = Units.ConvertLinearValue(z);
-                            }
-
-                            surface.Points.Add(new Point3D
-                            {
-                                Id = p.Attribute("id")?.Value ?? "",
-                                X = x,
-                                Y = y,
-                                Z = z
-                            });
-                        }
-                    }
-                }
-
-                // Parse Faces
-                var facesElement = definition.Element(ns + "Faces");
-                if (facesElement != null)
-                {
-                    foreach (var f in facesElement.Elements(ns + "F"))
-                    {
-                        var indices = f.Value.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                                     .Select(int.Parse)
-                                     .ToList();
-
-                        surface.Faces.Add(new Face
-                        {
-                            VertexIndices = indices,
-                            Neighbors = f.Attribute("n")?.Value ?? ""
-                        });
-                    }
+                    xmlns = reader.GetAttribute("xmlns");
+                    break;
                 }
             }
 
-            surfaces.Add(surface);
+            while (reader.Read())
+            {
+                // progress is remaining stream length / total stream length
+                float progress = 0f; //(float)(reader.Length - reader.Position) / reader.Length;
+                //progressCallback(progress);
+
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    switch (reader.Name)
+                    {
+                        case "Units":
+                            Units = LandXMLUnits.Parse(reader);
+                            if (Units == null)
+                            {
+                                Debug.LogWarning("No units information found in LandXML file. Using raw values.");
+                            }
+                            break;
+
+                        case "Surface":
+                            currentSurface = new Surface
+                            {
+                                Name = reader.GetAttribute("name") ?? "",
+                                Description = reader.GetAttribute("desc") ?? ""
+                            };
+                            break;
+
+                        case "Definition":
+                            if (currentSurface != null)
+                            {
+                                currentSurface.Area2D = double.Parse(reader.GetAttribute("area2DSurf") ?? "0", CultureInfo.InvariantCulture);
+                                currentSurface.Area3D = double.Parse(reader.GetAttribute("area3DSurf") ?? "0", CultureInfo.InvariantCulture);
+                                currentSurface.MaxElevation = double.Parse(reader.GetAttribute("elevMax") ?? "0", CultureInfo.InvariantCulture);
+                                currentSurface.MinElevation = double.Parse(reader.GetAttribute("elevMin") ?? "0", CultureInfo.InvariantCulture);
+                            }
+                            break;
+
+                        case "P":
+                            if (currentSurface != null)
+                            {
+                                int id = int.Parse(reader.GetAttribute("id") ?? "0");
+                                string pointData = reader.ReadElementContentAsString();
+                                var coordinates = pointData.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                         .Select(c => double.Parse(c, CultureInfo.InvariantCulture))
+                                                         .ToList();
+
+                                if (coordinates.Count >= 3)
+                                {
+                                    float x = (float)coordinates[0];
+                                    float y = (float)coordinates[1];
+                                    float z = (float)coordinates[2];
+
+                                    if (Units != null)
+                                    {
+                                        x = Units.ConvertLinearValue(x);
+                                        y = Units.ConvertLinearValue(y);
+                                        z = Units.ConvertLinearValue(z);
+                                    }
+
+                                    currentSurface.Points.Add(new Point3D
+                                    {
+                                        Id = id,
+                                        X = x,
+                                        Y = y,
+                                        Z = z
+                                    });
+                                }
+                            }
+                            break;
+
+                        case "F":
+                            if (currentSurface != null)
+                            {
+                                string faceData = reader.ReadElementContentAsString();
+                                var indices = faceData.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                   .Select(int.Parse)
+                                                   .ToList();
+
+                                currentSurface.Faces.Add(new Face
+                                {
+                                    VertexIndices = indices,
+                                    Neighbors = reader.GetAttribute("n") ?? ""
+                                });
+                            }
+                            break;
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Surface")
+                {
+                    if (currentSurface != null)
+                    {
+                        surfaces.Add(currentSurface);
+                        currentSurface = null;
+                    }
+                }
+            }
         }
 
         return surfaces;
@@ -162,7 +183,9 @@ public class LandXMLSurfaceParser
         string xmlFilePath = args[0];
         try
         {
-            var surfaces = ParseSurfaces(xmlFilePath);
+            var surfaces = ParseSurfaces(xmlFilePath, (progress) => {
+                Console.WriteLine($"Progress: {progress}");
+            });
             foreach (var surface in surfaces)
             {
                 Console.WriteLine($"\nSurface: {surface.Name}");

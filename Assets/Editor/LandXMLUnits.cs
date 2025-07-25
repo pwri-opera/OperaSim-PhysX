@@ -1,5 +1,5 @@
 using System;
-using System.Xml.Linq;
+using System.Xml;
 
 public class LandXMLUnits
 {
@@ -13,33 +13,46 @@ public class LandXMLUnits
     public string DirectionUnit { get; set; }
     public string UnitSystem { get; set; } // "Imperial" or "Metric"
 
-    public static LandXMLUnits Parse(XElement unitsElement)
+    public static LandXMLUnits Parse(XmlReader reader)
     {
-        if (unitsElement == null)
+        if (reader == null || reader.NodeType != XmlNodeType.Element || reader.Name != "Units")
             return null;
 
-        // Check for Imperial or Metric system
-        var imperialElement = unitsElement.Element(XName.Get("Imperial"));
-        var metricElement = unitsElement.Element(XName.Get("Metric"));
-        
-        XElement targetElement = imperialElement ?? metricElement;
-        if (targetElement == null)
-            return null;
-
-        var units = new LandXMLUnits
+        // Read until we find either Imperial or Metric element
+        while (reader.Read())
         {
-            UnitSystem = imperialElement != null ? "Imperial" : "Metric",
-            AreaUnit = targetElement.Attribute("areaUnit")?.Value,
-            LinearUnit = targetElement.Attribute("linearUnit")?.Value,
-            VolumeUnit = targetElement.Attribute("volumeUnit")?.Value,
-            TemperatureUnit = targetElement.Attribute("temperatureUnit")?.Value,
-            PressureUnit = targetElement.Attribute("pressureUnit")?.Value,
-            DiameterUnit = targetElement.Attribute("diameterUnit")?.Value,
-            AngularUnit = targetElement.Attribute("angularUnit")?.Value,
-            DirectionUnit = targetElement.Attribute("directionUnit")?.Value
-        };
+            if (reader.NodeType == XmlNodeType.Element && 
+                (reader.Name == "Imperial" || reader.Name == "Metric"))
+            {
+                var units = new LandXMLUnits
+                {
+                    UnitSystem = reader.Name,  // "Imperial" or "Metric"
+                    AreaUnit = reader.GetAttribute("areaUnit"),
+                    LinearUnit = reader.GetAttribute("linearUnit"),
+                    VolumeUnit = reader.GetAttribute("volumeUnit"),
+                    TemperatureUnit = reader.GetAttribute("temperatureUnit"),
+                    PressureUnit = reader.GetAttribute("pressureUnit"),
+                    DiameterUnit = reader.GetAttribute("diameterUnit"),
+                    AngularUnit = reader.GetAttribute("angularUnit"),
+                    DirectionUnit = reader.GetAttribute("directionUnit")
+                };
 
-        return units;
+                // Skip to the end of Units element
+                while (reader.Read())
+                {
+                    if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Units")
+                        break;
+                }
+
+                return units;
+            }
+            else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Units")
+            {
+                break;
+            }
+        }
+
+        return null;
     }
 
     public float ConvertLinearValue(float value)

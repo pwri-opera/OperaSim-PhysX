@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class LandXMLMeshConverter
 {
@@ -15,11 +16,13 @@ public class LandXMLMeshConverter
         
         // Convert Point3D to Vector3
         Vector3[] vertices = new Vector3[surface.Points.Count];
+        Dictionary<int, int> pointIndexMap = new Dictionary<int, int>();
         for (int i = 0; i < surface.Points.Count; i++)
         {
             Point3D point = surface.Points[i];
             // Convert to Unity's coordinate system (Z-up to Y-up)
             vertices[i] = new Vector3((float)point.X - center.x, (float)point.Z - center.z, (float)point.Y - center.y);
+            pointIndexMap.Add(point.Id, i);
         }
         
         // Convert Face indices to triangles
@@ -30,24 +33,15 @@ public class LandXMLMeshConverter
             // If faces are not triangulated, you'll need to triangulate them
             if (face.VertexIndices.Count >= 3)
             {
-                // Subtract 1 from indices because LandXML uses 1-based indexing
-                // while Unity uses 0-based indexing
-                int idx0 = face.VertexIndices[0] - 1;
-                int idx1 = face.VertexIndices[1] - 1;
-                int idx2 = face.VertexIndices[2] - 1;
-
-                // Validate indices are within bounds
-                if (idx0 >= 0 && idx0 < vertices.Length &&
-                    idx1 >= 0 && idx1 < vertices.Length &&
-                    idx2 >= 0 && idx2 < vertices.Length)
-                {
+                try {
+                    int idx0 = pointIndexMap[face.VertexIndices[0]];
+                    int idx1 = pointIndexMap[face.VertexIndices[1]];
+                    int idx2 = pointIndexMap[face.VertexIndices[2]];
                     triangles.Add(idx0);
                     triangles.Add(idx1);
                     triangles.Add(idx2);
-                }
-                else
-                {
-                    Debug.LogWarning($"Skipping invalid face with indices: {idx0}, {idx1}, {idx2} (vertex count: {vertices.Length})");
+                } catch (Exception e) {
+                    //Debug.LogWarning($"Skipping invalid face with indices: {face.VertexIndices[0]}, {face.VertexIndices[1]}, {face.VertexIndices[2]} (vertex count: {vertices.Length})");
                 }
             }
         }

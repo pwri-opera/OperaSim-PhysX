@@ -18,7 +18,9 @@ public class LandXML : EditorWindow
             return;
 
         try {
-            var landXMLSurfaces = LandXMLSurfaceParser.ParseSurfaces(path);
+            var landXMLSurfaces = LandXMLSurfaceParser.ParseSurfaces(path, (progress) => {
+                EditorUtility.DisplayProgressBar("Parsing LandXML", "Parsing...", progress);
+            });
             LandXML window = (LandXML)EditorWindow.GetWindow(typeof(LandXML));
             window.landXMLFilePath = path;
             window.landXMLSurfaces = landXMLSurfaces;
@@ -72,9 +74,13 @@ public class LandXML : EditorWindow
                     if (point.Z > maxZ) maxZ = point.Z;
                 }
             }
+            Debug.Log($"Min: ({minX}, {minY}, {minZ})");
+            Debug.Log($"Max: ({maxX}, {maxY}, {maxZ})");
+
             double center_x = (minX + maxX) / 2;
             double center_y = (minY + maxY) / 2;
             double center_z = (minZ + maxZ) / 2;
+            Debug.Log($"Center: ({center_x}, {center_y}, {center_z})");
             
             // Create a parent object to hold all surfaces
             GameObject parentObject = new GameObject("LandXML_Surfaces");
