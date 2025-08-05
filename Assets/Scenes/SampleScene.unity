@@ -13567,6 +13567,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: zx200
       objectReference: {fileID: 0}
+    - target: {fileID: 436595800036899970, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 664608353227296172, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1129486114864397411, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1270918927531078577, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1725495770091932613, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
       propertyPath: collisionExceptions.Array.data[0].Link2
       value: 
@@ -13603,6 +13619,18 @@ PrefabInstance:
       propertyPath: collisionExceptions.Array.data[4].Link2
       value: 
       objectReference: {fileID: 1983081748}
+    - target: {fileID: 2197239370540091970, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3281850951010920128, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3581802288373669043, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3781840263404902456, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -13647,8 +13675,46 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4187547910150548912, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4920991548140908187, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5070208915806648829, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5775059204286921280, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6053200817421426672, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8511441851211038960, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8991837212681491243, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9008546220155837735, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6053200817421426672, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+    - {fileID: 5775059204286921280, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+    - {fileID: 2197239370540091970, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+    - {fileID: 4920991548140908187, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+    - {fileID: 9008546220155837735, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
+    - {fileID: 5070208915806648829, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2dd7b6640a1df7f038639fda1ffd090a, type: 3}
