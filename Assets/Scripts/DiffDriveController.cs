@@ -11,12 +11,26 @@ using Unity.Robotics.Core;
 using System;
 using PID_Controller;
 
+public enum ProjectionMode
+{
+    Radial,         // 原点方向へ等比縮小
+    OmegaPriority,  // 角速度を優先保持
+    LinearPriority  // 並進速度を優先保持
+}
+
+
 /// <summary>
 /// 差動駆動車の制御を行う
 /// </summary>
 public class DiffDriveController : MonoBehaviour
 {
     private ROSConnection ros;
+
+    [Tooltip("VW挙動調整モードを使うか？\n（VW挙動調整モード：cmd_vel (vw入力) が与えられた際，vw組合せ時の出力を制限するモード")]
+    public bool EnableVWBehaviorMode = true;
+
+    [Tooltip("")]
+    public double VWRatioFactor = 1.0;
 
     [Tooltip("左の車輪のgameObjectを登録してください（複数登録可能）")]
     public List<GameObject> leftWheels;
@@ -92,7 +106,7 @@ public class DiffDriveController : MonoBehaviour
     private EmergencyStop emergencyStop;
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
         emergencyStop = EmergencyStop.GetEmergencyStop(this.gameObject);
@@ -286,11 +300,82 @@ public class DiffDriveController : MonoBehaviour
         // Debug.Log("RightJointVelocityCommand:" + rightVelCmd);
     }
 
+
+    void CommandLinearAngularVelocityVWBehaviorMode(double cmdLinearVel, double cmdAngularVel)
+    {
+        double p = VWRatioFactor;
+        // 1. 可行域判定
+        double g = Math.Pow(
+                    Math.Pow(Math.Abs(cmdLinearVel) / maxLinearVelocity, p) +
+                    Math.Pow(Math.Abs(cmdAngularVel) / maxAngularVelocity, p),
+                    1.0 / p);
+
+        double v_out = cmdLinearVel;
+        double w_out = cmdAngularVel;
+
+        ProjectionMode projMode = ProjectionMode.Radial;
+
+        if (g > 1f)        // ===== 投影が必要 =====
+        {
+            switch (projMode)
+            {
+                // --- 原点に向け等比縮小 (Radial) -----------------
+                case ProjectionMode.Radial:
+                    double s = 1f / g;
+                    v_out *= s;
+                    w_out *= s;
+                    break;
+
+                // --- 角速度優先 (OmegaPriority) -----------------
+                case ProjectionMode.OmegaPriority:
+                    w_out = Math.Clamp(w_out, -maxAngularVelocity, maxAngularVelocity);
+
+                    // (|v|/v_max)^p + (|w|/w_max)^p = 1 から v の許容値を決定
+                    double insideV = Math.Max(
+                            0f,
+                            1f - Math.Pow(Math.Abs(w_out) / maxAngularVelocity, p));
+                    double v_lim = maxLinearVelocity * Math.Pow(insideV, 1f / p);
+                    v_out = Math.Clamp(v_out, -v_lim, v_lim);
+                    break;
+
+                // --- 並進速度優先 (LinearPriority) --------------
+                case ProjectionMode.LinearPriority:
+                    v_out = Math.Clamp(v_out, -maxLinearVelocity, maxLinearVelocity);
+
+                    double insideW = Math.Max(
+                            0f,
+                            1f - Math.Pow(Math.Abs(v_out) / maxLinearVelocity, p));
+                    double w_lim = maxAngularVelocity * Math.Pow(insideW, 1f / p);
+                    w_out = Math.Clamp(w_out, -w_lim, w_lim);
+                    break;
+            }
+        }
+
+        // 2. 左右クローラ速度へ変換 (逆運動学)
+        leftVelCmd = v_out - tread_half * w_out;   // [m/s]
+        rightVelCmd = v_out + tread_half * w_out;   // [m/s]
+        Debug.Log("v_out:" + v_out);
+        Debug.Log("w_out:" + w_out);
+
+        // --- デバッグ出力（任意） -------------------------------
+        // Debug.Log($"projMode={projMode}  v_in={cmdLinearVel:F2} ω_in={cmdAngularVel:F2} "
+        //         +$"-> v_out={v_out:F2} ω_out={w_out:F2}");
+    }
+
     void ExecuteTwist(TwistMsg twist)
     {
         //Debug.Log("Linear Velocity:"+twist.linear.x);
         //Debug.Log("Angular Velocity:"+twist.angular.z);
-        CommandLinearAngularVelocity(twist.linear.x, twist.angular.z);
+
+        // ここで条件分岐を行い，vw 挙動調整モードを 使うかどうか選択
+        if (EnableVWBehaviorMode == true)
+        {
+            CommandLinearAngularVelocityVWBehaviorMode(twist.linear.x, twist.angular.z);
+        }
+        else
+        {
+            CommandLinearAngularVelocity(twist.linear.x, twist.angular.z);
+        }
     }
 
     void ExecuteJointCmd(JointCmdMsg cmd)
