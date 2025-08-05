@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 2035868205722608467}
   - component: {fileID: 5078693350119732929}
   - component: {fileID: 6834003790805673241}
+  - component: {fileID: 587370132521924129}
   m_Layer: 3
   m_Name: zx200
   m_TagString: robot
@@ -34,7 +35,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330258041213618457}
-  m_LocalRotation: {x: -0, y: -0.7045691, z: -0, w: 0.7096355}
+  m_LocalRotation: {x: 0, y: -0.7045661, z: 0, w: 0.7096384}
   m_LocalPosition: {x: -45.82, y: 0.68, z: 35.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -43,7 +44,7 @@ Transform:
   - {fileID: 6412660796302326879}
   - {fileID: 5366237281312768854}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: -89.589, z: 0}
 --- !u!114 &1725495770091932613
 MonoBehaviour:
@@ -253,6 +254,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   com3FrontControllerTopicName: zx200/front_cmd
+  enableDeadTime: 1
 --- !u!114 &6834003790805673241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,6 +268,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emergencyStopTopicName: zx200/emg_stop
+--- !u!114 &587370132521924129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330258041213618457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16726d81459adb54db74e12639577cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topicName: /zx200/unity/drive_params
+  targetJoints:
+  - {fileID: 4245795242541497929}
+  verbose: 0
 --- !u!1 &421342636634327953
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,7 +529,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8319837682532374436
 Transform:
   m_ObjectHideFlags: 0
@@ -1450,6 +1468,7 @@ GameObject:
   - component: {fileID: 7091080769301090667}
   - component: {fileID: 2928519782221613030}
   - component: {fileID: 492980436494137003}
+  - component: {fileID: 3245099202538915510}
   m_Layer: 0
   m_Name: boom_link
   m_TagString: Untagged
@@ -1497,7 +1516,7 @@ ArticulationBody:
   m_GameObject: {fileID: 1692593602678822202}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 250
+  m_Mass: 2130
   m_ParentAnchorPosition: {x: 0.040185887, y: 0.83668995, z: 0.22767143}
   m_ParentAnchorRotation: {x: 0.30070582, y: 0, z: 0, w: 0.95371705}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -1513,9 +1532,9 @@ ArticulationBody:
   m_XDrive:
     lowerLimit: -70
     upperLimit: 55
-    stiffness: 0
-    damping: 0
-    forceLimit: 0
+    stiffness: 100000000
+    damping: 100000000
+    forceLimit: 445505
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -1615,6 +1634,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlType: 2
+--- !u!114 &3245099202538915510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692593602678822202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b05714964f73533409c2a78581c92d30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadtime: 649.5
 --- !u!1 &1704452265756085925
 GameObject:
   m_ObjectHideFlags: 0
@@ -2974,7 +3006,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2151210409989563823
 Transform:
   m_ObjectHideFlags: 0
@@ -3324,7 +3356,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4554547760744093781
 Transform:
   m_ObjectHideFlags: 0
@@ -3365,8 +3397,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.1
-  m_ParentAnchorPosition: {x: -1.095, y: 0.395, z: -1.685}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: -1.0949998, y: 0.39500004, z: -1.6850014}
+  m_ParentAnchorRotation: {x: 0, y: -0.00000004214685, z: 0, w: 1.0000004}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -4297,6 +4329,7 @@ GameObject:
   - component: {fileID: 4727450863162097617}
   - component: {fileID: 3869366497279575450}
   - component: {fileID: 5204067966075200288}
+  - component: {fileID: 4006706686927394611}
   m_Layer: 0
   m_Name: bucket_link
   m_TagString: Untagged
@@ -4345,7 +4378,7 @@ ArticulationBody:
   m_GameObject: {fileID: 2475730653099896157}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 100
+  m_Mass: 660
   m_ParentAnchorPosition: {x: 0.02354516, y: 2.1809025, z: 1.8954018}
   m_ParentAnchorRotation: {x: -0.17364821, y: -0.0000000037252903, z: 0.000000007450581, w: 0.98480797}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -4361,9 +4394,9 @@ ArticulationBody:
   m_XDrive:
     lowerLimit: -35
     upperLimit: 136
-    stiffness: 0
-    damping: 0
-    forceLimit: 0
+    stiffness: 10000000
+    damping: 5000000
+    forceLimit: 210925
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -4463,6 +4496,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlType: 2
+--- !u!114 &4006706686927394611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2475730653099896157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b05714964f73533409c2a78581c92d30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadtime: 310
 --- !u!1 &2538644957061272203
 GameObject:
   m_ObjectHideFlags: 0
@@ -5920,7 +5966,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6035254151293502691
 Transform:
   m_ObjectHideFlags: 0
@@ -9009,7 +9055,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6477663591644952252
 Transform:
   m_ObjectHideFlags: 0
@@ -9050,8 +9096,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.1
-  m_ParentAnchorPosition: {x: 1.095, y: 0.395, z: 1.685}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: 1.0949998, y: 0.39500004, z: 1.6850014}
+  m_ParentAnchorRotation: {x: 0, y: -0.00000004214685, z: 0, w: 1.0000004}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -9159,7 +9205,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7785537081246409675
 Transform:
   m_ObjectHideFlags: 0
@@ -9200,8 +9246,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.1
-  m_ParentAnchorPosition: {x: 1.095, y: 0.395, z: -1.685}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: 1.0950019, y: 0.39500004, z: -1.6850005}
+  m_ParentAnchorRotation: {x: 0, y: -0.00000004214685, z: 0, w: 1.0000004}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -10266,7 +10312,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6813656727757697975
 Transform:
   m_ObjectHideFlags: 0
@@ -10307,8 +10353,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.1
-  m_ParentAnchorPosition: {x: -1.095, y: 0.395, z: 0}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: -1.0949991, y: 0.39500004, z: 0.0000014305115}
+  m_ParentAnchorRotation: {x: 0, y: -0.00000004214685, z: 0, w: 1.0000004}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -10809,6 +10855,7 @@ GameObject:
   - component: {fileID: 8907904024965245825}
   - component: {fileID: 7563931150112938569}
   - component: {fileID: 8245553631276763850}
+  - component: {fileID: 5539964170239229452}
   m_Layer: 0
   m_Name: body_link
   m_TagString: Untagged
@@ -10856,7 +10903,7 @@ ArticulationBody:
   m_GameObject: {fileID: 5864811885909104740}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 200
+  m_Mass: 9086
   m_ParentAnchorPosition: {x: 0.034300357, y: 1.1206, z: 0.10786878}
   m_ParentAnchorRotation: {x: 0, y: 0, z: -0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -10872,9 +10919,9 @@ ArticulationBody:
   m_XDrive:
     lowerLimit: 0
     upperLimit: 0
-    stiffness: 0
-    damping: 0
-    forceLimit: 3.4028235e+38
+    stiffness: 100000000
+    damping: 100000000
+    forceLimit: 68000
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -10974,6 +11021,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlType: 2
+--- !u!114 &5539964170239229452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5864811885909104740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b05714964f73533409c2a78581c92d30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadtime: 932
 --- !u!1 &5894726089802693358
 GameObject:
   m_ObjectHideFlags: 0
@@ -11237,7 +11297,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8331309515361716022
 Transform:
   m_ObjectHideFlags: 0
@@ -11278,8 +11338,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.1
-  m_ParentAnchorPosition: {x: -1.095, y: 0.395, z: 1.685}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: -1.0950019, y: 0.39500004, z: 1.6850005}
+  m_ParentAnchorRotation: {x: 0, y: -0.00000004214685, z: 0, w: 1.0000004}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -12533,7 +12593,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2089282297309750517
 Transform:
   m_ObjectHideFlags: 0
@@ -12739,6 +12799,7 @@ GameObject:
   - component: {fileID: 1615401484466564724}
   - component: {fileID: 6587672140924943843}
   - component: {fileID: 5615670537190771783}
+  - component: {fileID: 5719139068076114199}
   m_Layer: 0
   m_Name: arm_link
   m_TagString: Untagged
@@ -12786,7 +12847,7 @@ ArticulationBody:
   m_GameObject: {fileID: 6896237325348521548}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 250
+  m_Mass: 1010
   m_ParentAnchorPosition: {x: -0.010955974, y: 2.9959009, z: 4.7878013}
   m_ParentAnchorRotation: {x: 0.1305262, y: -0.000000029802322, z: 0, w: 0.99144495}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -12802,9 +12863,9 @@ ArticulationBody:
   m_XDrive:
     lowerLimit: 45
     upperLimit: 145
-    stiffness: 0
-    damping: 0
-    forceLimit: 0
+    stiffness: 20000000
+    damping: 20000000
+    forceLimit: 451655
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -12904,6 +12965,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlType: 2
+--- !u!114 &5719139068076114199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896237325348521548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b05714964f73533409c2a78581c92d30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadtime: 425.5
 --- !u!1 &6903694398721041502
 GameObject:
   m_ObjectHideFlags: 0
@@ -13541,7 +13615,7 @@ ArticulationBody:
   m_GameObject: {fileID: 7639827857697680238}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 5000
+  m_Mass: 7434
   m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -15245,7 +15319,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8264169630639782318
 Transform:
   m_ObjectHideFlags: 0
@@ -15980,7 +16054,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4635139460496404158
 Transform:
   m_ObjectHideFlags: 0
@@ -16021,8 +16095,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.1
-  m_ParentAnchorPosition: {x: 1.095, y: 0.395, z: 0}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: 1.0949991, y: 0.39500004, z: -0.0000014305115}
+  m_ParentAnchorRotation: {x: 0, y: -0.00000004214685, z: 0, w: 1.0000004}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -16288,7 +16362,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &419805484820065396
 Transform:
   m_ObjectHideFlags: 0
@@ -16334,7 +16408,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2353696601163794652
 Transform:
   m_ObjectHideFlags: 0
