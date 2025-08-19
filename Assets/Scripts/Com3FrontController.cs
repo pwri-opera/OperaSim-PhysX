@@ -6,7 +6,7 @@ using RosMessageTypes.Com3;
 using Unity.Robotics.UrdfImporter;
 using Unity.Profiling;  // Profile 用
 
-using DataSample = System.ValueTuple<float, double>; // 型エイリアス
+using DataSample = System.ValueTuple<double, double>; // 型エイリアス
 
 public class Com3JointInfo
 {
@@ -35,9 +35,6 @@ public class Com3FrontController : MonoBehaviour
     // 各ジョイントごとのバッファ
     private Dictionary<string, Queue<DataSample>> inputJointsQueue = new Dictionary<string, Queue<DataSample>>();
 
-    private double unityDeadTime = 40.0f; // msec
-    // private double internalDeadTime; // msec
-
     private Dictionary<string, double> joints_dt;
 
     // Unity Profiler 用
@@ -62,13 +59,16 @@ public class Com3FrontController : MonoBehaviour
             var jointtype = joint.GetComponent<Com3.ControlTypeAnnotation>();
             var jointdt = joint.GetComponent<DeadTime>();
             
-            if (ujoint && jointtype && jointdt)
+            if (ujoint && jointtype)
             {
                 joints.Add(ujoint.jointName, new Com3JointInfo(joint, jointtype));
-                joints_dt.Add(ujoint.jointName, jointdt.GetDeadTime());
+                if (jointdt)
+                {
+                    joints_dt.Add(ujoint.jointName, jointdt.GetDeadTime());
+                    // むだ時間制御用データバッファインスタンス作成（各関節）
+                    inputJointsQueue.Add(ujoint.jointName, new Queue<DataSample>());
+                }                
 
-                // むだ時間制御用データバッファインスタンス作成（各関節）
-                inputJointsQueue.Add(ujoint.jointName, new Queue<DataSample>());
 
                 ArticulationDrive drive = joint.xDrive;
                 if (jointtype.GetControlType() == Com3.ControlType.Effort)
@@ -104,7 +104,7 @@ public class Com3FrontController : MonoBehaviour
             return;
 
         currentCmd = cmd;
-        float currentTime = Time.time * 1000; // sec -> msec
+        double currentTime = Time.timeAsDouble * 1000.0; // sec -> msec
 
         k_JointAngleBoom.Value = currentCmd.position[2] * Mathf.Rad2Deg;
         Debug.Log("arm_joint Angle: " + currentCmd.position[1] * Mathf.Rad2Deg);
@@ -113,7 +113,7 @@ public class Com3FrontController : MonoBehaviour
         {
             try
             {
-                if (joints_dt[currentCmd.joint_name[i]] != 0.0)
+                if (joints_dt.ContainsKey(currentCmd.joint_name[i]))  
                 {
                     var joint = joints[currentCmd.joint_name[i]];
                     ArticulationDrive drive = joint.joint.xDrive;
@@ -170,7 +170,7 @@ public class Com3FrontController : MonoBehaviour
         {
             try
             {
-                if (joints_dt[currentCmd.joint_name[i]] == 0)
+                if (joints_dt.ContainsKey(currentCmd.joint_name[i]) == false)
                 {
                     return;
                 }
@@ -183,12 +183,12 @@ public class Com3FrontController : MonoBehaviour
                 while (queue.Count > 0)
                 {
                     var (timestamp, data) = queue.Peek();
-                    if ((Time.time * 1000 - timestamp) >= joints_dt[currentCmd.joint_name[i]])
+                    if ((Time.timeAsDouble * 1000 - timestamp) >= joints_dt[currentCmd.joint_name[i]])
                     {
                         data_sample = data;
                         inputJointsQueue[currentCmd.joint_name[i]].Dequeue();
                     }
-                    else if (queue.Count <= 0 || (Time.time - timestamp) < joints_dt[currentCmd.joint_name[i]])
+                    else if (queue.Count <= 0 || (Time.timeAsDouble - timestamp) < joints_dt[currentCmd.joint_name[i]])
                     {
                         break;
                     }
