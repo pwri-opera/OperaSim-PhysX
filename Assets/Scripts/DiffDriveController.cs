@@ -14,8 +14,7 @@ using PID_Controller;
 public enum ProjectionMode
 {
     Radial,         // 原点方向へ等比縮小
-    OmegaPriority,  // 角速度を優先保持
-    LinearPriority  // 並進速度を優先保持
+    RadialRatio     // 
 }
 
 
@@ -29,8 +28,11 @@ public class DiffDriveController : MonoBehaviour
     [Tooltip("VW挙動調整モードを使うか？\n（VW挙動調整モード：cmd_vel (vw入力) が与えられた際，vw組合せ時の出力を制限するモード")]
     public bool EnableVWBehaviorMode = true;
 
-    [Tooltip("")]
-    public double VWRatioFactor = 1.0;
+    [Tooltip("車体並進速度v と 車体旋回速度ω　が同時に与えられた際に，出力値を抑えるパラメータ: 値が小さい程，v，w 同時出力時の速度が制限される")]
+    public double VWDecelFactor = 1.0;
+
+    [Tooltip("車体並進速度v と 車体旋回速度ω の縮小配分を決める重み（0＝v優先でωを多く削る、1＝ω優先でvを多く削る）")]
+    public double VWRatioFactor = 0.9;
 
     [Tooltip("左の車輪のgameObjectを登録してください（複数登録可能）")]
     public List<GameObject> leftWheels;
@@ -104,6 +106,12 @@ public class DiffDriveController : MonoBehaviour
     private double timeElapsed;
 
     private EmergencyStop emergencyStop;
+
+    private static double Abs(double x) => Math.Abs(x);
+    private static double Pow(double x, double e) => Math.Pow(x, e);
+    private static double Clamp(double x, double lo, double hi) => x < lo ? lo : (x > hi ? hi : x);
+    private static double Clamp01(double x) => Clamp(x, 0.0, 1.0);
+    private static double SignNonzero(double x) => x < 0.0 ? -1.0 : (x > 0.0 ? 1.0 : 0.0);
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -303,7 +311,16 @@ public class DiffDriveController : MonoBehaviour
 
     void CommandLinearAngularVelocityVWBehaviorMode(double cmdLinearVel, double cmdAngularVel)
     {
-        double p = VWRatioFactor;
+
+        /* Calculate velocity command value based on inverse kinematics */
+        cmdLinearVel = Math.Min(cmdLinearVel, maxLinearVelocity);
+        cmdLinearVel = Math.Max(cmdLinearVel, -maxLinearVelocity);
+        cmdAngularVel = Math.Min(cmdAngularVel, maxAngularVelocity);
+        cmdAngularVel = Math.Max(cmdAngularVel, -maxAngularVelocity); 
+
+        double p = VWDecelFactor;
+        double ratio = VWRatioFactor;
+
         // 1. 可行域判定
         double g = Math.Pow(
                     Math.Pow(Math.Abs(cmdLinearVel) / maxLinearVelocity, p) +
@@ -313,7 +330,7 @@ public class DiffDriveController : MonoBehaviour
         double v_out = cmdLinearVel;
         double w_out = cmdAngularVel;
 
-        ProjectionMode projMode = ProjectionMode.Radial;
+        ProjectionMode projMode = ProjectionMode.RadialRatio;
 
         if (g > 1f)        // ===== 投影が必要 =====
         {
@@ -326,27 +343,11 @@ public class DiffDriveController : MonoBehaviour
                     w_out *= s;
                     break;
 
-                // --- 角速度優先 (OmegaPriority) -----------------
-                case ProjectionMode.OmegaPriority:
-                    w_out = Math.Clamp(w_out, -maxAngularVelocity, maxAngularVelocity);
-
-                    // (|v|/v_max)^p + (|w|/w_max)^p = 1 から v の許容値を決定
-                    double insideV = Math.Max(
-                            0f,
-                            1f - Math.Pow(Math.Abs(w_out) / maxAngularVelocity, p));
-                    double v_lim = maxLinearVelocity * Math.Pow(insideV, 1f / p);
-                    v_out = Math.Clamp(v_out, -v_lim, v_lim);
-                    break;
-
-                // --- 並進速度優先 (LinearPriority) --------------
-                case ProjectionMode.LinearPriority:
-                    v_out = Math.Clamp(v_out, -maxLinearVelocity, maxLinearVelocity);
-
-                    double insideW = Math.Max(
-                            0f,
-                            1f - Math.Pow(Math.Abs(v_out) / maxLinearVelocity, p));
-                    double w_lim = maxAngularVelocity * Math.Pow(insideW, 1f / p);
-                    w_out = Math.Clamp(w_out, -w_lim, w_lim);
+                case ProjectionMode.RadialRatio:
+                    (v_out, w_out) = ProjectByRatioScale(
+                        cmdLinearVel, cmdAngularVel,
+                        maxLinearVelocity, maxAngularVelocity,
+                        p, ratio);
                     break;
             }
         }
@@ -360,6 +361,51 @@ public class DiffDriveController : MonoBehaviour
         // --- デバッグ出力（任意） -------------------------------
         // Debug.Log($"projMode={projMode}  v_in={cmdLinearVel:F2} ω_in={cmdAngularVel:F2} "
         //         +$"-> v_out={v_out:F2} ω_out={w_out:F2}");
+    }
+
+    /// <summary>
+    /// ratio に基づく異方性スケーリング投影
+    /// v_out = s^alpha * v_in, w_out = s^(1-alpha) * w_in を満たす s を二分法で解く
+    /// </summary>
+    private static (double v_out, double w_out) ProjectByRatioScale(
+        double v_in, double w_in, double v_max, double w_max, double p, double ratio)
+    {
+        double V = Abs(v_in) / v_max;
+        double W = Abs(w_in) / w_max;
+
+        // 端点は数値的に不安定なので少しだけ離す
+        double alpha = Clamp01(ratio);
+        const double EPS = 1e-6;
+        alpha = Clamp(alpha, EPS, 1.0 - EPS);
+
+        double Va = Pow(V, p);
+        double Wb = Pow(W, p);
+        double ap = alpha * p;
+        double bp = (1.0 - alpha) * p;
+
+        // f(s) = Va*s^ap + Wb*s^bp - 1 = 0 を s∈(0,1] で解く
+        Func<double, double> f = s => Va * Pow(s, ap) + Wb * Pow(s, bp) - 1.0;
+
+        double sL = 0.0;     // f(sL) < 0
+        double sR = 1.0;     // f(sR) >= 0
+        for (int i = 0; i < 50; i++)
+        {
+            double sM = 0.5 * (sL + sR);
+            double fM = f(sM);
+            if (fM < 0.0) sL = sM; else sR = sM;
+        }
+        double s = 0.5 * (sL + sR);
+
+        double scaleV = Pow(s, alpha);
+        double scaleW = Pow(s, 1.0 - alpha);
+
+        double v_out = SignNonzero(v_in) * scaleV * Abs(v_in);
+        double w_out = SignNonzero(w_in) * scaleW * Abs(w_in);
+
+        // 浮動誤差の安全クリップ
+        v_out = Clamp(v_out, -v_max, v_max);
+        w_out = Clamp(w_out, -w_max, w_max);
+        return (v_out, w_out);
     }
 
     void ExecuteTwist(TwistMsg twist)
