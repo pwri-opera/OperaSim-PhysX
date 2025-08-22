@@ -24,7 +24,7 @@ public class JointPosController : MonoBehaviour
     private float emergencyStopPosition = 0.0f;
 
     // Start is called before the first frame update
-   IEnumerator Start()
+    IEnumerator Start()
     {
         yield return new WaitForSeconds(0.1f); // 少し待機してから設定
         ros = ROSConnection.GetOrCreateInstance();
@@ -32,9 +32,10 @@ public class JointPosController : MonoBehaviour
         joint = this.GetComponent<ArticulationBody>();
         targetPos = new Float64Msg();
 
-       if(joint)
+        if (joint)
         {
-            if (joint.GetComponent<Com3.ControlTypeAnnotation>() == null) {
+            if (joint.GetComponent<Com3.ControlTypeAnnotation>() == null)
+            {
                 var drive = joint.xDrive;
                 if (drive.stiffness == 0)
                     drive.stiffness = 200000;
@@ -57,15 +58,19 @@ public class JointPosController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (emergencyStop && emergencyStop.isEmergencyStop) {
-            if (currentEmergencyStop == false) {
+        if (emergencyStop && emergencyStop.isEmergencyStop)
+        {
+            if (currentEmergencyStop == false)
+            {
                 emergencyStopPosition = joint.jointPosition[0] * Mathf.Rad2Deg;
                 currentEmergencyStop = true;
             }
             var drive = joint.xDrive;
             drive.target = emergencyStopPosition;
             joint.xDrive = drive;
-        } else {
+        }
+        else
+        {
             currentEmergencyStop = false;
         }
     }
