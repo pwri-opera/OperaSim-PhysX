@@ -145,8 +145,8 @@ MonoBehaviour:
   - {fileID: 2186674413002338156}
   - {fileID: 3019333766987266763}
   robotName: mst110cr
-  TwistTopicName: mst110cr/tracks/cmd_vel
-  OdomTopicName: mst110cr/odom
+  TwistTopicName: mst110cr/cmd_vel
+  OdomTopicName: mst110cr/odom_pose
   Com3TopicName: mst110cr/track_cmd
   childFrameName: mst110cr/base_link
   treadCollectionFactor: 3
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00f7ba05af3df4dff8b17f595405ef28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: mst110cr/joint_state
+  topicName: mst110cr/joint_states
   enableJointEffortSensor: 0
   publishMessageInterval: 0.02
 --- !u!114 &3413207570692119096
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733cb131506379cc7832b6408257d941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  com3FrontControllerTopicName: mst110cr/front_cmd
+  com3FrontControllerTopicName: mst110cr/rot_dump_cmd
   enableDeadTime: 0
 --- !u!54 &1445546036829324771
 Rigidbody:
@@ -2925,7 +2925,7 @@ GameObject:
   - component: {fileID: 1055788950919020390}
   - component: {fileID: 248449165171887827}
   - component: {fileID: 1215127618373669673}
-  - component: {fileID: 8240941481228740973}
+  - component: {fileID: 3882381158596471579}
   m_Layer: 0
   m_Name: base_link
   m_TagString: Untagged
@@ -3065,7 +3065,7 @@ MonoBehaviour:
   jointName: base_joint
   EffortLimit: 1000
   VelocityLimit: 1000
---- !u!114 &8240941481228740973
+--- !u!114 &3882381158596471579
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3074,13 +3074,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 7776065020666623392}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2ddf92971c4b3145aaa4a37d3d79f9d, type: 3}
+  m_Script: {fileID: 11500000, guid: 15cc6f5a718578648ba928b41145c438, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  robotName: mst110cr
   topicName: mst110cr/global_pose
   childFrameName: mst110cr/base_link
-  publishMessageInterval: 0.05
+  publishMessageInterval: 0.1
 --- !u!1 &7812160290503283753
 GameObject:
   m_ObjectHideFlags: 0
