@@ -332,13 +332,13 @@ public class DiffDriveController : MonoBehaviour
 
         ProjectionMode projMode = ProjectionMode.RadialRatio;
 
-        if (g > 1f)        // ===== 投影が必要 =====
+        if (g > 1.0)        // ===== 投影が必要 =====
         {
             switch (projMode)
             {
                 // --- 原点に向け等比縮小 (Radial) -----------------
                 case ProjectionMode.Radial:
-                    double s = 1f / g;
+                    double s = 1.0 / g;
                     v_out *= s;
                     w_out *= s;
                     break;
@@ -355,8 +355,6 @@ public class DiffDriveController : MonoBehaviour
         // 2. 左右クローラ速度へ変換 (逆運動学)
         leftVelCmd = v_out - tread_half * w_out;   // [m/s]
         rightVelCmd = v_out + tread_half * w_out;   // [m/s]
-        Debug.Log("v_out:" + v_out);
-        Debug.Log("w_out:" + w_out);
 
         // --- デバッグ出力（任意） -------------------------------
         // Debug.Log($"projMode={projMode}  v_in={cmdLinearVel:F2} ω_in={cmdAngularVel:F2} "
