@@ -282,8 +282,8 @@ public class DiffDriveController : MonoBehaviour
         cmdAngularVel = Math.Max(cmdAngularVel, -maxAngularVelocity);
         leftVelCmd = (cmdLinearVel - tread_half * cmdAngularVel); // Unit is [m/s]
         rightVelCmd = (cmdLinearVel + tread_half * cmdAngularVel); // Unit is [m/s]
-        // Debug.Log("LeftJointVelocityCommand:" + leftVelCmd);
-        // Debug.Log("RightJointVelocityCommand:" + rightVelCmd);
+        // Debug.Log("LeftJointVeloityCommand:" + leftVelCmd);
+        // Debug.Log("RightJointVeloccityCommand:" + rightVelCmd);
     }
 
     void ExecuteTwist(TwistMsg twist)
