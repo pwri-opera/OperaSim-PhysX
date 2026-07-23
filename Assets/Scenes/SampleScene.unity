@@ -7539,9 +7539,10 @@ GameObject:
   - component: {fileID: 1121062039}
   - component: {fileID: 1121062038}
   - component: {fileID: 1121062041}
+  - component: {fileID: 1121062042}
   m_Layer: 0
-  m_Name: Camera
-  m_TagString: Untagged
+  m_Name: ZX200 Operator Camera
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7585,7 +7586,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -7627,7 +7628,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1121062037}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 436275a13d4459746955fc6db5953473, type: 3}
   m_Name: 
@@ -7646,6 +7647,22 @@ MonoBehaviour:
   _enableSpeedAcceleration: 1
   _speedAccelerationFactor: 1.5
   _initPositonButton: 114
+--- !u!114 &1121062042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121062037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1f7c4d9e2a43c5a6d7f8091b2c3d4e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  machineName: zx200
+  targetLinkName: body_link
+  localPosition: {x: -1, y: 1.5, z: 0.6}
+  localEulerAngles: {x: 0, y: 0, z: 0}
 --- !u!43 &1128053768
 Mesh:
   m_ObjectHideFlags: 0
@@ -12798,7 +12815,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2479393803914504992, guid: c12a7b61b5050d61bbdc6698f0017fae, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2484011198022980252, guid: c12a7b61b5050d61bbdc6698f0017fae, type: 3}
       propertyPath: m_IsActive
@@ -13928,7 +13945,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 169136759428265707, guid: 78b76bc3af1ad6347993d04315bd74d0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 256828119924515236, guid: 78b76bc3af1ad6347993d04315bd74d0, type: 3}
       propertyPath: m_IsActive
@@ -15670,6 +15687,10 @@ PrefabInstance:
     - target: {fileID: 89247410082738793, guid: 4ac80a83c71b86d40a9e3d020e4aefb6, type: 3}
       propertyPath: m_Name
       value: mst110cr
+      objectReference: {fileID: 0}
+    - target: {fileID: 89247410082738793, guid: 4ac80a83c71b86d40a9e3d020e4aefb6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

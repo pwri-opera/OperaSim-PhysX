@@ -424,6 +424,12 @@ public class DiffDriveController : MonoBehaviour
 
     void ExecuteJointCmd(JointCmdMsg cmd)
     {
+        if (cmd.joint_name == null || cmd.velocity == null || cmd.velocity.Length < cmd.joint_name.Length)
+        {
+            Debug.LogWarning($"Ignoring malformed track command: joint_name has {cmd.joint_name?.Length ?? 0} entries but velocity has {cmd.velocity?.Length ?? 0}.");
+            return;
+        }
+
         double linearVelCmd = Double.NaN, angularVelCmd = Double.NaN;
         for (int i = 0; i < cmd.joint_name.Length; i++) {
             if (cmd.joint_name[i] == "left_track") {

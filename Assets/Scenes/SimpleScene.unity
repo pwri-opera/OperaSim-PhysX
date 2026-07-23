@@ -1110,9 +1110,10 @@ GameObject:
   - component: {fileID: 1121062039}
   - component: {fileID: 1121062038}
   - component: {fileID: 1121062041}
+  - component: {fileID: 1121062042}
   m_Layer: 0
-  m_Name: Camera
-  m_TagString: Untagged
+  m_Name: ZX200 Operator Camera
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1156,7 +1157,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -1198,7 +1199,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1121062037}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 436275a13d4459746955fc6db5953473, type: 3}
   m_Name: 
@@ -1217,6 +1218,22 @@ MonoBehaviour:
   _enableSpeedAcceleration: 1
   _speedAccelerationFactor: 1.5
   _initPositonButton: 114
+--- !u!114 &1121062042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121062037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1f7c4d9e2a43c5a6d7f8091b2c3d4e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  machineName: zx200
+  targetLinkName: body_link
+  localPosition: {x: -1, y: 1.5, z: 0.6}
+  localEulerAngles: {x: 0, y: 0, z: 0}
 --- !u!1001 &1180730566
 PrefabInstance:
   m_ObjectHideFlags: 0

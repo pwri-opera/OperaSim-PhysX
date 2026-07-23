@@ -15,6 +15,8 @@ namespace RosMessageTypes.Com3
 
         //  joint name of control target.
         public string[] joint_name;
+        //  0: position, 1: velocity, 2: effort
+        public byte control_type;
         //  controlled variable for each joint name
         public double[] position;
         public double[] velocity;
@@ -23,14 +25,16 @@ namespace RosMessageTypes.Com3
         public JointCmdMsg()
         {
             this.joint_name = new string[0];
+            this.control_type = 0;
             this.position = new double[0];
             this.velocity = new double[0];
             this.effort = new double[0];
         }
 
-        public JointCmdMsg(string[] joint_name, double[] position, double[] velocity, double[] effort)
+        public JointCmdMsg(string[] joint_name, byte control_type, double[] position, double[] velocity, double[] effort)
         {
             this.joint_name = joint_name;
+            this.control_type = control_type;
             this.position = position;
             this.velocity = velocity;
             this.effort = effort;
@@ -41,6 +45,7 @@ namespace RosMessageTypes.Com3
         private JointCmdMsg(MessageDeserializer deserializer)
         {
             deserializer.Read(out this.joint_name, deserializer.ReadLength());
+            deserializer.Read(out this.control_type);
             deserializer.Read(out this.position, sizeof(double), deserializer.ReadLength());
             deserializer.Read(out this.velocity, sizeof(double), deserializer.ReadLength());
             deserializer.Read(out this.effort, sizeof(double), deserializer.ReadLength());
@@ -50,6 +55,7 @@ namespace RosMessageTypes.Com3
         {
             serializer.WriteLength(this.joint_name);
             serializer.Write(this.joint_name);
+            serializer.Write(this.control_type);
             serializer.WriteLength(this.position);
             serializer.Write(this.position);
             serializer.WriteLength(this.velocity);
@@ -62,6 +68,7 @@ namespace RosMessageTypes.Com3
         {
             return "JointCmdMsg: " +
             "\njoint_name: " + System.String.Join(", ", joint_name.ToList()) +
+            "\ncontrol_type: " + control_type.ToString() +
             "\nposition: " + System.String.Join(", ", position.ToList()) +
             "\nvelocity: " + System.String.Join(", ", velocity.ToList()) +
             "\neffort: " + System.String.Join(", ", effort.ToList());
