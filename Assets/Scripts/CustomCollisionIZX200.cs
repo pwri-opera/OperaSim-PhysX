@@ -13,6 +13,21 @@ public class CustomCollisionZX200 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // The collider on the ZX200 root is the simplified body envelope used
+        // for collisions with other machines. Keep it from colliding with the
+        // ZX200's own links while allowing contacts with external colliders.
+        Collider bodyEnvelope = GetComponent<Collider>();
+        if (bodyEnvelope != null)
+        {
+            foreach (Collider ownCollider in GetComponentsInChildren<Collider>())
+            {
+                if (ownCollider != bodyEnvelope)
+                {
+                    Physics.IgnoreCollision(bodyEnvelope, ownCollider, true);
+                }
+            }
+        }
+
         arm_link = gameObject.transform.Find("base_link/body_link/boom_link/arm_link/Collisions");
         bucket_inner_link = gameObject.transform.Find("base_link/body_link/boom_link/arm_link/bucket_link/bucket_inner");
         

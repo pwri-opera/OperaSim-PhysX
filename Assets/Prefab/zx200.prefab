@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 5078693350119732929}
   - component: {fileID: 6834003790805673241}
   - component: {fileID: 587370132521924129}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: zx200
   m_TagString: robot
   m_Icon: {fileID: 0}

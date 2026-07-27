@@ -64,6 +64,10 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Sony Spatial Reality Display SDK is installed locally under its own EULA.
+/Assets/SRDisplayUnityPlugin/
+/Assets/SRDisplayUnityPlugin.meta
+
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
