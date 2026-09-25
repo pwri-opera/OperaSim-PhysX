@@ -300,7 +300,7 @@
   </link>
   <!-- boom axis -->
   <joint name="boom_joint" type="revolute">
-    <origin rpy="0 0.6108652382 0" xyz="0.22767 -0.040187 0.83669"/>
+    <origin rpy="0 0.5591284432 0" xyz="0.05467 -0.040187 0.72492"/>
     <axis xyz="0 1 0"/>
     <parent link="body_link"/>
     <child link="boom_link"/>
@@ -326,7 +326,7 @@
     </inertial>
   </link>
   <joint name="arm_joint" type="revolute">
-    <origin rpy="0 0.2617993878 0" xyz="4.7878 0.010957 2.9959"/>
+    <origin rpy="0 0.2961945914 0" xyz="4.83998 0.010957 3.00227"/>
     <axis xyz="0 1 0"/>
     <parent link="boom_link"/>
     <child link="arm_link"/>
@@ -353,7 +353,7 @@
   </link>
   <!-- bucket axis -->
   <joint name="bucket_joint" type="revolute">
-    <origin rpy="0 -0.3490658504 0" xyz="1.8954 -0.023546 2.1809"/>
+    <origin rpy="0 -0.1605847774 0" xyz="1.91546 -0.023546 2.17374"/>
     <axis xyz="0 1 0"/>
     <parent link="arm_link"/>
     <child link="bucket_link"/>
@@ -396,7 +396,7 @@
     <parent link="bucket_link"/>
     <child link="bucket_end_link"/>
     <axis xyz="1 0 0"/>
-    <origin rpy="0 0 0" xyz="1.2 0 1"/>
+    <origin rpy="0 0 0" xyz="1.13012 0 0.93856"/>
     <limit effort="1" lower="-3.14" upper="3.14" velocity="0.5"/>
   </joint>
     
