@@ -34,8 +34,8 @@ public class JointStatePublisher : MonoBehaviour
     // Used to determine how much time has elapsed since the last message was published
     private float timeElapsed;
 
-    static readonly ProfilerCounterValue<double> k_RealtimeFactor = new(ProfilerCategory.Scripts, "Joint State (Arm)",
-        ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
+    // static readonly ProfilerCounterValue<double> k_RealtimeFactor = new(ProfilerCategory.Scripts, "Joint State (Arm)",
+    //     ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
 
     // Start is called before the first frame update
     void Start()

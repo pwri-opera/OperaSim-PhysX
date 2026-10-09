@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<robot name="mst110cr" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- Base Link -->
+	<link name="base_link"/>
+
+	<!-- Track {{{ -->
+	<joint name="base_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="track_link"/>
+	</joint>
+
+	<link name="track_link">
+		<visual>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-crawler.dae"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-crawler.dae"/>
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0.03"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+								iyy="1.0" iyz="0.0"
+											izz="1.0"/>
+		</inertial>
+	</link>
+	<!-- }}} Track ends here -->
+
+	<!-- Body {{{ -->
+	<joint name="swing_joint" type="continuous">
+		<origin xyz="0 0 1"/>
+		<axis xyz="0 0 1"/>
+		<parent link="track_link"/>
+		<child link="body_link"/>
+	</joint>
+
+	<link name="body_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-body.dae"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-body.dae"/>
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0.03"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+								iyy="1.0" iyz="0.0"
+											izz="1.0"/>
+		</inertial>
+	</link>
+	<!-- }}} Body ends here -->
+
+	<!-- Vessel {{{ -->
+	<joint name="vessel_pin_joint" type="revolute">
+		<origin xyz="-2.389 0 0.562"/>
+		<axis xyz="0 1 0"/>
+		<parent link="body_link"/>
+		<child link="vessel_link"/>
+		<limit lower="${radians(-60)}" upper="${radians(0)}" effort="500" velocity="6.159937255"/>
+	</joint>
+
+	<link name="vessel_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-vessel.dae"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-vessel.dae"/>
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0.03"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+								iyy="1.0" iyz="0.0"
+											izz="1.0"/>
+		</inertial>
+	</link>
+	<!-- }}} Vessel ends here -->
+	<!-- Vessel Cylinder {{{ -->
+	<joint name="vessel_cylinder_joint" type="continuous">
+		<origin xyz="-1.891 0 0.293"/>
+		<axis xyz="0 1 0"/>
+		<parent link="body_link"/>
+		<child link="vessel_cylinder_link"/>
+		<mimic joint="vessel_pin_joint" multiplier="${66/60}"/>
+	</joint>
+
+	<link name="vessel_cylinder_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-vessel_cylinder.dae"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-vessel_cylinder.dae"/>
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0.03"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+								iyy="1.0" iyz="0.0"
+											izz="1.0"/>
+		</inertial>
+	</link>
+	<!-- }}} Vessel Cylinder ends here -->
+	<!-- Vessel Rod {{{ -->
+	<joint name="vessel_rod_joint" type="prismatic">
+		<origin xyz="0 0 0"/>
+		<axis xyz="1.039 0 0.282"/>
+		<parent link="vessel_cylinder_link"/>
+		<child link="vessel_rod_link"/>
+		<limit lower="0" upper="0.6" effort="500" velocity="6.159937255"/>
+		<mimic joint="vessel_pin_joint" multiplier="${0.6/radians(-60)}"/>
+	</joint>
+
+	<link name="vessel_rod_link">
+		<visual>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-vessel_rod.dae"/>
+			</geometry>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mst110cr_description/meshes/mst110cr-vessel_rod.dae"/>
+			</geometry>
+		</collision>
+
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0.03"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+								iyy="1.0" iyz="0.0"
+											izz="1.0"/>
+		</inertial>
+	</link>
+	<!-- }}} Vessel Rod ends here -->
+
+</robot>

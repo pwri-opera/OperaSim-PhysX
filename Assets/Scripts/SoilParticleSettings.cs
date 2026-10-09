@@ -16,42 +16,54 @@ public class RockObjectDetector : MonoBehaviour
 
     [Tooltip("衝突イベントを通知する先のマネージャクラス")]
     public SoilParticleSettings manager;
-    private double timecreated = 0.0;
-    private Vector3 pos_last_collision = Vector3.zero;
+    [Tooltip("Terrainとして扱うGameObject名")]
+    public string terrainObjectName = "Terrain";
+
+    public double timecreated { get; private set; } = 0.0;
+    public Vector3 pos_last_terrain_collision { get; private set; } = Vector3.zero;  // 最後にTerrainと衝突した位置
+    public double last_terrain_collision_time { get; private set; } = double.NegativeInfinity;  // 最後にTerrainと衝突した時刻
+
 
     private void Start()
     {
         timecreated = Time.timeAsDouble;
-        pos_last_collision = transform.position;
+
+        pos_last_terrain_collision = transform.position;
+        last_terrain_collision_time = timecreated;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "Terrain")
+        if (collision.gameObject.name == terrainObjectName)
         {
-            pos_last_collision = transform.position;
+            pos_last_terrain_collision = transform.position;
+            last_terrain_collision_time = Time.timeAsDouble;
         }
     }
+
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.name == "Terrain")
+        if (collision.gameObject.name == terrainObjectName)
         {
-            pos_last_collision = transform.position;
+            pos_last_terrain_collision = transform.position;
+            last_terrain_collision_time = Time.timeAsDouble;
         }
     }
 
     private void FixedUpdate()
     {
-        if (Time.timeAsDouble - timecreated > 1.5)
+        var now = Time.timeAsDouble;
+        if (now - timecreated > 1.5)
         {
             var rigidbody = GetComponent<Rigidbody>();
+
             var velocity = rigidbody.velocity.sqrMagnitude;
-            if (velocity < 0.2 && Vector3.Distance(transform.position, pos_last_collision) < 0.1)
+            if (velocity < 0.2 && Vector3.Distance(transform.position, pos_last_terrain_collision) < 0.1)
             {
                 manager.OnRockTerrainCollision(this.gameObject);
             }
         }
-        if (this.transform.position.y - pos_last_collision.y < -1.0)
+        if (this.transform.position.y - pos_last_terrain_collision.y < -1.0)
         {
             manager.OnRockTerrainCollision(this.gameObject);
         }
@@ -65,6 +77,12 @@ public class SoilParticleSettings : MonoBehaviour
 {
     public static SoilParticleSettings instance = null;
 
+    [Tooltip("Terrainとして扱うGameObject名")]
+    public string terrainObjectName = "Terrain";
+
+    [Tooltip("バケットとして扱うGameObject名")]
+    public string bucketObjectName = "Bucket";
+
     [Tooltip("掘削時の地形変形を有効にする")]
     public bool enable = true;
 
@@ -74,8 +92,17 @@ public class SoilParticleSettings : MonoBehaviour
     [Tooltip("粒子間力を有効化する粒子間距離(m)")]
     public double partileStickDistance = 0.25;
 
+    [Tooltip("粒子反発力を有効化する粒子間距離(m)")]
+    public double partileRepulseDistance = 0.05;
+
     [Tooltip("粒子間力の強さ")]
     public float stickForce = 30.0f;
+
+    [Tooltip("粒子反発力の強さ")]
+    public float repulseForce = 0.0f;
+
+    [Tooltip("バケット内側に粒子を出現させる際の接触点からのオフセット(m)")]
+    public float bucketSpawnInset = 0.2f;
 
     [SerializeField]
     [Tooltip("地面の自然崩壊をシミュレートする際に用いる安息角の大きさ(x,y比)")]
@@ -93,6 +120,7 @@ public class SoilParticleSettings : MonoBehaviour
 
     private List<GameObject> rocks;
     private ConvexHullCalculator calc;
+    private List<GameObject> buckets;
     private float particle_volume;
     private List<Mesh> mesh_patterns;
     private double last_created_time = 0.0;
@@ -101,7 +129,8 @@ public class SoilParticleSettings : MonoBehaviour
     private JobHandle job_handle;
     private bool job_started = false;
     private NativeArray<float3> job_positions;
-    private NativeArray<float3> job_forces;
+    private NativeArray<float3> job_stickForces;
+    private NativeArray<float3> job_repulseForces;
 
     private float timeElapsed = 0.0f;
 
@@ -144,13 +173,14 @@ public class SoilParticleSettings : MonoBehaviour
         cs2 = Instantiate(Resources.Load<ComputeShader>("Dig"));
         if (cs2 == null)
         {
-            throw new MissingReferenceException("Could not find compute shader fo digging");
+            throw new MissingReferenceException("Could not find compute shader for digging");
         }
         digKernelIdx = cs2.FindKernel("Dig");
 
         // pregenerate particle meshes
         calc = new ConvexHullCalculator();
         rocks = new List<GameObject>();
+        buckets = new List<GameObject>();
         particle_volume = (float)(4.0 / 3.0 * Math.PI * Math.Pow(particleVisualRadius, 3));
         mesh_patterns = new List<Mesh>();
         for (int i = 0; i < 10; i++)
@@ -180,6 +210,16 @@ public class SoilParticleSettings : MonoBehaviour
         last_created_time = Time.timeAsDouble;
     }
 
+    public void RegisterBucket(GameObject bucket)
+    {
+        buckets.Add(bucket);
+    }
+
+    public void UnregisterBucket(GameObject bucket)
+    {
+        buckets.Remove(bucket);
+    }
+
     private void CreateRock(Vector3 point)
     {
         var rock = Instantiate(rockPrefab);
@@ -187,24 +227,60 @@ public class SoilParticleSettings : MonoBehaviour
         rock.transform.parent = null;
         rock.transform.position = point;
         rock.AddComponent<RockObjectDetector>();
-        rock.GetComponent<RockObjectDetector>().manager = this;
+        var detector = rock.GetComponent<RockObjectDetector>();
+        detector.manager = this;
+        detector.terrainObjectName = terrainObjectName;
         rock.GetComponent<MeshFilter>().sharedMesh = mesh_patterns[UnityEngine.Random.Range(0, mesh_patterns.Count)];
 
         rocks.Add(rock);
     }
 
-    public void OnBucketCollision(Collision other)
+    public void OnBucketCollision(Collision other, Vector3 bucketPosition)
     {
         if (!enable)
             return;
 
-        if (other.gameObject.name != "Terrain")
+        if (other.gameObject.name != terrainObjectName)
             return;
 
         var now = Time.timeAsDouble;
         if (now - last_created_time > 0.01)
         {
-            var point = other.GetContact(0).point;
+            if (other.contactCount == 0)
+                return;
+            var contact = other.GetContact(0);
+            var terrainPoint = contact.point;
+            var rockSpawnPoint = GetBucketInteriorSpawnPoint(terrainPoint, bucketPosition, contact.normal);
+            ModifyTerrain(terrainPoint, -particle_volume);
+            CreateRock(rockSpawnPoint);
+            last_created_time = now;
+        }
+    }
+
+    private Vector3 GetBucketInteriorSpawnPoint(Vector3 contactPoint, Vector3 bucketPosition, Vector3 contactNormal)
+    {
+        var direction = bucketPosition - contactPoint;
+        if (direction.sqrMagnitude < 1e-5f)
+        {
+            direction = -contactNormal;
+        }
+        direction.Normalize();
+        var inset = Mathf.Max(bucketSpawnInset, 0.0f);
+        return contactPoint + direction * inset;
+    }
+
+    public void OnBucketTrigger(Collider other, Vector3 bucketPosition)
+    {
+        if (!enable)
+            return;
+
+        if (other.gameObject.name != terrainObjectName)
+            return;
+
+        var now = Time.timeAsDouble;
+        if (now - last_created_time > 0.01)
+        {
+            var point = other.ClosestPointOnBounds(bucketPosition);
             ModifyTerrain(point, -particle_volume);
             CreateRock(point);
             last_created_time = now;
@@ -213,12 +289,17 @@ public class SoilParticleSettings : MonoBehaviour
 
     public void OnRockTerrainCollision(GameObject rock)
     {
-        if (Vector3.Distance(transform.position, rock.transform.position) > 2.0)
+        // bucketとの距離が2m以上離れている場合のみ地形に粒子を回収する
+        foreach(var bucket in buckets)
         {
-            ModifyTerrain(rock.transform.position, particle_volume);
-            Destroy(rock);
-            rocks.Remove(rock);
+            var dist = Vector3.Distance(bucket.transform.position, rock.transform.position);
+            if (dist < 2.0) {
+                return;
+            }
         }
+        ModifyTerrain(rock.transform.position, particle_volume);
+        Destroy(rock);
+        rocks.Remove(rock);
     }
 
     [BurstCompile]
@@ -227,24 +308,34 @@ public class SoilParticleSettings : MonoBehaviour
         [ReadOnly]
         public float particleStickDistance;
         [ReadOnly]
+        public float particleRepulseDistance;
+        [ReadOnly]
         public NativeArray<float3> positions;
         [WriteOnly]
-        public NativeArray<float3> forces;
+        public NativeArray<float3> stickForces;
+        [WriteOnly]
+        public NativeArray<float3> repulseForces;
 
         public void Execute(int index)
         {
             var rock1 = positions[index];
+            var stickvector = new float3(0, 0, 0);
             var repulvector = new float3(0, 0, 0);
             for (var j = 0; j < positions.Length; j++)
             {
                 var rock2 = positions[j];
                 float dist = math.distance(rock1, rock2);
-                if (dist < particleStickDistance)
+                if (dist < particleRepulseDistance)
                 {
                     repulvector += rock1 - rock2;
                 }
+                else if (dist < particleStickDistance)
+                {
+                    stickvector += rock1 - rock2;
+                }
             }
-            forces[index] = math.normalize(repulvector);
+            stickForces[index] = math.normalize(stickvector);
+            repulseForces[index] = math.normalize(repulvector);
         }
     }
 
@@ -254,7 +345,8 @@ public class SoilParticleSettings : MonoBehaviour
         {
             job_handle.Complete();
             job_positions.Dispose();
-            job_forces.Dispose();
+            job_stickForces.Dispose();
+            job_repulseForces.Dispose();
         }
     }
 
@@ -264,24 +356,31 @@ public class SoilParticleSettings : MonoBehaviour
         if (job_started)
         {
             job_handle.Complete();
-            if (rocks.Count == job.forces.Length)
+            if (rocks.Count == job.stickForces.Length && rocks.Count == job.repulseForces.Length)
             {
                 for (var i = 0; i < rocks.Count; i++)
                 {
                     var rock1 = rocks[i];
-                    var f = job.forces[i];
-                    if (!float.IsNaN(f.x))
+                    var stick = job.stickForces[i];
+                    var repulse = job.repulseForces[i];
+                    if (!float.IsNaN(repulse.x))
                     {
-                        rock1.GetComponent<Rigidbody>().AddForce(-f * SoilParticleSettings.instance.stickForce);
+                        rock1.GetComponent<Rigidbody>().AddForce(repulse * SoilParticleSettings.instance.repulseForce);
+                    }
+                    else if (!float.IsNaN(stick.x))
+                    {
+                        rock1.GetComponent<Rigidbody>().AddForce(-stick * SoilParticleSettings.instance.stickForce);
                     }
                 }
             }
             job_positions.Dispose();
-            job_forces.Dispose();
+            job_stickForces.Dispose();
+            job_repulseForces.Dispose();
         }
 
         job_positions = new NativeArray<float3>(rocks.Count, Allocator.Persistent);
-        job_forces = new NativeArray<float3>(rocks.Count, Allocator.Persistent);
+        job_stickForces = new NativeArray<float3>(rocks.Count, Allocator.Persistent);
+        job_repulseForces = new NativeArray<float3>(rocks.Count, Allocator.Persistent);
 
         for (var i = 0; i < rocks.Count; i++)
         {
@@ -291,10 +390,12 @@ public class SoilParticleSettings : MonoBehaviour
 
         job = new ParticleForceJob();
         job.particleStickDistance = (float)SoilParticleSettings.instance.partileStickDistance;
+        job.particleRepulseDistance = (float)SoilParticleSettings.instance.partileRepulseDistance;
         job.positions = job_positions;
-        job.forces = job_forces;
+        job.stickForces = job_stickForces;
+        job.repulseForces = job_repulseForces;
 
-        job_handle = job.Schedule(job_forces.Length, 1);
+        job_handle = job.Schedule(job_positions.Length, 1);
         job_started = true;
     }
 
@@ -358,8 +459,8 @@ public class SoilParticleSettings : MonoBehaviour
 
         var terrainData = GetComponent<Terrain>().terrainData;
         Vector3 relpos = (point - transform.position);
-        var posXInTerrain = (int)(relpos.x / terrainData.size.x * xRes);
-        var posYInTerrain = (int)(relpos.z / terrainData.size.z * yRes);
+        var posXInTerrain = Mathf.Clamp(Mathf.RoundToInt(relpos.x / terrainData.size.x * (xRes - 1)), 0, xRes - 1);
+        var posYInTerrain = Mathf.Clamp(Mathf.RoundToInt(relpos.z / terrainData.size.z * (yRes - 1)), 0, yRes - 1);
 
         cs2.SetTexture(digKernelIdx, "heightmap", heightmapRT0);
         cs2.SetFloat("diff", diff);
@@ -370,10 +471,16 @@ public class SoilParticleSettings : MonoBehaviour
         RenderTexture.active = heightmapRT0;
 
         RectInt rect = new RectInt(posXInTerrain - 10, posYInTerrain - 10, 20, 20);
+        rect = ClampRectToBounds(rect, xRes, yRes);
+        if (rect.width <= 0 || rect.height <= 0)
+        {
+            RenderTexture.active = prevRT;
+            return;
+        }
         if (!tiler) {
             terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
         } else {
-            CopyActiveRenderTextureToHeightmapTiled(rect, point, 10);
+            CopyActiveRenderTextureToHeightmapTiled(rect, point);
         }
 
         RenderTexture.active = prevRT;
@@ -394,50 +501,61 @@ public class SoilParticleSettings : MonoBehaviour
         Debug.DrawLine(pt4, pt1, color, duration, false);
     }
 
-    void CopyActiveRenderTextureToHeightmapTiled(RectInt rect, Vector3 point, int margin) {
-        var tilesize = new RectInt(0, 0, xRes / tiler.divides, yRes / tiler.divides);
+    void CopyActiveRenderTextureToHeightmapTiled(RectInt rect, Vector3 point) {
         var terrainData = gameObject.GetComponent<Terrain>().terrainData;
         foreach (var t in tiler.terrains) {
             var terrainData2 = t.GetComponent<Terrain>().terrainData;
-            Vector3 relpos2 = point - t.transform.position;
-            var posXInTerrain2 = (int)(relpos2.x / terrainData.size.x * xRes);
-            var posYInTerrain2 = (int)(relpos2.z / terrainData.size.z * yRes);
-            RectInt rect2 = new RectInt(posXInTerrain2 - margin, posYInTerrain2 - margin, margin * 2, margin * 2);
-            if (rect2.Overlaps(tilesize)) {
-                //DrawDebugRect(rect2, t.transform, terrainData.size, UnityEngine.Color.green, syncPeriod);
-                try {
-                    var rect1 = new RectInt();
-                    rect1.x = rect.x;
-                    rect1.y = rect.y;
-                    rect1.width = rect.width;
-                    rect1.height = rect.height;
-                    if (rect2.x + rect2.width > terrainData2.heightmapResolution) {
-                        rect1.width = terrainData2.heightmapResolution - rect2.x;
-                    }
-                    if (rect2.y + rect2.height > terrainData2.heightmapResolution) {
-                        rect1.height = terrainData2.heightmapResolution - rect2.y;
-                    }
-                    if (rect2.x < 0) {
-                        rect1.x -= rect2.x;
-                        rect2.x = 0;
-                    }
-                    if (rect2.y < 0) {
-                        rect1.y -= rect2.y;
-                        rect2.y = 0;
-                    }
-                    terrainData2.CopyActiveRenderTextureToHeightmap(rect1, rect2.min, TerrainHeightmapSyncControl.None);
-                    //var rect3 = new RectInt();
-                    //rect3.x = rect2.x;
-                    //rect3.y = rect2.y;
-                    //rect3.width = rect1.width;
-                    //rect3.height = rect1.height;
-                    //DrawDebugRect(rect3, t.transform, terrainData.size, UnityEngine.Color.red, syncPeriod);
-                } catch (Exception e) {
-                    //Debug.LogException(e);
-                    //Debug.Log(rect2 + " " + rect + " " + tilesize);
-                }
+            Vector3 tileRel = t.transform.position - transform.position;
+            var tileStartX = Mathf.RoundToInt(tileRel.x / terrainData.size.x * (xRes - 1));
+            var tileStartY = Mathf.RoundToInt(tileRel.z / terrainData.size.z * (yRes - 1));
+            RectInt rect2 = new RectInt(rect.x - tileStartX, rect.y - tileStartY, rect.width, rect.height);
+            //DrawDebugRect(rect2, t.transform, terrainData.size, UnityEngine.Color.green, syncPeriod);
+            try {
+                var tileBounds = new RectInt(0, 0, terrainData2.heightmapResolution, terrainData2.heightmapResolution);
+                var rect2Clamped = IntersectRect(rect2, tileBounds);
+                if (rect2Clamped.width <= 0 || rect2Clamped.height <= 0)
+                    continue;
+                int dx = rect2Clamped.x - rect2.x;
+                int dy = rect2Clamped.y - rect2.y;
+                var rect1 = new RectInt(rect.x + dx, rect.y + dy, rect2Clamped.width, rect2Clamped.height);
+                terrainData2.CopyActiveRenderTextureToHeightmap(rect1, rect2Clamped.min, TerrainHeightmapSyncControl.None);
+                //var rect3 = new RectInt();
+                //rect3.x = rect2.x;
+                //rect3.y = rect2.y;
+                //rect3.width = rect1.width;
+                //rect3.height = rect1.height;
+                //DrawDebugRect(rect3, t.transform, terrainData.size, UnityEngine.Color.red, syncPeriod);
+            } catch (Exception e) {
+                //Debug.LogException(e);
+                //Debug.Log(rect2 + " " + rect);
             }
         }
+    }
+
+    private static RectInt ClampRectToBounds(RectInt rect, int width, int height)
+    {
+        int xMin = Mathf.Max(rect.x, 0);
+        int yMin = Mathf.Max(rect.y, 0);
+        int xMax = Mathf.Min(rect.x + rect.width, width);
+        int yMax = Mathf.Min(rect.y + rect.height, height);
+        int w = xMax - xMin;
+        int h = yMax - yMin;
+        if (w <= 0 || h <= 0)
+            return new RectInt(0, 0, 0, 0);
+        return new RectInt(xMin, yMin, w, h);
+    }
+
+    private static RectInt IntersectRect(RectInt a, RectInt b)
+    {
+        int xMin = Mathf.Max(a.x, b.x);
+        int yMin = Mathf.Max(a.y, b.y);
+        int xMax = Mathf.Min(a.x + a.width, b.x + b.width);
+        int yMax = Mathf.Min(a.y + a.height, b.y + b.height);
+        int w = xMax - xMin;
+        int h = yMax - yMin;
+        if (w <= 0 || h <= 0)
+            return new RectInt(0, 0, 0, 0);
+        return new RectInt(xMin, yMin, w, h);
     }
 
     // Part of this code is from:
@@ -495,7 +613,7 @@ public class SoilParticleSettings : MonoBehaviour
                         terrainData.CopyActiveRenderTextureToHeightmap(rect, rect.min, TerrainHeightmapSyncControl.None);
                     } else {
                         // in case if the terrain is tiled
-                        CopyActiveRenderTextureToHeightmapTiled(rect, base_link.transform.position, 30);
+                        CopyActiveRenderTextureToHeightmapTiled(rect, base_link.transform.position);
                     }
                 }
             }

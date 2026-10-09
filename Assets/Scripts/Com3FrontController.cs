@@ -37,12 +37,12 @@ public class Com3FrontController : MonoBehaviour
 
     private Dictionary<string, double> joints_dt;
 
-    // Unity Profiler 用
-    static readonly ProfilerCounterValue<double> k_JointAngleBoom = new(ProfilerCategory.Scripts, "Joint Angle Arm",
-        ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
+    // // Unity Profiler 用
+    // static readonly ProfilerCounterValue<double> k_JointAngleBoom = new(ProfilerCategory.Scripts, "Joint Angle Arm",
+    //     ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
 
-    static readonly ProfilerCounterValue<double> k_JointAngleBoom_2 = new(ProfilerCategory.Scripts, "Joint Angle Arm (after dead time)",
-        ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
+    // static readonly ProfilerCounterValue<double> k_JointAngleBoom_2 = new(ProfilerCategory.Scripts, "Joint Angle Arm (after dead time)",
+    //     ProfilerMarkerDataUnit.Count, ProfilerCounterOptions.FlushOnEndOfFrame);
 
     // Start is called before the first frame update
     void Start()
@@ -106,8 +106,8 @@ public class Com3FrontController : MonoBehaviour
         currentCmd = cmd;
         double currentTime = Time.timeAsDouble * 1000.0; // sec -> msec
 
-        k_JointAngleBoom.Value = currentCmd.position[2] * Mathf.Rad2Deg;
-        Debug.Log("arm_joint Angle: " + currentCmd.position[1] * Mathf.Rad2Deg);
+        // k_JointAngleBoom.Value = currentCmd.position[2] * Mathf.Rad2Deg;
+        // Debug.Log("arm_joint Angle: " + currentCmd.position[1] * Mathf.Rad2Deg);
 
         for (int i = 0; i < currentCmd.joint_name.Length; i++)
         {
@@ -157,8 +157,8 @@ public class Com3FrontController : MonoBehaviour
     // ----- Functions for controlling with dead time ----- //
     void FixedUpdate()
     {
-        k_JointAngleBoom_2.Value = joints["arm_joint"].joint.xDrive.target;
-        Debug.Log("arm_joint Angle: " + joints["arm_joint"].joint.xDrive.target);
+        // k_JointAngleBoom_2.Value = joints["arm_joint"].joint.xDrive.target;
+        // Debug.Log("arm_joint Angle: " + joints["arm_joint"].joint.xDrive.target);
 
         double data_sample = 0.0f;
 
