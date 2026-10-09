@@ -207,6 +207,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de755eb9608519242b24f7ffc65aad35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EnableVWBehaviorMode: 1
+  VWDecelFactor: 2
+  VWRatioFactor: 0.9900000095367432
   leftWheels:
   - {fileID: 7709485648472277760}
   - {fileID: 5830050921450530812}
@@ -221,13 +224,13 @@ MonoBehaviour:
   Com3TopicName: zx200/track_cmd
   childFrameName: zx200/base_link
   treadCollectionFactor: 3
-  pGain: 1000
-  iGain: 0
-  dGain: 0
-  torqueLimit: 10000
-  brakeTorque: 100000
-  maxLinearVelocity: 3
-  maxAngularVelocity: 3
+  pGain: 600
+  iGain: 100
+  dGain: 10
+  torqueLimit: 20000
+  brakeTorque: 200000
+  maxLinearVelocity: 0.9166669845581055
+  maxAngularVelocity: 0.4000000059604645
   publishMessageInterval: 0.02
 --- !u!114 &2035868205722608467
 MonoBehaviour:
@@ -1282,8 +1285,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 2130
-  m_ParentAnchorPosition: {x: 0.040185887, y: 0.83668995, z: 0.22767143}
-  m_ParentAnchorRotation: {x: 0.30070582, y: 0, z: 0, w: 0.95371705}
+  m_ParentAnchorPosition: {x: 0.040186662, y: 0.83668995, z: 0.2276708}
+  m_ParentAnchorRotation: {x: 0.30070585, y: 0, z: 0, w: 0.95371705}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_MatchAnchors: 1
@@ -2244,7 +2247,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.001
-  m_ParentAnchorPosition: {x: -0.00000016391277, y: 1.0000018, z: 1.2000045}
+  m_ParentAnchorPosition: {x: 0.00000015646219, y: 1, z: 1.2000015}
   m_ParentAnchorRotation: {x: 0, y: 0.707107, z: 0, w: 0.707107}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
@@ -3849,8 +3852,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 660
-  m_ParentAnchorPosition: {x: 0.02354516, y: 2.1809025, z: 1.8954018}
-  m_ParentAnchorRotation: {x: -0.17364821, y: -0.0000000037252903, z: 0.000000007450581, w: 0.98480797}
+  m_ParentAnchorPosition: {x: 0.023546152, y: 2.1809018, z: 1.8954015}
+  m_ParentAnchorRotation: {x: -0.17364822, y: 0, z: 0, w: 0.98480797}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_MatchAnchors: 1
@@ -4057,10 +4060,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"left_front_wheel_trans\" type=\"SimpleTransmission\">\n 
-    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"left_front_wheel_motor\">\n   
-    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"left_front_wheel_joint\">\n   
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n 
+  PluginText: "<transmission name=\"left_front_wheel_trans\" type=\"SimpleTransmission\">\n
+    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"left_front_wheel_motor\">\n
+    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"left_front_wheel_joint\">\n
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n
     </joint>\n</transmission>"
 --- !u!114 &4421161284980503208
 MonoBehaviour:
@@ -4074,7 +4077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<gazebo reference=\"left_front_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n 
+  PluginText: "<gazebo reference=\"left_front_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n
     <mu1 value=\"2.5\" />\n  <mu2 value=\"2.5\" />\n  <kp value=\"50000\" />\n  <kd
     value=\"10\" />\n</gazebo>"
 --- !u!114 &9118866265160112249
@@ -4089,10 +4092,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"left_middle_wheel_trans\" type=\"SimpleTransmission\">\n 
-    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"left_middle_wheel_motor\">\n   
-    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"left_middle_wheel_joint\">\n   
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n 
+  PluginText: "<transmission name=\"left_middle_wheel_trans\" type=\"SimpleTransmission\">\n
+    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"left_middle_wheel_motor\">\n
+    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"left_middle_wheel_joint\">\n
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n
     </joint>\n</transmission>"
 --- !u!114 &1204514765612744252
 MonoBehaviour:
@@ -4106,7 +4109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<gazebo reference=\"left_middle_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n 
+  PluginText: "<gazebo reference=\"left_middle_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n
     <mu1 value=\"2.5\" />\n  <mu2 value=\"2.5\" />\n  <kp value=\"50000\" />\n  <kd
     value=\"10\" />\n</gazebo>"
 --- !u!114 &5137015263218538325
@@ -4121,10 +4124,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"left_rear_wheel_trans\" type=\"SimpleTransmission\">\n 
-    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"left_rear_wheel_motor\">\n   
-    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"left_rear_wheel_joint\">\n   
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n 
+  PluginText: "<transmission name=\"left_rear_wheel_trans\" type=\"SimpleTransmission\">\n
+    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"left_rear_wheel_motor\">\n
+    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"left_rear_wheel_joint\">\n
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n
     </joint>\n</transmission>"
 --- !u!114 &1427246919139550528
 MonoBehaviour:
@@ -4138,7 +4141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<gazebo reference=\"left_rear_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n 
+  PluginText: "<gazebo reference=\"left_rear_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n
     <mu1 value=\"2.5\" />\n  <mu2 value=\"2.5\" />\n  <kp value=\"50000\" />\n  <kd
     value=\"10\" />\n</gazebo>"
 --- !u!114 &7634276224246335361
@@ -4153,10 +4156,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"right_front_wheel_trans\" type=\"SimpleTransmission\">\n 
-    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"right_front_wheel_motor\">\n   
-    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"right_front_wheel_joint\">\n   
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n 
+  PluginText: "<transmission name=\"right_front_wheel_trans\" type=\"SimpleTransmission\">\n
+    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"right_front_wheel_motor\">\n
+    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"right_front_wheel_joint\">\n
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n
     </joint>\n</transmission>"
 --- !u!114 &1551289929426489115
 MonoBehaviour:
@@ -4170,7 +4173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<gazebo reference=\"right_front_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n 
+  PluginText: "<gazebo reference=\"right_front_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n
     <mu1 value=\"2.5\" />\n  <mu2 value=\"2.5\" />\n  <kp value=\"50000\" />\n  <kd
     value=\"10\" />\n</gazebo>"
 --- !u!114 &9101493511629191654
@@ -4185,10 +4188,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"right_middle_wheel_trans\" type=\"SimpleTransmission\">\n 
-    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"right_middle_wheel_motor\">\n   
-    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"right_middle_wheel_joint\">\n   
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n 
+  PluginText: "<transmission name=\"right_middle_wheel_trans\" type=\"SimpleTransmission\">\n
+    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"right_middle_wheel_motor\">\n
+    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"right_middle_wheel_joint\">\n
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n
     </joint>\n</transmission>"
 --- !u!114 &4568101024829262398
 MonoBehaviour:
@@ -4202,7 +4205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<gazebo reference=\"right_middle_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n 
+  PluginText: "<gazebo reference=\"right_middle_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n
     <mu1 value=\"2.5\" />\n  <mu2 value=\"2.5\" />\n  <kp value=\"50000\" />\n  <kd
     value=\"10\" />\n</gazebo>"
 --- !u!114 &7091770722658148624
@@ -4217,10 +4220,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"right_rear_wheel_trans\" type=\"SimpleTransmission\">\n 
-    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"right_rear_wheel_motor\">\n   
-    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"right_rear_wheel_joint\">\n   
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n 
+  PluginText: "<transmission name=\"right_rear_wheel_trans\" type=\"SimpleTransmission\">\n
+    <type>transmission_interface/SimpleTransmission</type>\n  <actuator name=\"right_rear_wheel_motor\">\n
+    <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n  <joint name=\"right_rear_wheel_joint\">\n
+    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>\n
     </joint>\n</transmission>"
 --- !u!114 &2407580452543091914
 MonoBehaviour:
@@ -4234,7 +4237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<gazebo reference=\"right_rear_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n 
+  PluginText: "<gazebo reference=\"right_rear_wheel_link\">\n  <!--material>Gazebo/Red</material-->\n
     <mu1 value=\"2.5\" />\n  <mu2 value=\"2.5\" />\n  <kp value=\"50000\" />\n  <kd
     value=\"10\" />\n</gazebo>"
 --- !u!114 &7852434971304473320
@@ -4249,9 +4252,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"tran1\">\n  <type>transmission_interface/SimpleTransmission</type>\n 
-    <joint name=\"swing_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n 
-    </joint>\n  <actuator name=\"motor1\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n   
+  PluginText: "<transmission name=\"tran1\">\n  <type>transmission_interface/SimpleTransmission</type>\n
+    <joint name=\"swing_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
+    </joint>\n  <actuator name=\"motor1\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
     <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n</transmission>"
 --- !u!114 &8384335691432703621
 MonoBehaviour:
@@ -4265,9 +4268,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"tran2\">\n  <type>transmission_interface/SimpleTransmission</type>\n 
-    <joint name=\"boom_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n 
-    </joint>\n  <actuator name=\"motor2\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n   
+  PluginText: "<transmission name=\"tran2\">\n  <type>transmission_interface/SimpleTransmission</type>\n
+    <joint name=\"boom_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
+    </joint>\n  <actuator name=\"motor2\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
     <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n</transmission>"
 --- !u!114 &138881419556882751
 MonoBehaviour:
@@ -4281,9 +4284,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"tran3\">\n  <type>transmission_interface/SimpleTransmission</type>\n 
-    <joint name=\"arm_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n 
-    </joint>\n  <actuator name=\"motor3\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n   
+  PluginText: "<transmission name=\"tran3\">\n  <type>transmission_interface/SimpleTransmission</type>\n
+    <joint name=\"arm_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
+    </joint>\n  <actuator name=\"motor3\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
     <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n</transmission>"
 --- !u!114 &8116828367982819275
 MonoBehaviour:
@@ -4297,9 +4300,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"tran4\">\n  <type>transmission_interface/SimpleTransmission</type>\n 
-    <joint name=\"bucket_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n 
-    </joint>\n  <actuator name=\"motor4\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n   
+  PluginText: "<transmission name=\"tran4\">\n  <type>transmission_interface/SimpleTransmission</type>\n
+    <joint name=\"bucket_joint\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
+    </joint>\n  <actuator name=\"motor4\">\n    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>\n
     <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n</transmission>"
 --- !u!114 &4065829092726629037
 MonoBehaviour:
@@ -4313,9 +4316,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PluginText: "<transmission name=\"dummy_trans1\">\n  <type>transmission_interface/SimpleTransmission</type>\n 
-    <joint name=\"bucket_end_joint\">\n    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>\n 
-    </joint>\n  <actuator name=\"dummy_motor1\">\n    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>\n   
+  PluginText: "<transmission name=\"dummy_trans1\">\n  <type>transmission_interface/SimpleTransmission</type>\n
+    <joint name=\"bucket_end_joint\">\n    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>\n
+    </joint>\n  <actuator name=\"dummy_motor1\">\n    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>\n
     <mechanicalReduction>1</mechanicalReduction>\n  </actuator>\n</transmission>"
 --- !u!114 &6095149686224507669
 MonoBehaviour:
@@ -9018,6 +9021,7 @@ GameObject:
   - component: {fileID: 7563931150112938569}
   - component: {fileID: 8245553631276763850}
   - component: {fileID: 5539964170239229452}
+  - component: {fileID: 8359664668133249983}
   m_Layer: 0
   m_Name: body_link
   m_TagString: Untagged
@@ -9066,7 +9070,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 9086
-  m_ParentAnchorPosition: {x: 0.034300357, y: 1.1206, z: 0.10786878}
+  m_ParentAnchorPosition: {x: 0.034300793, y: 1.1206, z: 0.10786821}
   m_ParentAnchorRotation: {x: 0, y: 0, z: -0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
@@ -9196,6 +9200,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deadtime: 932
+--- !u!114 &8359664668133249983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5864811885909104740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fde203493ea8e9d4d9fbbab9ee3cc927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topicName: zx200/global_pose
+  publishMessageInterval: 0.1
 --- !u!1 &5914060223042467245
 GameObject:
   m_ObjectHideFlags: 0
@@ -9942,7 +9960,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.000000834465, y: 0.0000011399696, z: 0.0000024446733}
+  m_ParentAnchorPosition: {x: 0.00000015646219, y: 0.0000005901651, z: 0.0000018639812}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.707107, w: 0.707107}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -10723,8 +10741,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1010
-  m_ParentAnchorPosition: {x: -0.010955974, y: 2.9959009, z: 4.7878013}
-  m_ParentAnchorRotation: {x: 0.1305262, y: -0.000000029802322, z: 0, w: 0.99144495}
+  m_ParentAnchorPosition: {x: -0.010956593, y: 2.9958997, z: 4.7877994}
+  m_ParentAnchorRotation: {x: 0.13052621, y: 0, z: 0, w: 0.991445}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_MatchAnchors: 1

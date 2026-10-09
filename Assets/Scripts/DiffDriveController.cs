@@ -356,6 +356,7 @@ public class DiffDriveController : MonoBehaviour
         leftVelCmd = v_out - tread_half * w_out;   // [m/s]
         rightVelCmd = v_out + tread_half * w_out;   // [m/s]
 
+
         // --- デバッグ出力（任意） -------------------------------
         // Debug.Log($"projMode={projMode}  v_in={cmdLinearVel:F2} ω_in={cmdAngularVel:F2} "
         //         +$"-> v_out={v_out:F2} ω_out={w_out:F2}");
