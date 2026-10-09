@@ -17,11 +17,22 @@ public class JointPosController : MonoBehaviour
     [Tooltip("初期の目標角度(degree)")]
     public double initTargetPos;
 
+    [Tooltip("関節目標角速度の上限 (deg/s)。0 = 無制限（従来動作）")]
+    [Min(0)] public float maxAngularSpeed = 0f;
+
+    [Tooltip("ランプ目標の微分を drive.targetVelocity に供給する（速度フィードフォワード）")]
+    public bool enableVelocityFeedforward = true;
+
     private ArticulationBody joint;
     private Float64Msg targetPos;
     private EmergencyStop emergencyStop;
     private bool currentEmergencyStop = false;
     private float emergencyStopPosition = 0.0f;
+
+    // 最新の指令角 (deg) と、速度制限で整形された現在目標角 (deg)
+    private float commandedTargetDeg;
+    private float currentTargetDeg;
+    private bool hasCommand = false;
 
     // Start is called before the first frame update
     IEnumerator Start()
@@ -45,7 +56,10 @@ public class JointPosController : MonoBehaviour
                     drive.forceLimit = 100000;
 
                 drive.target = (float)initTargetPos;
+                drive.targetVelocity = 0f;
                 joint.xDrive = drive;
+                currentTargetDeg = commandedTargetDeg = (float)initTargetPos;
+                hasCommand = true;
             }
         }
         else
@@ -58,6 +72,12 @@ public class JointPosController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (joint == null)
+            return;
+
+        var drive = joint.xDrive;
+        float dt = Time.fixedDeltaTime;
+
         if (emergencyStop && emergencyStop.isEmergencyStop)
         {
             if (currentEmergencyStop == false)
@@ -65,14 +85,29 @@ public class JointPosController : MonoBehaviour
                 emergencyStopPosition = joint.jointPosition[0] * Mathf.Rad2Deg;
                 currentEmergencyStop = true;
             }
-            var drive = joint.xDrive;
             drive.target = emergencyStopPosition;
+            drive.targetVelocity = 0f;
             joint.xDrive = drive;
+            // e-stop解除時にランプが指令値へ跳ばないよう、保持角から再開する
+            currentTargetDeg = emergencyStopPosition;
+            commandedTargetDeg = emergencyStopPosition;
+            return;
         }
-        else
-        {
-            currentEmergencyStop = false;
-        }
+        currentEmergencyStop = false;
+
+        if (!hasCommand)
+            return;
+
+        float prevTargetDeg = currentTargetDeg;
+        float nextTargetDeg = (maxAngularSpeed > 0f && dt > 0f)
+            ? Mathf.MoveTowards(prevTargetDeg, commandedTargetDeg, maxAngularSpeed * dt)
+            : commandedTargetDeg;
+
+        drive.target = nextTargetDeg;
+        if (enableVelocityFeedforward)
+            drive.targetVelocity = (dt > 0f) ? (nextTargetDeg - prevTargetDeg) / dt : 0f;
+        joint.xDrive = drive;
+        currentTargetDeg = nextTargetDeg;
     }
 
     void ExecuteJointPosControl(Float64Msg msg)
@@ -80,9 +115,13 @@ public class JointPosController : MonoBehaviour
         if (emergencyStop && emergencyStop.isEmergencyStop)
             return;
         targetPos = msg;
-        var drive = joint.xDrive;
-        drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
-        joint.xDrive = drive;
+        // 指令角を保持するのみ。drive.target への反映は FixedUpdate で
+        // 速度制限とフィードフォワードと共に行う。
+        commandedTargetDeg = (float)(targetPos.data * Mathf.Rad2Deg);
+        // 初回指令時は実際の関節角からランプを開始する（0基点の誤移動を防ぐ）
+        if (!hasCommand && joint != null)
+            currentTargetDeg = joint.jointPosition[0] * Mathf.Rad2Deg;
+        hasCommand = true;
         //Debug.Log("Joint Target Position:" + targetPos.data);
     }
 }
