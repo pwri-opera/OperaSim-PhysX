@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -11,17 +12,28 @@ public class JointPosController : MonoBehaviour
 {
     private ROSConnection ros;
 
+    [Tooltip("むだ時間機能の 有効/無効 切替え")]
+    public bool enableDeadTime;
+
     [Tooltip("角度設定コマンドのROSトピック名")]
     public string setpointTopicName = "joint_name/setpoint";
 
     [Tooltip("初期の目標角度(degree)")]
     public double initTargetPos;
 
+    [Tooltip("入力に対するむだ時間 (msec) \n40 msec 以上に設定") ]
+    [Min(40)] public double deadTime;
+
     private ArticulationBody joint;
     private Float64Msg targetPos;
     private EmergencyStop emergencyStop;
     private bool currentEmergencyStop = false;
     private float emergencyStopPosition = 0.0f;
+
+    private Queue<(double timestamp, Float64Msg data)> InputQueue = new Queue<(double, Float64Msg)>();
+
+    private double unityDeadTime = 40.0f; // msec
+    private double internalDeadTime; // msec
 
     // Start is called before the first frame update
     IEnumerator Start()
@@ -53,11 +65,35 @@ public class JointPosController : MonoBehaviour
             Debug.Log("No ArticulationBody are found");
         }
 
-        ros.Subscribe<Float64Msg>(Utils.PreprocessNamespace(this.gameObject, setpointTopicName), ExecuteJointPosControl);
+        internalDeadTime = deadTime - unityDeadTime;
+
+        if (enableDeadTime == false)
+        {
+            // Debug.Log("Normal Mode");
+            // ros.Subscribe<Float64Msg>(setpointTopicName, ExecuteJointPosControl);
+            ros.Subscribe<Float64Msg>(Utils.PreprocessNamespace(this.gameObject, setpointTopicName), AddInputData);
+        }
+        else
+        {
+            // Debug.Log("Dead Time Mode");
+            // Debug.Log("deadTime" + deadTime);
+            ros.Subscribe<Float64Msg>(Utils.PreprocessNamespace(this.gameObject, setpointTopicName), AddInputData);
+            // ros.Subscribe<Float64Msg>(setpointTopicName, AddInputData);
+        }        
     }
 
+
+    /// <summary>
+    /// 入力値を関節に与える（むだ時間込み）
+    /// </summary>
     void FixedUpdate()
     {
+        // Dead Time 
+        if (internalDeadTime != 0.0)
+        {
+            GetDelayedData();
+        }
+        
         if (emergencyStop && emergencyStop.isEmergencyStop)
         {
             if (currentEmergencyStop == false)
@@ -75,6 +111,9 @@ public class JointPosController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 入力値を関節に与える（むだ時間無し）
+    /// </summary>
     void ExecuteJointPosControl(Float64Msg msg)
     {
         if (emergencyStop && emergencyStop.isEmergencyStop)
@@ -84,5 +123,39 @@ public class JointPosController : MonoBehaviour
         drive.target = (float)(targetPos.data * Mathf.Rad2Deg);
         joint.xDrive = drive;
         //Debug.Log("Joint Target Position:" + targetPos.data);
+    }
+
+    /// <summary>
+    /// 入力値をむだ時間実装用のキューに保存
+    /// </summary>
+    void AddInputData(Float64Msg msg)
+    { 
+        double currentTime = Time.timeAsDouble * 1000.0; // sec -> msec
+        InputQueue.Enqueue((currentTime, msg));
+    }
+
+    /// <summary>
+    /// むだ時間経過後の入力値をキューから取り出す
+    /// </summary>
+    void GetDelayedData()
+    {
+        // 疑似的なスレッドを使えると while を入れずに済む（要検討）
+        while (InputQueue.Count > 0)
+        { 
+            var (timestamp, data) = InputQueue.Peek();
+            if ((Time.timeAsDouble*1000 - timestamp) >= internalDeadTime)
+            {
+                ExecuteJointPosControl(data);
+                InputQueue.Dequeue();
+            }
+            else if (InputQueue.Count <= 0 || (Time.timeAsDouble - timestamp) < internalDeadTime)
+            {
+                break;
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 }
