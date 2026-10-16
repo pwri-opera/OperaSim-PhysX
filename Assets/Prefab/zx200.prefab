@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00f7ba05af3df4dff8b17f595405ef28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: zx200/joint_state
+  topicName: zx200/joint_states
   enableJointEffortSensor: 0
   publishMessageInterval: 0.04
 --- !u!114 &3686397559774379334
